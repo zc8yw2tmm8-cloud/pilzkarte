@@ -1,0 +1,863 @@
+==============================================================
+KALIBRIERUNG
+==============================================================
+Hintergrund: 23380 Punkt-Tage, Monate (6, 7, 8, 9, 10, 11)
+Funde: 2683 in 7 Arten
+
+Verhaeltnis 1.00 = Bedingung ist bei Funden genauso haeufig
+wie an normalen Tagen, also kein Signal.
+<<< starkes Signal   < schwaches Signal   -- gemieden
+
+==============================================================
+BIRKENPILZ  (150 Funde)
+==============================================================
+
+  Saisonfaktor birkenpilz (1.0 = beste Zeit)
+  Monat     Funde  alle Pilze      Rate   Faktor
+  1             0        2576      0.00     0.00
+  2             0        2562      0.00     0.00
+  3             0        2357      0.00     0.00
+  4             0        1774      0.00     0.00
+  5             0        1701      0.00     0.00
+  6             0        1884      0.00     0.00
+  7             3        2446      1.23     0.22
+  8            10        6431      1.55     0.28
+  9            40        7109      5.63     1.00
+  10           86       16803      5.12     0.91
+  11           11        6765      1.63     0.29
+  12            0        2846      0.00     0.00
+
+  Zum Einsetzen in arten.py:
+  "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, 7: 0.22, 8: 0.28, 9: 1.0, 10: 0.91, 11: 0.29, 12: 0.0},
+
+  Kernmonate: (9, 10)
+  (Vergleich nur innerhalb dieser Monate - das trennt
+   Pilzsignal von Jahreszeit)
+
+  Bodenfeuchte 0-7cm  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 21.3 %               14.3%    20.3%        0.70
+  21.3 - 25.6 %            14.3%    20.2%        0.71
+  25.6 - 30.8 %            28.6%    19.9%        1.43  <
+  30.8 - 35.0 %            13.5%    19.7%        0.69
+  ab 35.0 %                29.4%    19.8%        1.48  <
+
+  Bodenfeuchte 7-28cm  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 19.5 %               14.3%    20.1%        0.71
+  19.5 - 23.7 %            11.9%    20.2%        0.59
+  23.7 - 28.7 %            26.2%    20.0%        1.31  <
+  28.7 - 33.5 %            18.3%    19.8%        0.92
+  ab 33.5 %                29.4%    19.9%        1.48  <
+
+  Bodentemp 0-7cm  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 11.0 C               27.0%    21.2%        1.27  <
+  11.0 - 12.8 C            25.4%    19.6%        1.29  <
+  12.8 - 15.0 C            24.6%    20.1%        1.22  <
+  15.0 - 16.6 C            17.5%    19.9%        0.88
+  ab 16.6 C                 5.6%    19.2%        0.29  --
+
+  Bodentemp 7-28cm  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 11.5 C               26.2%    20.8%        1.26  <
+  11.5 - 13.2 C            26.2%    20.5%        1.28  <
+  13.2 - 15.3 C            27.0%    19.5%        1.38  <
+  15.3 - 16.8 C            16.7%    19.7%        0.84
+  ab 16.8 C                 4.0%    19.5%        0.20  --
+
+  Lufttemperatur  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 11.4 C               27.8%    20.5%        1.35  <
+  11.4 - 13.4 C            26.2%    19.9%        1.31  <
+  13.4 - 15.4 C            24.6%    19.7%        1.25  <
+  15.4 - 17.1 C            17.5%    20.0%        0.87
+  ab 17.1 C                 4.0%    19.9%        0.20  --
+
+  Regen Tag 4-14  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 8.9 mm               15.1%    20.2%        0.75
+  8.9 - 15.9 mm            22.2%    19.9%        1.11
+  15.9 - 24.8 mm           15.1%    20.2%        0.75
+  24.8 - 34.3 mm           20.6%    19.7%        1.05
+  ab 34.3 mm               27.0%    20.0%        1.35  <
+
+  Regen Tag 0-3  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 0.8 mm               16.7%    20.6%        0.81
+  0.8 - 3.0 mm             17.5%    19.5%        0.90
+  3.0 - 7.6 mm             21.4%    20.1%        1.06
+  7.6 - 15.0 mm            21.4%    19.9%        1.08
+  ab 15.0 mm               23.0%    19.9%        1.16  <
+
+  Regentage von 14  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 3                    13.5%    25.0%        0.54
+  3 - 4                    11.1%    16.1%        0.69
+  4 - 6                    31.0%    27.1%        1.14
+  6 - 8                    27.0%    17.5%        1.54  <<<
+  ab 8                     17.5%    14.4%        1.21  <
+
+  Tage seit Regen  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 0 d                  11.9%    21.5%        0.55
+  0 - 2 d                  39.7%    23.0%        1.73  <<<
+  2 - 4 d                  12.7%    15.6%        0.81
+  4 - 8 d                  15.1%    20.5%        0.74
+  ab 8 d                   20.6%    19.4%        1.06
+
+  Regen 60 Tage  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 86.6 mm              19.0%    20.0%        0.95
+  86.6 - 110.7 mm          19.0%    20.1%        0.95
+  110.7 - 128.0 mm         18.3%    20.0%        0.91
+  128.0 - 149.0 mm         11.1%    19.9%        0.56
+  ab 149.0 mm              32.5%    20.0%        1.63  <<<
+
+  Wasserbilanz 14 Tage  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -20.5 mm              6.3%    20.1%        0.32  --
+  -20.5 - -7.5 mm          19.0%    20.0%        0.95
+  -7.5 - 3.9 mm            23.8%    20.0%        1.19  <
+  3.9 - 20.0 mm            19.0%    20.0%        0.95
+  ab 20.0 mm               31.7%    20.0%        1.59  <<<
+
+  Wasserbilanz 60 Tage  (126 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -109.4 mm            11.1%    20.0%        0.56
+  -109.4 - -69.0 mm        19.8%    20.0%        0.99
+  -69.0 - -33.1 mm         15.9%    20.0%        0.79
+  -33.1 - -1.7 mm          19.8%    20.0%        0.99
+  ab -1.7 mm               33.3%    20.0%        1.67  <<<
+
+==============================================================
+MARONE  (394 Funde)
+==============================================================
+
+  Saisonfaktor marone (1.0 = beste Zeit)
+  Monat     Funde  alle Pilze      Rate   Faktor
+  1             1        2576      0.39     0.03
+  2             0        2562      0.00     0.00
+  3             0        2357      0.00     0.00
+  4             0        1774      0.00     0.00
+  5             0        1701      0.00     0.00
+  6             2        1884      1.06     0.09
+  7             5        2446      2.04     0.17
+  8            28        6431      4.35     0.37
+  9            83        7109     11.68     0.99
+  10          199       16803     11.84     1.00
+  11           71        6765     10.50     0.89
+  12            5        2846      1.76     0.15
+
+  Zum Einsetzen in arten.py:
+  "saison": {1: 0.03, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.09, 7: 0.17, 8: 0.37, 9: 0.99, 10: 1.0, 11: 0.89, 12: 0.15},
+
+  Kernmonate: (9, 10, 11)
+  (Vergleich nur innerhalb dieser Monate - das trennt
+   Pilzsignal von Jahreszeit)
+
+  Bodenfeuchte 0-7cm  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 22.7 %               13.6%    20.1%        0.68
+  22.7 - 26.9 %            28.0%    20.2%        1.39  <
+  26.9 - 32.6 %            21.8%    19.8%        1.10
+  32.6 - 36.0 %             9.1%    20.3%        0.45  --
+  ab 36.0 %                27.5%    19.5%        1.41  <
+
+  Bodenfeuchte 7-28cm  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 21.2 %               11.9%    20.3%        0.59
+  21.2 - 25.2 %            24.9%    19.9%        1.25  <
+  25.2 - 30.9 %            27.5%    20.0%        1.38  <
+  30.9 - 34.9 %             8.8%    20.0%        0.44  --
+  ab 34.9 %                26.9%    19.8%        1.36  <
+
+  Bodentemp 0-7cm  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 7.5 C                 6.5%    20.2%        0.32  --
+  7.5 - 10.5 C             32.0%    20.0%        1.60  <<<
+  10.5 - 12.9 C            30.3%    20.2%        1.50  <<<
+  12.9 - 15.8 C            22.7%    20.1%        1.13
+  ab 15.8 C                 8.5%    19.5%        0.44  --
+
+  Bodentemp 7-28cm  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 8.3 C                 6.5%    20.2%        0.32  --
+  8.3 - 11.1 C             33.1%    20.3%        1.63  <<<
+  11.1 - 13.2 C            29.2%    19.6%        1.49  <
+  13.2 - 16.0 C            22.9%    20.4%        1.12
+  ab 16.0 C                 8.2%    19.6%        0.42  --
+
+  Lufttemperatur  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 8.7 C                 9.1%    20.0%        0.45  --
+  8.7 - 11.1 C             32.6%    20.2%        1.61  <<<
+  11.1 - 13.6 C            28.9%    20.2%        1.43  <
+  13.6 - 16.3 C            23.2%    19.9%        1.17  <
+  ab 16.3 C                 6.2%    19.6%        0.32  --
+
+  Regen Tag 4-14  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 7.6 mm               12.7%    20.1%        0.64
+  7.6 - 15.6 mm            19.3%    20.1%        0.96
+  15.6 - 24.6 mm           17.3%    20.1%        0.86
+  24.6 - 33.9 mm           16.4%    19.8%        0.83
+  ab 33.9 mm               34.3%    20.0%        1.72  <<<
+
+  Regen Tag 0-3  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 0.8 mm               16.7%    20.5%        0.81
+  0.8 - 2.8 mm             15.0%    19.8%        0.76
+  2.8 - 7.3 mm             20.1%    19.9%        1.01
+  7.3 - 14.5 mm            21.5%    19.8%        1.09
+  ab 14.5 mm               26.6%    19.9%        1.34  <
+
+  Regentage von 14  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 3                    13.6%    25.4%        0.54
+  3 - 4                    15.3%    15.0%        1.02
+  4 - 6                    24.1%    25.6%        0.94
+  6 - 8                    25.5%    17.3%        1.47  <
+  ab 8                     21.5%    16.8%        1.28  <
+
+  Tage seit Regen  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 1 d                  37.7%    32.7%        1.15  <
+  1 - 2 d                  12.2%    10.2%        1.20  <
+  2 - 5 d                  21.2%    20.6%        1.03
+  5 - 9 d                  12.5%    16.6%        0.75
+  ab 9 d                   16.4%    19.8%        0.83
+
+  Regen 60 Tage  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 89.5 mm               9.6%    20.0%        0.48  --
+  89.5 - 110.8 mm          19.3%    20.1%        0.96
+  110.8 - 128.6 mm         21.2%    19.8%        1.07
+  128.6 - 153.7 mm         22.7%    20.0%        1.13
+  ab 153.7 mm              27.2%    20.0%        1.36  <
+
+  Wasserbilanz 14 Tage  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -14.2 mm              9.9%    20.2%        0.49  --
+  -14.2 - -1.3 mm          14.7%    19.9%        0.74
+  -1.3 - 11.4 mm           25.2%    20.1%        1.25  <
+  11.4 - 24.6 mm           17.6%    20.0%        0.88
+  ab 24.6 mm               32.6%    19.8%        1.64  <<<
+
+  Wasserbilanz 60 Tage  (353 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -88.3 mm              7.6%    20.0%        0.38  --
+  -88.3 - -34.0 mm         25.8%    20.0%        1.29  <
+  -34.0 - 1.9 mm           21.0%    20.0%        1.05
+  1.9 - 36.3 mm            23.2%    20.0%        1.16  <
+  ab 36.3 mm               22.4%    20.0%        1.12
+
+==============================================================
+PARASOL  (530 Funde)
+==============================================================
+
+  Saisonfaktor parasol (1.0 = beste Zeit)
+  Monat     Funde  alle Pilze      Rate   Faktor
+  1             0        2576      0.00     0.00
+  2             1        2562      0.39     0.02
+  3             0        2357      0.00     0.00
+  4             0        1774      0.00     0.00
+  5             4        1701      2.35     0.12
+  6            18        1884      9.55     0.51
+  7            24        2446      9.81     0.52
+  8            73        6431     11.35     0.60
+  9           134        7109     18.85     1.00
+  10          217       16803     12.91     0.69
+  11           59        6765      8.72     0.46
+  12            0        2846      0.00     0.00
+
+  Zum Einsetzen in arten.py:
+  "saison": {1: 0.0, 2: 0.02, 3: 0.0, 4: 0.0, 5: 0.12, 6: 0.51, 7: 0.52, 8: 0.6, 9: 1.0, 10: 0.69, 11: 0.46, 12: 0.0},
+
+  Kernmonate: (8, 9, 10, 11)
+  (Vergleich nur innerhalb dieser Monate - das trennt
+   Pilzsignal von Jahreszeit)
+
+  Bodenfeuchte 0-7cm  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 20.6 %                8.9%    20.2%        0.44  --
+  20.6 - 25.1 %            20.7%    19.9%        1.04
+  25.1 - 30.5 %            24.8%    20.0%        1.24  <
+  30.5 - 35.2 %            13.7%    20.0%        0.68
+  ab 35.2 %                31.9%    19.9%        1.60  <<<
+
+  Bodenfeuchte 7-28cm  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 18.8 %                7.7%    20.1%        0.38  --
+  18.8 - 23.4 %            19.0%    20.3%        0.94
+  23.4 - 28.7 %            27.5%    19.8%        1.39  <
+  28.7 - 34.1 %            14.1%    20.2%        0.70
+  ab 34.1 %                31.7%    19.6%        1.62  <<<
+
+  Bodentemp 0-7cm  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 8.9 C                11.6%    20.1%        0.58
+  8.9 - 12.2 C             39.5%    20.5%        1.93  <<<
+  12.2 - 15.8 C            24.6%    19.8%        1.25  <
+  15.8 - 19.0 C            19.0%    19.9%        0.96
+  ab 19.0 C                 5.2%    19.7%        0.26  --
+
+  Bodentemp 7-28cm  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 9.6 C                11.8%    20.3%        0.58
+  9.6 - 12.6 C             38.7%    20.1%        1.93  <<<
+  12.6 - 16.0 C            27.1%    19.8%        1.37  <
+  16.0 - 18.9 C            17.6%    20.2%        0.87
+  ab 18.9 C                 4.8%    19.6%        0.24  --
+
+  Lufttemperatur  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 9.8 C                15.7%    20.8%        0.76
+  9.8 - 12.5 C             32.9%    19.7%        1.67  <<<
+  12.5 - 16.3 C            30.4%    19.7%        1.55  <<<
+  16.3 - 19.0 C            18.2%    20.4%        0.89
+  ab 19.0 C                 2.7%    19.4%        0.14  --
+
+  Regen Tag 4-14  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 7.4 mm                9.3%    20.1%        0.46  --
+  7.4 - 15.3 mm            13.5%    20.0%        0.67
+  15.3 - 23.9 mm           11.8%    20.1%        0.59
+  23.9 - 34.0 mm           22.8%    20.0%        1.14
+  ab 34.0 mm               42.7%    19.8%        2.15  <<<
+
+  Regen Tag 0-3  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 0.8 mm               17.2%    20.3%        0.84
+  0.8 - 2.9 mm             12.6%    19.8%        0.64
+  2.9 - 7.1 mm             16.1%    20.1%        0.80
+  7.1 - 13.8 mm            22.6%    19.9%        1.14
+  ab 13.8 mm               31.5%    19.8%        1.59  <<<
+
+  Regentage von 14  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 3                    10.6%    25.5%        0.41  --
+  3 - 5                    19.0%    28.9%        0.66
+  5 - 6                     9.9%    11.7%        0.85
+  6 - 8                    24.8%    17.7%        1.40  <
+  ab 8                     35.6%    16.1%        2.21  <<<
+
+  Tage seit Regen  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 1 d                  41.0%    33.3%        1.23  <
+  1 - 2 d                  14.1%    10.1%        1.40  <
+  2 - 5 d                  19.3%    21.1%        0.91
+  5 - 9 d                  11.2%    16.2%        0.69
+  ab 9 d                   14.5%    19.4%        0.75
+
+  Regen 60 Tage  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 88.6 mm              10.6%    20.1%        0.52
+  88.6 - 111.8 mm          12.8%    20.0%        0.64
+  111.8 - 132.9 mm         15.7%    20.0%        0.79
+  132.9 - 160.4 mm         24.8%    20.0%        1.24  <
+  ab 160.4 mm              36.0%    19.9%        1.81  <<<
+
+  Wasserbilanz 14 Tage  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -28.4 mm              3.3%    20.1%        0.16  --
+  -28.4 - -8.9 mm          11.8%    20.0%        0.59
+  -8.9 - 5.2 mm            20.5%    20.0%        1.02
+  5.2 - 21.8 mm            25.7%    19.9%        1.29  <
+  ab 21.8 mm               38.7%    19.9%        1.94  <<<
+
+  Wasserbilanz 60 Tage  (483 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -111.7 mm             6.8%    20.0%        0.34  --
+  -111.7 - -63.8 mm        15.9%    20.0%        0.80
+  -63.8 - -16.4 mm         23.6%    20.0%        1.18  <
+  -16.4 - 25.0 mm          29.4%    20.0%        1.47  <
+  ab 25.0 mm               24.2%    20.0%        1.21  <
+
+==============================================================
+PFIFFERLING  (113 Funde)
+==============================================================
+
+  Saisonfaktor pfifferling (1.0 = beste Zeit)
+  Monat     Funde  alle Pilze      Rate   Faktor
+  1             1        2576      0.39     0.05
+  2             0        2562      0.00     0.00
+  3             0        2357      0.00     0.00
+  4             0        1774      0.00     0.00
+  5             0        1701      0.00     0.00
+  6             8        1884      4.25     0.49
+  7            21        2446      8.59     1.00
+  8            27        6431      4.20     0.49
+  9            28        7109      3.94     0.46
+  10           22       16803      1.31     0.15
+  11            2        6765      0.30     0.03
+  12            4        2846      1.41     0.16
+
+  Zum Einsetzen in arten.py:
+  "saison": {1: 0.05, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.49, 7: 1.0, 8: 0.49, 9: 0.46, 10: 0.15, 11: 0.03, 12: 0.16},
+
+  Kernmonate: (7, 8, 9, 10)
+  (Vergleich nur innerhalb dieser Monate - das trennt
+   Pilzsignal von Jahreszeit)
+
+  Bodenfeuchte 0-7cm  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 18.0 %                6.1%    20.3%        0.30  --
+  18.0 - 22.8 %            12.2%    19.8%        0.62
+  22.8 - 27.4 %            25.5%    20.1%        1.27  <
+  27.4 - 32.8 %            20.4%    19.9%        1.03
+  ab 32.8 %                35.7%    20.0%        1.79  <<<
+
+  Bodenfeuchte 7-28cm  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 16.3 %                4.1%    20.0%        0.20  --
+  16.3 - 20.6 %            12.2%    20.1%        0.61
+  20.6 - 24.8 %            22.4%    20.0%        1.12
+  24.8 - 31.1 %            25.5%    20.1%        1.27  <
+  ab 31.1 %                35.7%    19.8%        1.80  <<<
+
+  Bodentemp 0-7cm  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 12.9 C               18.4%    20.1%        0.91
+  12.9 - 16.5 C            27.6%    20.4%        1.35  <
+  16.5 - 18.5 C            34.7%    20.1%        1.73  <<<
+  18.5 - 20.4 C            16.3%    19.9%        0.82
+  ab 20.4 C                 3.1%    19.5%        0.16  --
+
+  Bodentemp 7-28cm  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 13.3 C               18.4%    20.4%        0.90
+  13.3 - 16.6 C            27.6%    19.7%        1.40  <
+  16.6 - 18.3 C            33.7%    20.6%        1.64  <<<
+  18.3 - 19.9 C            16.3%    19.4%        0.84
+  ab 19.9 C                 4.1%    19.9%        0.21  --
+
+  Lufttemperatur  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 13.6 C               19.4%    20.1%        0.96
+  13.6 - 16.9 C            28.6%    20.2%        1.41  <
+  16.9 - 18.6 C            37.8%    20.4%        1.85  <<<
+  18.6 - 19.9 C             8.2%    19.5%        0.42  --
+  ab 19.9 C                 6.1%    19.7%        0.31  --
+
+  Regen Tag 4-14  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 8.8 mm                5.1%    20.2%        0.25  --
+  8.8 - 16.3 mm            17.3%    20.0%        0.87
+  16.3 - 24.2 mm           11.2%    20.1%        0.56
+  24.2 - 35.2 mm           15.3%    19.8%        0.77
+  ab 35.2 mm               51.0%    20.0%        2.55  <<<
+
+  Regen Tag 0-3  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 1.0 mm               10.2%    20.8%        0.49  --
+  1.0 - 3.6 mm              4.1%    19.8%        0.21  --
+  3.6 - 7.7 mm             13.3%    19.6%        0.68
+  7.7 - 14.6 mm            22.4%    19.9%        1.13
+  ab 14.6 mm               50.0%    19.8%        2.52  <<<
+
+  Regentage von 14  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 3                     6.1%    24.0%        0.26  --
+  3 - 5                    15.3%    30.2%        0.51
+  5 - 6                    12.2%    13.1%        0.93
+  6 - 8                    24.5%    18.3%        1.34  <
+  ab 8                     41.8%    14.3%        2.93  <<<
+
+  Tage seit Regen  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 0 d                  35.7%    20.4%        1.75  <<<
+  0 - 2 d                  43.9%    25.2%        1.74  <<<
+  2 - 4 d                  11.2%    16.6%        0.68
+  4 - 8 d                   6.1%    19.1%        0.32  --
+  ab 8 d                    3.1%    18.7%        0.16  --
+
+  Regen 60 Tage  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 91.4 mm               2.0%    20.1%        0.10  --
+  91.4 - 115.3 mm           3.1%    20.0%        0.15  --
+  115.3 - 137.2 mm          9.2%    20.0%        0.46  --
+  137.2 - 164.6 mm         17.3%    20.0%        0.87
+  ab 164.6 mm              68.4%    19.9%        3.43  <<<
+
+  Wasserbilanz 14 Tage  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -40.5 mm              0.0%    20.0%        0.00  --
+  -40.5 - -23.3 mm         12.2%    20.0%        0.61
+  -23.3 - -7.3 mm          10.2%    20.0%        0.51
+  -7.3 - 11.4 mm           28.6%    20.1%        1.42  <
+  ab 11.4 mm               49.0%    19.9%        2.46  <<<
+
+  Wasserbilanz 60 Tage  (98 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -143.0 mm             0.0%    20.0%        0.00  --
+  -143.0 - -95.4 mm         7.1%    20.0%        0.36  --
+  -95.4 - -62.9 mm          8.2%    20.0%        0.41  --
+  -62.9 - -24.1 mm         22.4%    20.0%        1.12
+  ab -24.1 mm              62.2%    19.9%        3.12  <<<
+
+==============================================================
+SCHWEFELPORLING  (1054 Funde)
+==============================================================
+
+  Saisonfaktor schwefelporling (1.0 = beste Zeit)
+  Monat     Funde  alle Pilze      Rate   Faktor
+  1            18        2576      6.99     0.03
+  2             6        2562      2.34     0.01
+  3            14        2357      5.94     0.03
+  4            50        1774     28.18     0.14
+  5           347        1701    204.00     1.00
+  6           144        1884     76.43     0.37
+  7            42        2446     17.17     0.08
+  8           149        6431     23.17     0.11
+  9           183        7109     25.74     0.13
+  10           71       16803      4.23     0.02
+  11           18        6765      2.66     0.01
+  12           12        2846      4.22     0.02
+
+  Zum Einsetzen in arten.py:
+  "saison": {1: 0.03, 2: 0.01, 3: 0.03, 4: 0.14, 5: 1.0, 6: 0.37, 7: 0.08, 8: 0.11, 9: 0.13, 10: 0.02, 11: 0.01, 12: 0.02},
+
+  Kernmonate: (5, 6, 8, 9)
+  (Vergleich nur innerhalb dieser Monate - das trennt
+   Pilzsignal von Jahreszeit)
+
+  Bodenfeuchte 0-7cm  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 15.8 %               19.2%    20.0%        0.96
+  15.8 - 20.4 %            19.9%    20.2%        0.99
+  20.4 - 24.8 %            16.9%    20.1%        0.84
+  24.8 - 30.1 %            19.8%    19.8%        1.00
+  ab 30.1 %                24.2%    19.9%        1.22  <
+
+  Bodenfeuchte 7-28cm  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 14.7 %               13.9%    20.0%        0.69
+  14.7 - 18.8 %            21.4%    20.6%        1.04
+  18.8 - 22.4 %            18.0%    19.7%        0.91
+  22.4 - 28.1 %            20.0%    19.9%        1.01
+  ab 28.1 %                26.7%    19.7%        1.35  <
+
+  Bodentemp 0-7cm  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 15.9 C               44.3%    21.0%        2.11  <<<
+  15.9 - 17.6 C            20.3%    20.1%        1.01
+  17.6 - 19.2 C            14.7%    19.7%        0.74
+  19.2 - 20.8 C             9.8%    19.9%        0.49  --
+  ab 20.8 C                10.8%    19.2%        0.56
+
+  Bodentemp 7-28cm  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 15.8 C               49.2%    21.2%        2.32  <<<
+  15.8 - 17.2 C            19.0%    19.4%        0.98
+  17.2 - 18.6 C            10.1%    19.9%        0.51
+  18.6 - 20.1 C             9.5%    20.2%        0.47  --
+  ab 20.1 C                12.3%    19.2%        0.64
+
+  Lufttemperatur  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 15.8 C               50.9%    21.0%        2.43  <<<
+  15.8 - 17.3 C            16.6%    19.9%        0.83
+  17.3 - 18.7 C            12.0%    20.4%        0.59
+  18.7 - 20.1 C             9.8%    20.0%        0.49  --
+  ab 20.1 C                10.6%    18.7%        0.57
+
+  Regen Tag 4-14  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 7.6 mm               26.2%    20.2%        1.30  <
+  7.6 - 14.8 mm            21.7%    19.8%        1.10
+  14.8 - 22.8 mm           13.9%    20.1%        0.69
+  22.8 - 35.4 mm           16.6%    19.9%        0.84
+  ab 35.4 mm               21.5%    20.0%        1.08
+
+  Regen Tag 0-3  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 0.6 mm               22.4%    20.9%        1.07
+  0.6 - 2.8 mm             19.0%    19.7%        0.96
+  2.8 - 6.7 mm             17.4%    19.7%        0.88
+  6.7 - 13.6 mm            22.0%    19.8%        1.11
+  ab 13.6 mm               19.3%    19.9%        0.97
+
+  Regentage von 14  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 3                    33.0%    27.7%        1.19  <
+  3 - 4                    11.2%    15.3%        0.73
+  4 - 6                    21.5%    26.6%        0.81
+  6 - 7                     9.0%    10.5%        0.86
+  ab 7                     25.3%    19.8%        1.28  <
+
+  Tage seit Regen  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 1 d                  31.2%    32.4%        0.96
+  1 - 2 d                   9.5%    10.6%        0.89
+  2 - 5 d                  23.3%    22.0%        1.06
+  5 - 9 d                  13.5%    16.9%        0.80
+  ab 9 d                   22.5%    18.1%        1.24  <
+
+  Regen 60 Tage  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 76.1 mm              22.7%    20.0%        1.14
+  76.1 - 108.8 mm          24.3%    20.0%        1.22  <
+  108.8 - 132.1 mm         16.8%    20.0%        0.84
+  132.1 - 160.7 mm         19.9%    20.1%        0.99
+  ab 160.7 mm              16.3%    19.9%        0.82
+
+  Wasserbilanz 14 Tage  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -45.0 mm             22.2%    20.0%        1.11
+  -45.0 - -31.4 mm         21.1%    20.0%        1.06
+  -31.4 - -17.9 mm         18.8%    20.1%        0.94
+  -17.9 - -2.0 mm          14.9%    19.9%        0.75
+  ab -2.0 mm               22.8%    20.0%        1.14
+
+  Wasserbilanz 60 Tage  (823 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -150.4 mm            15.2%    20.1%        0.76
+  -150.4 - -108.0 mm       14.0%    19.9%        0.70
+  -108.0 - -79.7 mm        16.6%    20.0%        0.83
+  -79.7 - -52.9 mm         17.0%    20.0%        0.85
+  ab -52.9 mm              37.2%    20.0%        1.86  <<<
+
+==============================================================
+SOMMERSTEINPILZ  (86 Funde)
+==============================================================
+
+  Saisonfaktor sommersteinpilz (1.0 = beste Zeit)
+  Monat     Funde  alle Pilze      Rate   Faktor
+  1             0        2576      0.00     0.00
+  2             0        2562      0.00     0.00
+  3             0        2357      0.00     0.00
+  4             0        1774      0.00     0.00
+  5             2        1701      1.18     0.08
+  6            29        1884     15.39     1.00
+  7            28        2446     11.45     0.74
+  8            20        6431      3.11     0.20
+  9             4        7109      0.56     0.04
+  10            2       16803      0.12     0.01
+  11            1        6765      0.15     0.01
+  12            0        2846      0.00     0.00
+
+  Zum Einsetzen in arten.py:
+  "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.08, 6: 1.0, 7: 0.74, 8: 0.2, 9: 0.04, 10: 0.01, 11: 0.01, 12: 0.0},
+
+  Kernmonate: (6, 7, 8)
+  (Vergleich nur innerhalb dieser Monate - das trennt
+   Pilzsignal von Jahreszeit)
+
+  Bodenfeuchte 0-7cm  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 15.3 %                3.9%    20.2%        0.19  --
+  15.3 - 19.8 %            13.0%    19.8%        0.65
+  19.8 - 24.0 %            16.9%    20.1%        0.84
+  24.0 - 29.3 %            27.3%    20.0%        1.37  <
+  ab 29.3 %                39.0%    19.9%        1.96  <<<
+
+  Bodenfeuchte 7-28cm  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 14.1 %                7.8%    20.3%        0.38  --
+  14.1 - 18.1 %             7.8%    20.3%        0.38  --
+  18.1 - 21.7 %            16.9%    19.8%        0.85
+  21.7 - 26.8 %            19.5%    19.7%        0.99
+  ab 26.8 %                48.1%    20.0%        2.40  <<<
+
+  Bodentemp 0-7cm  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 17.4 C               44.2%    20.2%        2.19  <<<
+  17.4 - 18.8 C            24.7%    21.3%        1.16  <
+  18.8 - 19.9 C            14.3%    18.9%        0.75
+  19.9 - 21.3 C            11.7%    20.3%        0.58
+  ab 21.3 C                 5.2%    19.3%        0.27  --
+
+  Bodentemp 7-28cm  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 17.0 C               45.5%    20.2%        2.25  <<<
+  17.0 - 18.2 C            24.7%    20.0%        1.24  <
+  18.2 - 19.3 C            13.0%    21.4%        0.61
+  19.3 - 20.4 C            10.4%    18.6%        0.56
+  ab 20.4 C                 6.5%    19.8%        0.33  --
+
+  Lufttemperatur  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 17.0 C               42.9%    20.3%        2.12  <<<
+  17.0 - 18.4 C            24.7%    20.7%        1.19  <
+  18.4 - 19.4 C            20.8%    19.9%        1.05
+  19.4 - 20.3 C             7.8%    19.9%        0.39  --
+  ab 20.3 C                 3.9%    19.3%        0.20  --
+
+  Regen Tag 4-14  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 8.8 mm                5.2%    20.1%        0.26  --
+  8.8 - 16.8 mm             3.9%    20.0%        0.19  --
+  16.8 - 24.6 mm           15.6%    20.0%        0.78
+  24.6 - 37.9 mm           29.9%    19.9%        1.50  <
+  ab 37.9 mm               45.5%    19.9%        2.28  <<<
+
+  Regen Tag 0-3  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 1.0 mm               11.7%    20.7%        0.56
+  1.0 - 3.6 mm             15.6%    19.3%        0.81
+  3.6 - 7.7 mm             23.4%    20.3%        1.15  <
+  7.7 - 14.4 mm            20.8%    19.7%        1.05
+  ab 14.4 mm               28.6%    20.0%        1.43  <
+
+  Regentage von 14  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 3                     6.5%    23.0%        0.28  --
+  3 - 5                    11.7%    28.0%        0.42  --
+  5 - 6                    13.0%    13.8%        0.94
+  6 - 8                    22.1%    20.8%        1.06
+  ab 8                     46.8%    14.4%        3.26  <<<
+
+  Tage seit Regen  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 0 d                  16.9%    20.7%        0.81
+  0 - 2 d                  41.6%    25.7%        1.61  <<<
+  2 - 4 d                  16.9%    17.0%        0.99
+  4 - 8 d                  18.2%    17.9%        1.02
+  ab 8 d                    6.5%    18.7%        0.35  --
+
+  Regen 60 Tage  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 88.8 mm               5.2%    20.0%        0.26  --
+  88.8 - 116.9 mm          11.7%    20.0%        0.59
+  116.9 - 141.7 mm         16.9%    20.0%        0.84
+  141.7 - 166.8 mm         20.8%    20.1%        1.04
+  ab 166.8 mm              45.5%    19.9%        2.28  <<<
+
+  Wasserbilanz 14 Tage  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -49.7 mm              5.2%    20.1%        0.26  --
+  -49.7 - -36.7 mm         10.4%    19.9%        0.52
+  -36.7 - -23.9 mm         11.7%    20.0%        0.58
+  -23.9 - -4.8 mm          23.4%    20.0%        1.17  <
+  ab -4.8 mm               49.4%    20.0%        2.47  <<<
+
+  Wasserbilanz 60 Tage  (77 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -156.3 mm             1.3%    20.1%        0.06  --
+  -156.3 - -114.9 mm       19.5%    20.0%        0.98
+  -114.9 - -82.3 mm        14.3%    20.0%        0.71
+  -82.3 - -55.6 mm         10.4%    20.0%        0.52
+  ab -55.6 mm              54.5%    20.0%        2.73  <<<
+
+==============================================================
+STEINPILZ  (356 Funde)
+==============================================================
+
+  Saisonfaktor steinpilz (1.0 = beste Zeit)
+  Monat     Funde  alle Pilze      Rate   Faktor
+  1             0        2576      0.00     0.00
+  2             0        2562      0.00     0.00
+  3             0        2357      0.00     0.00
+  4             0        1774      0.00     0.00
+  5             1        1701      0.59     0.04
+  6             1        1884      0.53     0.04
+  7             4        2446      1.64     0.13
+  8            39        6431      6.06     0.46
+  9            93        7109     13.08     1.00
+  10          168       16803     10.00     0.76
+  11           47        6765      6.95     0.53
+  12            3        2846      1.05     0.08
+
+  Zum Einsetzen in arten.py:
+  "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.04, 6: 0.04, 7: 0.13, 8: 0.46, 9: 1.0, 10: 0.76, 11: 0.53, 12: 0.08},
+
+  Kernmonate: (8, 9, 10, 11)
+  (Vergleich nur innerhalb dieser Monate - das trennt
+   Pilzsignal von Jahreszeit)
+
+  Bodenfeuchte 0-7cm  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 20.6 %                6.3%    20.2%        0.31  --
+  20.6 - 25.1 %            20.5%    19.9%        1.03
+  25.1 - 30.5 %            29.4%    20.0%        1.47  <
+  30.5 - 35.2 %            15.0%    20.0%        0.75
+  ab 35.2 %                28.8%    19.9%        1.45  <
+
+  Bodenfeuchte 7-28cm  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 18.8 %                7.8%    20.1%        0.39  --
+  18.8 - 23.4 %            16.4%    20.3%        0.81
+  23.4 - 28.7 %            30.5%    19.8%        1.54  <<<
+  28.7 - 34.1 %            15.6%    20.2%        0.77
+  ab 34.1 %                29.7%    19.6%        1.52  <<<
+
+  Bodentemp 0-7cm  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 8.9 C                13.5%    20.1%        0.67
+  8.9 - 12.2 C             41.8%    20.5%        2.04  <<<
+  12.2 - 15.8 C            23.6%    19.8%        1.20  <
+  15.8 - 19.0 C            17.0%    19.9%        0.85
+  ab 19.0 C                 4.0%    19.7%        0.20  --
+
+  Bodentemp 7-28cm  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 9.6 C                12.7%    20.3%        0.62
+  9.6 - 12.6 C             44.1%    20.1%        2.19  <<<
+  12.6 - 16.0 C            23.3%    19.8%        1.18  <
+  16.0 - 18.9 C            16.1%    20.2%        0.80
+  ab 18.9 C                 3.7%    19.6%        0.19  --
+
+  Lufttemperatur  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 9.8 C                16.7%    20.8%        0.80
+  9.8 - 12.5 C             38.3%    19.7%        1.95  <<<
+  12.5 - 16.3 C            28.8%    19.7%        1.46  <
+  16.3 - 19.0 C            14.4%    20.4%        0.71
+  ab 19.0 C                 1.7%    19.4%        0.09  --
+
+  Regen Tag 4-14  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 7.4 mm                9.8%    20.1%        0.49  --
+  7.4 - 15.3 mm            11.8%    20.0%        0.59
+  15.3 - 23.9 mm           15.0%    20.1%        0.75
+  23.9 - 34.0 mm           26.5%    20.0%        1.33  <
+  ab 34.0 mm               36.9%    19.8%        1.86  <<<
+
+  Regen Tag 0-3  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 0.8 mm               16.1%    20.3%        0.79
+  0.8 - 2.9 mm             13.5%    19.8%        0.68
+  2.9 - 7.1 mm             14.7%    20.1%        0.73
+  7.1 - 13.8 mm            15.0%    19.9%        0.75
+  ab 13.8 mm               40.6%    19.8%        2.05  <<<
+
+  Regentage von 14  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 3                    10.7%    25.5%        0.42  --
+  3 - 5                    23.3%    28.9%        0.81
+  5 - 6                    11.8%    11.7%        1.01
+  6 - 8                    20.5%    17.7%        1.15  <
+  ab 8                     33.7%    16.1%        2.09  <<<
+
+  Tage seit Regen  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 1 d                  46.4%    33.3%        1.39  <
+  1 - 2 d                  13.0%    10.1%        1.29  <
+  2 - 5 d                  17.6%    21.1%        0.83
+  5 - 9 d                  10.4%    16.2%        0.64
+  ab 9 d                   12.7%    19.4%        0.65
+
+  Regen 60 Tage  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis 88.6 mm              11.8%    20.1%        0.59
+  88.6 - 111.8 mm          13.8%    20.0%        0.69
+  111.8 - 132.9 mm         17.6%    20.0%        0.88
+  132.9 - 160.4 mm         24.8%    20.0%        1.24  <
+  ab 160.4 mm              32.0%    19.9%        1.61  <<<
+
+  Wasserbilanz 14 Tage  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -28.4 mm              2.3%    20.1%        0.11  --
+  -28.4 - -8.9 mm          10.1%    20.0%        0.50
+  -8.9 - 5.2 mm            23.6%    20.0%        1.18  <
+  5.2 - 21.8 mm            23.1%    19.9%        1.16  <
+  ab 21.8 mm               40.9%    19.9%        2.05  <<<
+
+  Wasserbilanz 60 Tage  (347 Funde)
+  Bereich                  Funde   normal  Verhaeltnis
+  bis -111.7 mm             6.6%    20.0%        0.33  --
+  -111.7 - -63.8 mm        16.7%    20.0%        0.84
+  -63.8 - -16.4 mm         27.4%    20.0%        1.37  <
+  -16.4 - 25.0 mm          23.3%    20.0%        1.17  <
+  ab 25.0 mm               25.9%    20.0%        1.30  <

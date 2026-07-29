@@ -1,0 +1,65 @@
+name: Wetterdaten sammeln
+
+# Jeden Morgen um 6 Uhr UTC, also 8 Uhr im Sommer und 7 Uhr im Winter.
+# GitHub kann geplante Laeufe um bis zu 15 Minuten verschieben oder bei
+# hoher Last auslassen - fuer Tageswerte ist das unerheblich, weil das
+# Skript beim naechsten Lauf nachholt.
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:        # von Hand ausloesbar
+
+permissions:
+  contents: write           # noetig, um die Ergebnisse zurueckzuschreiben
+
+concurrency:
+  group: taeglich
+  cancel-in-progress: false
+
+jobs:
+  sammeln:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Projekt holen
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Pakete installieren
+        run: pip install -r requirements.txt
+
+      - name: Vortag sammeln
+        run: python sammeln.py
+
+      - name: Vorhersage holen
+        run: python prognose.py
+
+      # Fehlende Tage nachholen, falls ein Lauf ausgefallen ist.
+      # Laeuft nur sonntags, weil es 1.000 Abrufe kostet.
+      - name: Luecken schliessen
+        if: github.event.schedule == '0 6 * * *'
+        run: |
+          if [ "$(date +%u)" = "7" ]; then
+            python nachfuellen.py
+          else
+            echo "Nur sonntags - heute uebersprungen"
+          fi
+
+      - name: Ergebnisse zurueckschreiben
+        run: |
+          git config user.name "Pilzkarte"
+          git config user.email "actions@github.com"
+          git add wetter_historie/ wetter_prognose.csv
+          if git diff --staged --quiet; then
+            echo "Nichts geaendert"
+          else
+            git commit -m "Wetterdaten $(date +%Y-%m-%d)"
+            git pull --rebase
+            git push
+          fi

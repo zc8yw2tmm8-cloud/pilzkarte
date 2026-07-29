@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wie die Pilzkarte rechnet</title>
+<style>
+  body { font: 15px/1.6 system-ui, sans-serif; color: #e6e6e6;
+          background: #15181c;
+          max-width: 860px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  h2 { font-size: 19px; margin: 34px 0 10px; padding-top: 14px;
+        border-top: 2px solid #2f353d; }
+  h3 { font-size: 17px; margin: 26px 0 2px; }
+  h4 { font-size: 13px; margin: 16px 0 6px; color: #9aa0a6;
+        text-transform: uppercase; letter-spacing: .04em; }
+  p.lat { margin: 0 0 8px; color: #9aa0a6;
+           font-style: italic; }
+  .formel { background: #1e2228;
+             border-left: 4px solid #5fb763;
+             padding: 12px 16px; margin: 14px 0; font-size: 16px; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0 4px; }
+  th, td { text-align: left; padding: 5px 9px;
+            border-bottom: 1px solid #2f353d;
+            font-size: 14px; }
+  th { background: #1e2228; font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .04em; color: #9aa0a6; }
+  td.p { text-align: right; font-variant-numeric: tabular-nums;
+          width: 70px; }
+  td.gruppe { background: #1e2228; width: 210px;
+               vertical-align: top; }
+  td.gruppe small { color: #9aa0a6; }
+  .saison { display: flex; gap: 3px; align-items: flex-end; margin: 6px 0; }
+  .mon { flex: 1; text-align: center; }
+  .saeule { width: 100%; border-radius: 2px 2px 0 0; }
+  .mname { font-size: 11px; color: #9aa0a6; margin-top: 3px; }
+  .mwert { font-size: 10px; color: #9aa0a6; }
+  .chip { display: inline-block; background: #1e2228;
+           border-radius: 12px;
+           padding: 2px 10px; margin: 2px 2px 2px 0; font-size: 13px; }
+  .hinweis { background: #1e2228;
+              border-left: 4px solid #f0b429;
+              padding: 8px 14px; font-size: 14px; }
+  .warnung { background: #1e2228;
+              border-left: 4px solid #ef5350;
+              padding: 12px 16px; margin: 14px 0; }
+  section.art { border-bottom: 1px solid #2f353d;
+                 padding-bottom: 18px; }
+  nav { font-size: 14px; background: #1e2228; padding: 10px 14px;
+         border-radius: 6px; }
+  a { color: #5fb763; }
+  @media (max-width: 700px) {
+    body { padding: 14px 12px 70px; -webkit-text-size-adjust: 100%; }
+    table { font-size: 13px; }
+    th, td { padding: 4px 5px; }
+    td.gruppe { width: 130px; }
+    .saison { gap: 2px; }
+    .mname, .mwert { font-size: 9px; }
+    nav { line-height: 2.2; }
+  }
+  ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+</style>
+</head>
+<body>
+
+<h1>Wie die Pilzkarte rechnet</h1>
+<p class="lat">Automatisch aus arten.py erzeugt &ndash; die Zahlen unten sind
+genau die, mit denen die Karte gerade arbeitet.</p>
+
+<h2>Was die Karte zeigt</h2>
+<p>Jede Zelle ist 2 &times; 2 km gross und liegt im Wald. Die Farbe sagt,
+wie gut die <b>Bedingungen</b> fuer eine Pilzart gerade sind &ndash; nicht,
+ob dort tatsaechlich Pilze stehen. Sie beantwortet die Frage
+&bdquo;wohin lohnt die Anfahrt&ldquo;, nicht &bdquo;wo genau im Wald&ldquo;.</p>
+
+<div class="formel">
+  <b>Endscore = Wetterpunkte &times; Saisonfaktor &times; Waldtypfaktor</b><br>
+  <small>Wetterpunkte 0&ndash;100 &middot; beide Faktoren zwischen 0 und 1</small>
+</div>
+
+<p>Die Saison wird mit der Staerke <b>0.85</b> gewichtet: Ein Monatswert
+von 0 senkt den Score also nicht auf null, sondern auf
+15 % &ndash; ein Restwert bleibt, weil auch ausserhalb
+der Hauptzeit einzelne Funde vorkommen.</p>
+
+<h2>Woher die Daten kommen</h2>
+<ul>
+  <li><b>Wetter:</b> Open-Meteo. Vergangenheit aus dem ERA5-Archiv
+      (ca. 11 km Raster), der taegliche Zulauf aus dem DWD-Modell icon_d2
+      (2 km) fuer Regen und Lufttemperatur. Bodenwerte und Verdunstung
+      kommen immer aus dem Standardmodell, weil icon_d2 sie nicht liefert.</li>
+  <li><b>Baumarten:</b> Thuenen-Atlas, Karte der dominanten Baumarten,
+      10 m Aufloesung, elf Klassen.</li>
+  <li><b>Waldflaechen:</b> OpenStreetMap ueber die Overpass-API. Ueber die
+      Waldpolygone wurde ein 2-km-Raster gelegt; eine Zelle zaehlt als Wald,
+      wenn ihr Mittelpunkt oder eine ihrer vier Ecken im Wald liegt.</li>
+  <li><b>Schutzgebiete:</b> OpenStreetMap. Rot = Naturschutzgebiet,
+      Sammeln verboten. Blau = Landschaftsschutz, meist erlaubt.</li>
+  <li><b>Hoehenlage:</b> Open-Meteo Elevation API.</li>
+  <li><b>Fundmeldungen zur Kalibrierung:</b> GBIF, ueberwiegend
+      Citizen-Science-Beobachtungen der letzten Jahre.</li>
+</ul>
+
+<h2>Die Kenngroessen</h2>
+<p>Alle beziehen sich auf einen Stichtag &ndash; heute oder einen der
+Prognosetage.</p>
+<table>
+  <tr><th>Groesse</th><th>Berechnung</th></tr>
+  <tr><td>Bodenfeuchte</td><td>Mittel der letzten 5 Tage, Volumenanteil
+      in der Schicht 0&ndash;7 cm</td></tr>
+  <tr><td>Bodentemperatur</td><td>Mittel der letzten 5 Tage, 0&ndash;7 cm</td></tr>
+  <tr><td>Niederschlag Tag 4&ndash;14</td><td>Summe des Regens, der 4 bis 14
+      Tage vor dem Stichtag fiel</td></tr>
+  <tr><td>Niederschlag Tag 0&ndash;3</td><td>Summe der letzten vier Tage</td></tr>
+  <tr><td>Regentage</td><td>Anzahl Tage mit mindestens 1 mm, von 14</td></tr>
+  <tr><td>Tage seit Regen</td><td>Abstand zum letzten Tag mit mindestens
+      3 mm</td></tr>
+  <tr><td>Wasserbilanz</td><td>Regen minus Verdunstung, ueber 14 und 60
+      Tage. Erklaert, warum 20 mm im heissen August weniger wert sind als
+      im kuehlen Oktober. <b>Der staerkste Einzelwert</b> in der
+      Kalibrierung.</td></tr>
+  <tr><td>Frosttage</td><td>Tage mit Lufttemperatur unter 0 &deg;C in den
+      letzten 14, dazu die tiefste Bodentemperatur</td></tr>
+</table>
+
+<h2>Abzuege</h2>
+<table>
+  <tr><th>Bedingung</th><th>Abzug</th><th>Grundlage</th></tr>
+  <tr><td>Bodenfeuchte unter 17 % und kein frischer Regen</td>
+      <td class="p">-15</td><td>ausgetrockneter Boden</td></tr>
+  <tr><td>Ueber 14 Tage ohne Regen von mindestens 3 mm</td>
+      <td class="p">-12</td><td>gemessen: Auswahlverhaeltnis 0,14</td></tr>
+  <tr><td>Wasserbilanz der letzten 60 Tage unter -120 mm</td>
+      <td class="p">-10</td><td>Trockensommer wirkt nach</td></tr>
+  <tr><td>Ein bis zwei Frosttage in den letzten 14</td>
+      <td class="p">-15 bis -20</td>
+      <td>gemessen: Auswahlverhaeltnis faellt auf 0,0 bis 0,7</td></tr>
+  <tr><td>Drei Frosttage oder Bodentemperatur unter -1 &deg;C</td>
+      <td class="p">-35 bis -45</td>
+      <td>gemessen: 0,0 bis 0,3</td></tr>
+</table>
+
+<p>Der Frostabzug ist an Fundmeldungen aus Oktober bis Dezember
+gemessen. Wichtig dabei: Das Signal bleibt bestehen, wenn man
+<i>nur den November</i> betrachtet - es ist also nicht bloss der
+Saisonverlauf, sondern Frost selbst.</p>
+
+<div class="hinweis">Eine Annahme wurde dabei widerlegt: Marone und
+Birkenpilz galten als frosthart. Gemessen reagieren sie so empfindlich
+wie die anderen - die Marone faellt im November schon bei ein bis zwei
+Frosttagen auf 0,00. Wirklich unbeeindruckt ist nur der
+Schwefelporling (1,74 bei leichtem Frost), was zu einem Holzbewohner
+passt: Sein Fruchtkoerper steht geschuetzter und haelt wochenlang.</div>
+
+<h2>Wie die Schwellen zustande kamen</h2>
+<p>Fundmeldungen allein sagen wenig. Dass Steinpilze bei 31 % Bodenfeuchte
+gefunden werden, ist nur dann interessant, wenn der Boden nicht ohnehin
+meistens so feucht ist. Deshalb werden die Fundbedingungen gegen eine
+<b>Hintergrundstichprobe</b> gehalten: mehrere zehntausend normale Tage an
+zufaelligen Waldpunkten seit 2019.</p>
+
+<div class="formel">
+  Auswahlverhaeltnis =
+  Anteil der Funde in einem Wertebereich &divide;
+  Anteil der normalen Tage im selben Bereich
+</div>
+
+<p>1,0 bedeutet: kein Signal. 2,0 bedeutet: doppelt so haeufig wie zufaellig
+zu erwarten. Verglichen wird nur innerhalb derselben Monate &ndash; sonst
+misst man den Herbst und nicht den Pilz.</p>
+
+<p>Grundlage sind 2819 Fundmeldungen aus GBIF gegen rund 47.000
+Vergleichstage an 35 zufaelligen Waldpunkten seit 2019. Alle
+Wetterbaender und Saisonfaktoren unten sind daraus abgeleitet.</p>
+
+<p>Die <b>Bodenfaktoren</b> (pH und Tonanteil) sind ebenfalls gemessen:
+468 Fundorte gegen 977 Waldpunkte im selben Gebiet. Der Tonanteil ist
+dabei das staerkste Bodensignal - beim Schwefelporling reicht das
+Auswahlverhaeltnis von 0,04 bei unter 12 % Ton bis 2,89 bei ueber 20 %.
+Ton haelt Wasser, das ist der Mechanismus dahinter.</p>
+
+<div class="hinweis">Vorbehalt: Tonreiche Boeden liegen in dieser
+Region im Sueden, wo auch mehr Menschen melden. Ein Teil des Effekts
+koennte Beobachterdichte sein. Dagegen spricht, dass der Birkenpilz
+genau umgekehrt reagiert - bei reiner Sammlerdichte muessten alle
+Arten in dieselbe Richtung zeigen.</div>
+
+<p>Noch <b>geschaetzt</b> sind die Baumartenfaktoren, die
+Frostempfindlichkeit je Art sowie die Bodenwerte von Pfifferling und
+Sommersteinpilz - fuer diese beiden lagen nur je zehn Fundorte im
+Vergleichsgebiet.</p>
+
+<h2>Baumarten</h2>
+<p>Fuer jede Rasterzelle sind die Anteile der Baumarten bekannt -
+aus der Karte der dominanten Baumarten des Thuenen-Instituts
+(Blickensdoerfer u.a. 2024, Sentinel-1 und -2 kombiniert mit der
+Bundeswaldinventur, 10 m Aufloesung, Stand 2017/2018). Je Zelle
+wurden rund 37.000 Bildpunkte ausgezaehlt.</p>
+
+<p>Der Faktor ist ein <b>gewichteter Mittelwert</b>, keine Kategorie.
+Eine Zelle mit 60 % Eiche, 30 % Kiefer und 10 % Birke ergibt beim
+Schwefelporling 0,6&times;1,0 + 0,3&times;0,1 + 0,1&times;0,3 = 0,66.
+Damit zaehlt auch eine Beimischung: Ein Kiefernforst mit 20 % Birke
+ist fuer den Birkenpilz brauchbar, obwohl die Hauptbaumart Kiefer ist.</p>
+
+<p>Zusaetzlich daempft ein geringer Waldanteil in der Zelle - aber
+<b>je nach Art unterschiedlich stark</b>. Nicht alle Pilze sind
+Waldpilze: Der Parasol steht auf Wiesen und Weiden, der Schwefelporling
+am einzelnen Baum (Alleeeiche, Kopfweide, alter Obstbaum), der
+Birkenpilz ueberall dort, wo eine Birke waechst. Fuer sie wirkt die
+Daempfung kaum. Pfifferling und Marone brauchen dagegen geschlossenen
+Bestand, bei ihnen wirkt sie deutlich.</p>
+
+<div class="hinweis">Grundsaetzliche Grenze: Die Karte zeigt nur Zellen,
+die in OpenStreetMap als Wald eingetragen sind. Wiesen, Parks,
+Streuobstwiesen, Hecken und Alleen fehlen ganz - obwohl gerade dort
+Parasol und Schwefelporling haeufig stehen. Ein Fuenftel der
+ausgewerteten Fundmeldungen liegt in Siedlungsgebiet und damit
+ausserhalb dieser Karte.</div>
+
+<p>Die Gewichte stammen aus der Pilzliteratur und wurden an
+Fundmeldungen geprueft. Dabei zeigte sich ein Fallstrick: Ein erster
+Vergleich der Baumarten an Fundorten mit denen in der Region ergab,
+dass <i>alle</i> Arten Laubwald bevorzugen und Kiefer meiden - auch
+die Marone, die ein Nadelwaldpilz ist. Der Grund war nicht Biologie,
+sondern <b>wo Menschen unterwegs sind</b>:</p>
+
+<table>
+  <tr><th>Baumart</th><th>Anteil an der Waldflaeche</th>
+      <th>Anteil an den Pilzmeldeorten</th></tr>
+  <tr><td>Kiefer</td><td>45,3 %</td><td>11,7 %</td></tr>
+  <tr><td>Eiche</td><td>21,4 %</td><td>43,6 %</td></tr>
+  <tr><td>Buche</td><td>9,5 %</td><td>26,5 %</td></tr>
+</table>
+
+<p>Rechnet man gegen die Meldeorte statt gegen die Flaeche, bleibt ein
+schwaecheres, aber sinnvolles Bild: Steinpilz bei Fichte und Buche,
+Schwefelporling bei Eiche, Erle und Weide, Marone bei Nadelholz.</p>
+
+<div class="hinweis">Die Zahl der auswertbaren Fundorte je Art liegt
+nur zwischen 43 und 86. Die Gewichte sind daher behutsam angepasst,
+nicht direkt uebernommen. Und das Referenzjahr der Baumartenkarte ist
+2017/2018: Wo dort Fichte steht, kann heute Kahlflaeche sein.</div>
+
+<h2>Belegte Funde</h2>
+<p>Als eigene Ebene lassen sich gemeldete Funde derselben Art einblenden -
+lila Punkte, zusammengefasst zu Gruppen. Gezeigt wird ein Fenster von
+&plusmn;21 Tagen <b>im Jahreslauf</b>: Ein Oktoberfund von 2021 erscheint
+also auf der Oktoberkarte. Juengere Funde sind kraeftiger dargestellt.
+Meldungen mit einer Ortsangabe grober als 3 km werden weggelassen.</p>
+
+<p>Das ist keine Vorhersage, sondern eine Gegenprobe: Wo schon einmal
+etwas stand, stimmt oft mehr als das Wetter allein hergibt - Baumarten,
+Alter des Bestandes, Bodenverhaeltnisse im Kleinen.</p>
+
+<div class="hinweis">Beim Schwefelporling ist diese Ebene wertvoller als
+der Score. Er waechst an einzelnen Baeumen und kommt dort jahrelang
+wieder. Ein alter Fundpunkt ist deshalb ein besserer Hinweis als jede
+Wetterrechnung - was die Kalibrierung bestaetigt: Bei 840 Funden liegen
+alle Wetter-Auswahlverhaeltnisse zwischen 0,74 und 1,33, also praktisch
+ohne Signal.</div>
+
+<p>Einschraenkung: Diese Punkte zeigen, wo Menschen unterwegs waren und
+gemeldet haben. Waldstuecke ohne Meldungen sind nicht schlechter, nur
+unbeachtet.</p>
+
+<h2>Was die Karte <i>nicht</i> kann</h2>
+<div class="warnung">
+  <b>Sie erkennt keine Pilze und sagt nichts ueber Essbarkeit.</b>
+  Bestimme jeden Fund selbst sicher, im Zweifel ueber eine Pilzberatung.
+  Kein Pilz gehoert in die Pfanne, bei dem auch nur ein Restzweifel bleibt.
+</div>
+<ul>
+  <li><b>Baumarten von 2017/2018.</b> Seither hat das Fichtensterben
+      ganze Bestaende veraendert. In dieser Region spielt das kaum eine
+      Rolle - Fichte kommt hier fast nicht vor -, im Mittelgebirge sehr
+      wohl.</li>
+  <li><b>Nur Anwesenheitsdaten.</b> Es ist bekannt, wann jemand etwas fand
+      &ndash; nicht, wann jemand vergeblich suchte. Die Schwellen lassen
+      sich deshalb nur einseitig pruefen.</li>
+  <li><b>Beobachterverzerrung.</b> Im Oktober sind mehr Sammler unterwegs
+      als im Juli. Der Saisonfaktor rechnet das heraus, indem er die
+      Meldungen einer Art durch alle Pilzmeldungen desselben Monats teilt.</li>
+  <li><b>Grobes Raster.</b> 2 km sagen etwas ueber ein Waldstueck, nichts
+      ueber die einzelne Senke. Beim Schwefelporling, der an einzelnen
+      Baeumen waechst, ist das besonders unscharf.</li>
+  <li><b>Schutzgebiete ohne Gewaehr.</b> OpenStreetMap ist gut gepflegt,
+      aber nicht amtlich. Verbindlich ist das jeweilige Landesverzeichnis.
+      Und auch ausserhalb gilt: nur fuer den Eigenbedarf, einzelne Arten
+      stehen bundesweit unter Schutz.</li>
+</ul>
+
+<h2>Die Arten im Einzelnen</h2>
+<nav><a href="#steinpilz">Steinpilz</a> &middot; <a href="#sommersteinpilz">Sommersteinpilz</a> &middot; <a href="#marone">Maronenroehrling</a> &middot; <a href="#pfifferling">Pfifferling</a> &middot; <a href="#birkenpilz">Birkenpilz</a> &middot; <a href="#parasol">Parasol</a> &middot; <a href="#schwefelporling">Schwefelporling</a></nav>
+
+    <section class="art" id="steinpilz">
+      <h3>Steinpilz</h3>
+      <p class="lat">Boletus edulis</p>
+      
+      <h4>Saisonfaktor</h4>
+      <div class="saison"><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Jan</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Feb</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mrz</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Apr</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mai</div><div class="mwert">0.04</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Jun</div><div class="mwert">0.04</div></div><div class="mon"><div class="saeule" style="height:6px;background:#2f353d"></div><div class="mname">Jul</div><div class="mwert">0.13</div></div><div class="mon"><div class="saeule" style="height:21px;background:#8bc34a"></div><div class="mname">Aug</div><div class="mwert">0.46</div></div><div class="mon"><div class="saeule" style="height:46px;background:#5fb763"></div><div class="mname">Sep</div><div class="mwert">1.00</div></div><div class="mon"><div class="saeule" style="height:35px;background:#5fb763"></div><div class="mname">Okt</div><div class="mwert">0.76</div></div><div class="mon"><div class="saeule" style="height:24px;background:#8bc34a"></div><div class="mname">Nov</div><div class="mwert">0.53</div></div><div class="mon"><div class="saeule" style="height:4px;background:#2f353d"></div><div class="mname">Dez</div><div class="mwert">0.08</div></div></div>
+      <h4>Baumarten-Faktor</h4>
+      <p><span class='chip' style='font-weight:600'>Fichte &times;1.0</span> <span class='chip' style='font-weight:600'>Buche &times;1.0</span> <span class='chip' style='font-weight:600'>Tanne &times;0.9</span> <span class='chip' style='font-weight:600'>Kiefer &times;0.85</span> <span class='chip' style='font-weight:600'>Eiche &times;0.8</span> <span class='chip'>Douglasie &times;0.5</span> <span class='chip'>Laerche &times;0.5</span> <span class='chip'>sonst. Laubholz (langlebig) &times;0.5</span> <span class='chip'>Birke &times;0.4</span> <span class='chip'>sonst. Laubholz (kurzlebig) &times;0.3</span> <span class='chip'>Erle &times;0.2</span></p>
+      <h4>Wetterpunkte</h4>
+      <table class='baender'><tr><th>Groesse</th><th>Bereich</th><th>Punkte</th></tr><tr><td rowspan="4" class="gruppe">Bodenfeuchte 0-7 cm<br><small>max. 18 Punkte</small></td><td>ab 33 %</td><td class="p">18</td></tr><tr><td>24 &ndash; 33 %</td><td class="p">15</td></tr><tr><td>20 &ndash; 24 %</td><td class="p">8</td></tr><tr><td>17 &ndash; 20 %</td><td class="p">3</td></tr><tr><td rowspan="5" class="gruppe">Bodentemperatur 0-7 cm<br><small>max. 22 Punkte</small></td><td>9 &ndash; 13 &deg;C</td><td class="p">22</td></tr><tr><td>13 &ndash; 16 &deg;C</td><td class="p">16</td></tr><tr><td>7 &ndash; 9 &deg;C</td><td class="p">10</td></tr><tr><td>16 &ndash; 19 &deg;C</td><td class="p">7</td></tr><tr><td>19 &ndash; 21 &deg;C</td><td class="p">2</td></tr><tr><td rowspan="3" class="gruppe">Lufttemperatur, Mittel 14 Tage<br><small>max. 8 Punkte</small></td><td>10 &ndash; 16 &deg;C</td><td class="p">8</td></tr><tr><td>16 &ndash; 18 &deg;C</td><td class="p">4</td></tr><tr><td>8 &ndash; 10 &deg;C</td><td class="p">4</td></tr><tr><td rowspan="4" class="gruppe">Niederschlag Tag 4-14<br><small>max. 15 Punkte</small></td><td>ab 34 mm</td><td class="p">15</td></tr><tr><td>24 &ndash; 34 mm</td><td class="p">12</td></tr><tr><td>15 &ndash; 24 mm</td><td class="p">7</td></tr><tr><td>7 &ndash; 15 mm</td><td class="p">3</td></tr><tr><td rowspan="4" class="gruppe">Regentage von 14<br><small>max. 15 Punkte</small></td><td>ab 8 </td><td class="p">15</td></tr><tr><td>6 &ndash; 8 </td><td class="p">11</td></tr><tr><td>5 &ndash; 6 </td><td class="p">7</td></tr><tr><td>3 &ndash; 5 </td><td class="p">4</td></tr><tr><td rowspan="4" class="gruppe">Wasserbilanz 14 Tage<br><small>max. 22 Punkte</small></td><td>ab 15 mm</td><td class="p">22</td></tr><tr><td>0 &ndash; 15 mm</td><td class="p">17</td></tr><tr><td>-12 &ndash; 0 mm</td><td class="p">10</td></tr><tr><td>-30 &ndash; -12 mm</td><td class="p">3</td></tr></table>
+    </section>
+    
+    <section class="art" id="sommersteinpilz">
+      <h3>Sommersteinpilz</h3>
+      <p class="lat">Boletus reticulatus</p>
+      
+      <h4>Saisonfaktor</h4>
+      <div class="saison"><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Jan</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Feb</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mrz</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Apr</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:4px;background:#2f353d"></div><div class="mname">Mai</div><div class="mwert">0.08</div></div><div class="mon"><div class="saeule" style="height:46px;background:#5fb763"></div><div class="mname">Jun</div><div class="mwert">1.00</div></div><div class="mon"><div class="saeule" style="height:34px;background:#5fb763"></div><div class="mname">Jul</div><div class="mwert">0.74</div></div><div class="mon"><div class="saeule" style="height:9px;background:#2f353d"></div><div class="mname">Aug</div><div class="mwert">0.20</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Sep</div><div class="mwert">0.04</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Okt</div><div class="mwert">0.01</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Nov</div><div class="mwert">0.01</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Dez</div><div class="mwert">0.00</div></div></div>
+      <h4>Baumarten-Faktor</h4>
+      <p><span class='chip' style='font-weight:600'>Eiche &times;1.0</span> <span class='chip' style='font-weight:600'>Buche &times;1.0</span> <span class='chip'>sonst. Laubholz (langlebig) &times;0.7</span> <span class='chip'>Birke &times;0.3</span> <span class='chip'>sonst. Laubholz (kurzlebig) &times;0.25</span> <span class='chip'>Erle &times;0.2</span> <span class='chip'>Kiefer &times;0.15</span> <span class='chip'>Laerche &times;0.15</span> <span class='chip'>Fichte &times;0.1</span> <span class='chip'>Douglasie &times;0.1</span> <span class='chip'>Tanne &times;0.1</span></p>
+      <h4>Wetterpunkte</h4>
+      <table class='baender'><tr><th>Groesse</th><th>Bereich</th><th>Punkte</th></tr><tr><td rowspan="4" class="gruppe">Bodenfeuchte 0-7 cm<br><small>max. 20 Punkte</small></td><td>ab 29.0 %</td><td class="p">20</td></tr><tr><td>24 &ndash; 29.0 %</td><td class="p">15</td></tr><tr><td>20 &ndash; 24 %</td><td class="p">7</td></tr><tr><td>15 &ndash; 20 %</td><td class="p">2</td></tr><tr><td rowspan="4" class="gruppe">Bodentemperatur 0-7 cm<br><small>max. 22 Punkte</small></td><td>bis 17.5 &deg;C</td><td class="p">22</td></tr><tr><td>17.5 &ndash; 19 &deg;C</td><td class="p">13</td></tr><tr><td>19 &ndash; 20 &deg;C</td><td class="p">8</td></tr><tr><td>20 &ndash; 21.5 &deg;C</td><td class="p">4</td></tr><tr><td rowspan="3" class="gruppe">Lufttemperatur, Mittel 14 Tage<br><small>max. 6 Punkte</small></td><td>bis 17 &deg;C</td><td class="p">6</td></tr><tr><td>17 &ndash; 18.5 &deg;C</td><td class="p">4</td></tr><tr><td>18.5 &ndash; 19.5 &deg;C</td><td class="p">2</td></tr><tr><td rowspan="4" class="gruppe">Niederschlag Tag 4-14<br><small>max. 16 Punkte</small></td><td>ab 38 mm</td><td class="p">16</td></tr><tr><td>25 &ndash; 38 mm</td><td class="p">12</td></tr><tr><td>17 &ndash; 25 mm</td><td class="p">6</td></tr><tr><td>9 &ndash; 17 mm</td><td class="p">2</td></tr><tr><td rowspan="4" class="gruppe">Regentage von 14<br><small>max. 14 Punkte</small></td><td>ab 8 </td><td class="p">14</td></tr><tr><td>6 &ndash; 8 </td><td class="p">10</td></tr><tr><td>5 &ndash; 6 </td><td class="p">5</td></tr><tr><td>3 &ndash; 5 </td><td class="p">2</td></tr><tr><td rowspan="4" class="gruppe">Wasserbilanz 14 Tage<br><small>max. 22 Punkte</small></td><td>ab -5 mm</td><td class="p">22</td></tr><tr><td>-24 &ndash; -5 mm</td><td class="p">15</td></tr><tr><td>-37 &ndash; -24 mm</td><td class="p">8</td></tr><tr><td>-50 &ndash; -37 mm</td><td class="p">3</td></tr></table>
+    </section>
+    
+    <section class="art" id="marone">
+      <h3>Maronenroehrling</h3>
+      <p class="lat">Imleria badia</p>
+      
+      <h4>Saisonfaktor</h4>
+      <div class="saison"><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Jan</div><div class="mwert">0.03</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Feb</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mrz</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Apr</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mai</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:4px;background:#2f353d"></div><div class="mname">Jun</div><div class="mwert">0.09</div></div><div class="mon"><div class="saeule" style="height:8px;background:#2f353d"></div><div class="mname">Jul</div><div class="mwert">0.17</div></div><div class="mon"><div class="saeule" style="height:17px;background:#8bc34a"></div><div class="mname">Aug</div><div class="mwert">0.37</div></div><div class="mon"><div class="saeule" style="height:46px;background:#5fb763"></div><div class="mname">Sep</div><div class="mwert">0.99</div></div><div class="mon"><div class="saeule" style="height:46px;background:#5fb763"></div><div class="mname">Okt</div><div class="mwert">1.00</div></div><div class="mon"><div class="saeule" style="height:41px;background:#5fb763"></div><div class="mname">Nov</div><div class="mwert">0.89</div></div><div class="mon"><div class="saeule" style="height:7px;background:#2f353d"></div><div class="mname">Dez</div><div class="mwert">0.15</div></div></div>
+      <h4>Baumarten-Faktor</h4>
+      <p><span class='chip' style='font-weight:600'>Fichte &times;1.0</span> <span class='chip' style='font-weight:600'>Kiefer &times;0.95</span> <span class='chip' style='font-weight:600'>Tanne &times;0.9</span> <span class='chip'>Douglasie &times;0.7</span> <span class='chip'>Laerche &times;0.6</span> <span class='chip'>Buche &times;0.5</span> <span class='chip'>Eiche &times;0.35</span> <span class='chip'>Birke &times;0.3</span> <span class='chip'>sonst. Laubholz (langlebig) &times;0.25</span> <span class='chip'>sonst. Laubholz (kurzlebig) &times;0.2</span> <span class='chip'>Erle &times;0.15</span></p>
+      <h4>Wetterpunkte</h4>
+      <table class='baender'><tr><th>Groesse</th><th>Bereich</th><th>Punkte</th></tr><tr><td rowspan="4" class="gruppe">Bodenfeuchte 0-7 cm<br><small>max. 18 Punkte</small></td><td>ab 27 %</td><td class="p">18</td></tr><tr><td>22 &ndash; 27 %</td><td class="p">15</td></tr><tr><td>19 &ndash; 22 %</td><td class="p">9</td></tr><tr><td>16 &ndash; 19 %</td><td class="p">4</td></tr><tr><td rowspan="4" class="gruppe">Bodentemperatur 0-7 cm<br><small>max. 22 Punkte</small></td><td>7.5 &ndash; 13 &deg;C</td><td class="p">22</td></tr><tr><td>13 &ndash; 16 &deg;C</td><td class="p">17</td></tr><tr><td>16 &ndash; 18 &deg;C</td><td class="p">8</td></tr><tr><td>5 &ndash; 7.5 &deg;C</td><td class="p">6</td></tr><tr><td rowspan="4" class="gruppe">Lufttemperatur, Mittel 14 Tage<br><small>max. 14 Punkte</small></td><td>8.5 &ndash; 14 &deg;C</td><td class="p">14</td></tr><tr><td>14 &ndash; 16.5 &deg;C</td><td class="p">10</td></tr><tr><td>6 &ndash; 8.5 &deg;C</td><td class="p">5</td></tr><tr><td>16.5 &ndash; 18 &deg;C</td><td class="p">4</td></tr><tr><td rowspan="4" class="gruppe">Niederschlag Tag 4-14<br><small>max. 14 Punkte</small></td><td>ab 34 mm</td><td class="p">14</td></tr><tr><td>15 &ndash; 34 mm</td><td class="p">10</td></tr><tr><td>8 &ndash; 15 mm</td><td class="p">7</td></tr><tr><td>4 &ndash; 8 mm</td><td class="p">3</td></tr><tr><td rowspan="3" class="gruppe">Regentage von 14<br><small>max. 14 Punkte</small></td><td>ab 6 </td><td class="p">14</td></tr><tr><td>3 &ndash; 6 </td><td class="p">10</td></tr><tr><td>2 &ndash; 3 </td><td class="p">5</td></tr><tr><td rowspan="4" class="gruppe">Wasserbilanz 14 Tage<br><small>max. 18 Punkte</small></td><td>ab 24 mm</td><td class="p">18</td></tr><tr><td>-1 &ndash; 24 mm</td><td class="p">14</td></tr><tr><td>-14 &ndash; -1 mm</td><td class="p">9</td></tr><tr><td>-28 &ndash; -14 mm</td><td class="p">5</td></tr></table>
+    </section>
+    
+    <section class="art" id="pfifferling">
+      <h3>Pfifferling</h3>
+      <p class="lat">Cantharellus cibarius</p>
+      
+      <h4>Saisonfaktor</h4>
+      <div class="saison"><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Jan</div><div class="mwert">0.05</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Feb</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mrz</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Apr</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mai</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:23px;background:#8bc34a"></div><div class="mname">Jun</div><div class="mwert">0.49</div></div><div class="mon"><div class="saeule" style="height:46px;background:#5fb763"></div><div class="mname">Jul</div><div class="mwert">1.00</div></div><div class="mon"><div class="saeule" style="height:23px;background:#8bc34a"></div><div class="mname">Aug</div><div class="mwert">0.49</div></div><div class="mon"><div class="saeule" style="height:21px;background:#8bc34a"></div><div class="mname">Sep</div><div class="mwert">0.46</div></div><div class="mon"><div class="saeule" style="height:7px;background:#2f353d"></div><div class="mname">Okt</div><div class="mwert">0.15</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Nov</div><div class="mwert">0.03</div></div><div class="mon"><div class="saeule" style="height:7px;background:#2f353d"></div><div class="mname">Dez</div><div class="mwert">0.16</div></div></div>
+      <h4>Baumarten-Faktor</h4>
+      <p><span class='chip' style='font-weight:600'>Fichte &times;1.0</span> <span class='chip' style='font-weight:600'>Kiefer &times;0.9</span> <span class='chip' style='font-weight:600'>Tanne &times;0.85</span> <span class='chip'>Buche &times;0.6</span> <span class='chip'>Eiche &times;0.55</span> <span class='chip'>Douglasie &times;0.5</span> <span class='chip'>Laerche &times;0.45</span> <span class='chip'>Birke &times;0.4</span> <span class='chip'>sonst. Laubholz (langlebig) &times;0.3</span> <span class='chip'>sonst. Laubholz (kurzlebig) &times;0.25</span> <span class='chip'>Erle &times;0.2</span></p>
+      <h4>Wetterpunkte</h4>
+      <table class='baender'><tr><th>Groesse</th><th>Bereich</th><th>Punkte</th></tr><tr><td rowspan="4" class="gruppe">Bodenfeuchte 0-7 cm<br><small>max. 18 Punkte</small></td><td>ab 33 %</td><td class="p">18</td></tr><tr><td>27 &ndash; 33 %</td><td class="p">13</td></tr><tr><td>23 &ndash; 27 %</td><td class="p">8</td></tr><tr><td>18 &ndash; 23 %</td><td class="p">3</td></tr><tr><td rowspan="4" class="gruppe">Bodentemperatur 0-7 cm<br><small>max. 16 Punkte</small></td><td>16 &ndash; 19 &deg;C</td><td class="p">16</td></tr><tr><td>13 &ndash; 16 &deg;C</td><td class="p">13</td></tr><tr><td>19 &ndash; 20.5 &deg;C</td><td class="p">8</td></tr><tr><td>10 &ndash; 13 &deg;C</td><td class="p">6</td></tr><tr><td rowspan="3" class="gruppe">Lufttemperatur, Mittel 14 Tage<br><small>max. 10 Punkte</small></td><td>17 &ndash; 19 &deg;C</td><td class="p">10</td></tr><tr><td>13.5 &ndash; 17 &deg;C</td><td class="p">8</td></tr><tr><td>19 &ndash; 20 &deg;C</td><td class="p">3</td></tr><tr><td rowspan="4" class="gruppe">Regentage von 14<br><small>max. 15 Punkte</small></td><td>ab 8 </td><td class="p">15</td></tr><tr><td>6 &ndash; 8 </td><td class="p">10</td></tr><tr><td>5 &ndash; 6 </td><td class="p">6</td></tr><tr><td>3 &ndash; 5 </td><td class="p">3</td></tr><tr><td rowspan="4" class="gruppe">Wasserbilanz 14 Tage<br><small>max. 16 Punkte</small></td><td>ab 11 mm</td><td class="p">16</td></tr><tr><td>-7 &ndash; 11 mm</td><td class="p">11</td></tr><tr><td>-23 &ndash; -7 mm</td><td class="p">5</td></tr><tr><td>-40 &ndash; -23 mm</td><td class="p">2</td></tr><tr><td rowspan="4" class="gruppe">Wasserbilanz 60 Tage<br><small>max. 25 Punkte</small></td><td>ab -25 mm</td><td class="p">25</td></tr><tr><td>-63 &ndash; -25 mm</td><td class="p">15</td></tr><tr><td>-95 &ndash; -63 mm</td><td class="p">6</td></tr><tr><td>-143 &ndash; -95 mm</td><td class="p">2</td></tr></table>
+    </section>
+    
+    <section class="art" id="birkenpilz">
+      <h3>Birkenpilz</h3>
+      <p class="lat">Leccinum scabrum</p>
+      
+      <h4>Saisonfaktor</h4>
+      <div class="saison"><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Jan</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Feb</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mrz</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Apr</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mai</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Jun</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:10px;background:#2f353d"></div><div class="mname">Jul</div><div class="mwert">0.22</div></div><div class="mon"><div class="saeule" style="height:13px;background:#2f353d"></div><div class="mname">Aug</div><div class="mwert">0.28</div></div><div class="mon"><div class="saeule" style="height:46px;background:#5fb763"></div><div class="mname">Sep</div><div class="mwert">1.00</div></div><div class="mon"><div class="saeule" style="height:42px;background:#5fb763"></div><div class="mname">Okt</div><div class="mwert">0.91</div></div><div class="mon"><div class="saeule" style="height:13px;background:#2f353d"></div><div class="mname">Nov</div><div class="mwert">0.29</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Dez</div><div class="mwert">0.00</div></div></div>
+      <h4>Baumarten-Faktor</h4>
+      <p><span class='chip' style='font-weight:600'>Birke &times;1.0</span> <span class='chip'>sonst. Laubholz (kurzlebig) &times;0.45</span> <span class='chip'>Erle &times;0.3</span> <span class='chip'>Kiefer &times;0.25</span> <span class='chip'>sonst. Laubholz (langlebig) &times;0.2</span> <span class='chip'>Eiche &times;0.15</span> <span class='chip'>Buche &times;0.1</span> <span class='chip'>Laerche &times;0.1</span> <span class='chip'>Fichte &times;0.1</span> <span class='chip'>Tanne &times;0.05</span> <span class='chip'>Douglasie &times;0.05</span></p>
+      <h4>Wetterpunkte</h4>
+      <table class='baender'><tr><th>Groesse</th><th>Bereich</th><th>Punkte</th></tr><tr><td rowspan="4" class="gruppe">Bodenfeuchte 0-7 cm<br><small>max. 20 Punkte</small></td><td>ab 30 %</td><td class="p">20</td></tr><tr><td>25 &ndash; 30 %</td><td class="p">16</td></tr><tr><td>21 &ndash; 25 %</td><td class="p">10</td></tr><tr><td>17 &ndash; 21 %</td><td class="p">5</td></tr><tr><td rowspan="3" class="gruppe">Bodentemperatur 0-7 cm<br><small>max. 20 Punkte</small></td><td>bis 15 &deg;C</td><td class="p">20</td></tr><tr><td>15 &ndash; 16.5 &deg;C</td><td class="p">14</td></tr><tr><td>16.5 &ndash; 18 &deg;C</td><td class="p">6</td></tr><tr><td rowspan="3" class="gruppe">Lufttemperatur, Mittel 14 Tage<br><small>max. 14 Punkte</small></td><td>11 &ndash; 15.5 &deg;C</td><td class="p">14</td></tr><tr><td>8 &ndash; 11 &deg;C</td><td class="p">9</td></tr><tr><td>15.5 &ndash; 17 &deg;C</td><td class="p">8</td></tr><tr><td rowspan="3" class="gruppe">Niederschlag Tag 4-14<br><small>max. 14 Punkte</small></td><td>ab 34 mm</td><td class="p">14</td></tr><tr><td>9 &ndash; 34 mm</td><td class="p">11</td></tr><tr><td>4 &ndash; 9 mm</td><td class="p">6</td></tr><tr><td rowspan="3" class="gruppe">Regentage von 14<br><small>max. 14 Punkte</small></td><td>ab 6 </td><td class="p">14</td></tr><tr><td>4 &ndash; 6 </td><td class="p">10</td></tr><tr><td>2 &ndash; 4 </td><td class="p">6</td></tr><tr><td rowspan="4" class="gruppe">Wasserbilanz 14 Tage<br><small>max. 18 Punkte</small></td><td>ab 20 mm</td><td class="p">18</td></tr><tr><td>-7 &ndash; 20 mm</td><td class="p">14</td></tr><tr><td>-20 &ndash; -7 mm</td><td class="p">9</td></tr><tr><td>-34 &ndash; -20 mm</td><td class="p">5</td></tr></table>
+    </section>
+    
+    <section class="art" id="parasol">
+      <h3>Parasol</h3>
+      <p class="lat">Macrolepiota procera</p>
+      
+      <h4>Saisonfaktor</h4>
+      <div class="saison"><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Jan</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Feb</div><div class="mwert">0.02</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mrz</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Apr</div><div class="mwert">0.00</div></div><div class="mon"><div class="saeule" style="height:6px;background:#2f353d"></div><div class="mname">Mai</div><div class="mwert">0.12</div></div><div class="mon"><div class="saeule" style="height:23px;background:#8bc34a"></div><div class="mname">Jun</div><div class="mwert">0.51</div></div><div class="mon"><div class="saeule" style="height:24px;background:#8bc34a"></div><div class="mname">Jul</div><div class="mwert">0.52</div></div><div class="mon"><div class="saeule" style="height:28px;background:#8bc34a"></div><div class="mname">Aug</div><div class="mwert">0.60</div></div><div class="mon"><div class="saeule" style="height:46px;background:#5fb763"></div><div class="mname">Sep</div><div class="mwert">1.00</div></div><div class="mon"><div class="saeule" style="height:32px;background:#8bc34a"></div><div class="mname">Okt</div><div class="mwert">0.69</div></div><div class="mon"><div class="saeule" style="height:21px;background:#8bc34a"></div><div class="mname">Nov</div><div class="mwert">0.46</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Dez</div><div class="mwert">0.00</div></div></div>
+      <h4>Baumarten-Faktor</h4>
+      <p><span class='chip' style='font-weight:600'>Eiche &times;1.0</span> <span class='chip' style='font-weight:600'>Birke &times;1.0</span> <span class='chip' style='font-weight:600'>sonst. Laubholz (langlebig) &times;1.0</span> <span class='chip' style='font-weight:600'>sonst. Laubholz (kurzlebig) &times;1.0</span> <span class='chip' style='font-weight:600'>Buche &times;0.95</span> <span class='chip' style='font-weight:600'>Laerche &times;0.95</span> <span class='chip' style='font-weight:600'>Kiefer &times;0.9</span> <span class='chip' style='font-weight:600'>Erle &times;0.85</span> <span class='chip' style='font-weight:600'>Fichte &times;0.8</span> <span class='chip' style='font-weight:600'>Douglasie &times;0.8</span> <span class='chip' style='font-weight:600'>Tanne &times;0.8</span></p>
+      <h4>Wetterpunkte</h4>
+      <table class='baender'><tr><th>Groesse</th><th>Bereich</th><th>Punkte</th></tr><tr><td rowspan="4" class="gruppe">Bodenfeuchte 0-7 cm<br><small>max. 18 Punkte</small></td><td>ab 33 %</td><td class="p">18</td></tr><tr><td>24 &ndash; 33 %</td><td class="p">14</td></tr><tr><td>20 &ndash; 24 %</td><td class="p">8</td></tr><tr><td>17 &ndash; 20 %</td><td class="p">3</td></tr><tr><td rowspan="4" class="gruppe">Bodentemperatur 0-7 cm<br><small>max. 22 Punkte</small></td><td>9 &ndash; 12.5 &deg;C</td><td class="p">22</td></tr><tr><td>12.5 &ndash; 16 &deg;C</td><td class="p">16</td></tr><tr><td>16 &ndash; 19 &deg;C</td><td class="p">10</td></tr><tr><td>7 &ndash; 9 &deg;C</td><td class="p">7</td></tr><tr><td rowspan="3" class="gruppe">Lufttemperatur, Mittel 14 Tage<br><small>max. 10 Punkte</small></td><td>10 &ndash; 16 &deg;C</td><td class="p">10</td></tr><tr><td>16 &ndash; 19 &deg;C</td><td class="p">6</td></tr><tr><td>8 &ndash; 10 &deg;C</td><td class="p">5</td></tr><tr><td rowspan="4" class="gruppe">Niederschlag Tag 4-14<br><small>max. 15 Punkte</small></td><td>ab 34 mm</td><td class="p">15</td></tr><tr><td>24 &ndash; 34 mm</td><td class="p">11</td></tr><tr><td>15 &ndash; 24 mm</td><td class="p">6</td></tr><tr><td>7 &ndash; 15 mm</td><td class="p">3</td></tr><tr><td rowspan="4" class="gruppe">Regentage von 14<br><small>max. 15 Punkte</small></td><td>ab 8 </td><td class="p">15</td></tr><tr><td>6 &ndash; 8 </td><td class="p">11</td></tr><tr><td>5 &ndash; 6 </td><td class="p">6</td></tr><tr><td>3 &ndash; 5 </td><td class="p">3</td></tr><tr><td rowspan="4" class="gruppe">Wasserbilanz 14 Tage<br><small>max. 20 Punkte</small></td><td>ab 22 mm</td><td class="p">20</td></tr><tr><td>5 &ndash; 22 mm</td><td class="p">16</td></tr><tr><td>-9 &ndash; 5 mm</td><td class="p">11</td></tr><tr><td>-28 &ndash; -9 mm</td><td class="p">4</td></tr></table>
+    </section>
+    
+    <section class="art" id="schwefelporling">
+      <h3>Schwefelporling</h3>
+      <p class="lat">Laetiporus sulphureus</p>
+      <p class="hinweis">Holzbewohner: Abzuege fuer Bodentrockenheit wirken nur zu 20 %, weil diese Art ihr Wasser aus dem Stamm zieht.</p>
+      <h4>Saisonfaktor</h4>
+      <div class="saison"><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Jan</div><div class="mwert">0.03</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Feb</div><div class="mwert">0.01</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Mrz</div><div class="mwert">0.03</div></div><div class="mon"><div class="saeule" style="height:6px;background:#2f353d"></div><div class="mname">Apr</div><div class="mwert">0.14</div></div><div class="mon"><div class="saeule" style="height:46px;background:#5fb763"></div><div class="mname">Mai</div><div class="mwert">1.00</div></div><div class="mon"><div class="saeule" style="height:17px;background:#8bc34a"></div><div class="mname">Jun</div><div class="mwert">0.37</div></div><div class="mon"><div class="saeule" style="height:4px;background:#2f353d"></div><div class="mname">Jul</div><div class="mwert">0.08</div></div><div class="mon"><div class="saeule" style="height:5px;background:#2f353d"></div><div class="mname">Aug</div><div class="mwert">0.11</div></div><div class="mon"><div class="saeule" style="height:6px;background:#2f353d"></div><div class="mname">Sep</div><div class="mwert">0.13</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Okt</div><div class="mwert">0.02</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Nov</div><div class="mwert">0.01</div></div><div class="mon"><div class="saeule" style="height:2px;background:#2f353d"></div><div class="mname">Dez</div><div class="mwert">0.02</div></div></div>
+      <h4>Baumarten-Faktor</h4>
+      <p><span class='chip' style='font-weight:600'>Eiche &times;1.0</span> <span class='chip' style='font-weight:600'>sonst. Laubholz (kurzlebig) &times;0.85</span> <span class='chip' style='font-weight:600'>sonst. Laubholz (langlebig) &times;0.8</span> <span class='chip'>Erle &times;0.4</span> <span class='chip'>Buche &times;0.35</span> <span class='chip'>Birke &times;0.3</span> <span class='chip'>Laerche &times;0.15</span> <span class='chip'>Kiefer &times;0.1</span> <span class='chip'>Fichte &times;0.08</span> <span class='chip'>Douglasie &times;0.08</span> <span class='chip'>Tanne &times;0.08</span></p>
+      <h4>Wetterpunkte</h4>
+      <table class='baender'><tr><th>Groesse</th><th>Bereich</th><th>Punkte</th></tr><tr><td rowspan="3" class="gruppe">Bodenfeuchte 0-7 cm<br><small>max. 25 Punkte</small></td><td>ab 30 %</td><td class="p">25</td></tr><tr><td>15 &ndash; 30 %</td><td class="p">22</td></tr><tr><td>bis 15 %</td><td class="p">20</td></tr><tr><td rowspan="3" class="gruppe">Bodentemperatur 0-7 cm<br><small>max. 25 Punkte</small></td><td>bis 16 &deg;C</td><td class="p">25</td></tr><tr><td>16 &ndash; 18.5 &deg;C</td><td class="p">22</td></tr><tr><td>ab 18.5 &deg;C</td><td class="p">19</td></tr><tr><td rowspan="3" class="gruppe">Lufttemperatur, Mittel 14 Tage<br><small>max. 20 Punkte</small></td><td>bis 16 &deg;C</td><td class="p">20</td></tr><tr><td>16 &ndash; 18 &deg;C</td><td class="p">17</td></tr><tr><td>ab 18 &deg;C</td><td class="p">15</td></tr><tr><td rowspan="3" class="gruppe">Wasserbilanz 60 Tage<br><small>max. 30 Punkte</small></td><td>ab -42 mm</td><td class="p">30</td></tr><tr><td>-100 &ndash; -42 mm</td><td class="p">24</td></tr><tr><td>bis -100 mm</td><td class="p">20</td></tr></table>
+    </section>
+    
+
+</body>
+</html>

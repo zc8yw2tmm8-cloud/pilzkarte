@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilzkarte</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.4 system-ui, sans-serif;
+          display: flex; flex-direction: column; height: 100vh;
+          background: #15181c; color: #e6e6e6; }
+  header { padding: 10px 14px; background: #1e2228;
+            border-bottom: 1px solid #2f353d;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  h1 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
+  .leiste { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  /* Auf dem Telefon: eine Zeile zum Wischen statt vieler Reihen.
+     Sonst frisst die Leiste die halbe Bildschirmhoehe. */
+  @media (max-width: 700px) {
+    body { -webkit-text-size-adjust: 100%; }
+    header { padding: 8px 10px; }
+    h1 { font-size: 14px; margin-bottom: 6px; }
+    .leiste { flex-wrap: nowrap; overflow-x: auto;
+               scrollbar-width: none;
+               -webkit-overflow-scrolling: touch;
+               padding-bottom: 2px; }
+    .leiste::-webkit-scrollbar { display: none; }
+    button.art { flex: 0 0 auto; padding: 9px 12px; font-size: 13px;
+                  min-height: 40px; }
+    button.art.liste, button.art.info { margin-left: 0; }
+  }
+  button.art { border: 1px solid #2f353d;
+                background: #15181c; color: #e6e6e6;
+                padding: 7px 12px; border-radius: 20px; cursor: pointer;
+                font-size: 14px; display: flex; align-items: baseline;
+                gap: 6px; }
+  button.art:hover { border-color: #5fb763; }
+  button.art.aktiv { background: #5fb763;
+                      border-color: #5fb763;
+                      color: #1e2228; }
+  button.art.liste { margin-left: auto; background: #1e2228; }
+  button.art.info {
+                     background: #1e2228;
+                     border-style: dashed; }
+  button.art.info.aktiv { background: #455a64; border-color: #455a64; }
+  button.art .wert { font-size: 10px; opacity: .65;
+                      margin-left: 2px; }
+  button.art .wert b { font-size: 14px; font-weight: 700;
+                        opacity: 1; }
+  iframe { flex: 1; width: 100%; border: 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pilzkarte &ndash; Region Wolfsburg / Braunschweig / Suedheide</h1>
+  <div class="leiste"><button class="art" data-datei="karte_pfifferling.html" data-i="0">Pfifferling<span class="wert"><b>13</b>/100</span></button><button class="art" data-datei="karte_parasol.html" data-i="1">Parasol<span class="wert"><b>10</b>/100</span></button><button class="art" data-datei="karte_schwefelporling.html" data-i="2">Schwefelporling<span class="wert"><b>5</b>/100</span></button><button class="art" data-datei="karte_sommersteinpilz.html" data-i="3">Sommersteinpilz<span class="wert"><b>5</b>/100</span></button><button class="art" data-datei="karte_steinpilz.html" data-i="4">Steinpilz<span class="wert"><b>4</b>/100</span></button><button class="art" data-datei="karte_marone.html" data-i="5">Maronenroehrling<span class="wert"><b>3</b>/100</span></button><button class="art" data-datei="karte_birkenpilz.html" data-i="6">Birkenpilz<span class="wert"><b>2</b>/100</span></button><button class="art liste" data-datei="beste.html">&#9733; Beste Gebiete</button><button class="art info" data-datei="info.html">? Wie wird gerechnet</button></div>
+</header>
+<iframe id="rahmen" src="karte_pfifferling.html"></iframe>
+<script>
+  var knoepfe = document.querySelectorAll('button.art');
+  var rahmen = document.getElementById('rahmen');
+  knoepfe.forEach(function (b) {
+    b.addEventListener('click', function () {
+      knoepfe.forEach(function (x) { x.classList.remove('aktiv'); });
+      b.classList.add('aktiv');
+      rahmen.src = b.dataset.datei;
+    });
+  });
+  if (knoepfe.length) { knoepfe[0].classList.add('aktiv'); }
+</script>
+</body>
+</html>
