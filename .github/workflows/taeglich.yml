@@ -65,6 +65,6 @@ jobs:
             echo "Nichts geaendert"
           else
             git commit -m "Wetterdaten $(date +%Y-%m-%d)"
-            git pull --rebase
+            git pull --rebase --autostash
             git push
           fi
