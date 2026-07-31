@@ -16,10 +16,15 @@ concurrency:
   group: taeglich
   cancel-in-progress: false
 
+env:
+  # Sonst puffert Python die Ausgabe und man sieht bei einem
+  # abgebrochenen Lauf ueberhaupt nichts.
+  PYTHONUNBUFFERED: "1"
+
 jobs:
   sammeln:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     steps:
       - name: Projekt holen
