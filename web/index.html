@@ -28,6 +28,37 @@
   h1 { font-size: 15px; font-weight: 600; margin: 0; }
   .stand { font-size: 11px; color: var(--leise); margin-left: auto; }
 
+  .ansicht { display: flex; gap: 3px; margin-left: 10px; }
+  .um { border: 1px solid var(--linie); background: transparent;
+        color: var(--leise); padding: 4px 10px; cursor: pointer;
+        font-size: 12px; border-radius: 5px; min-height: 30px; }
+  .um.aktiv { background: var(--linie); color: var(--text); }
+  a.um { text-decoration: none; display: flex; align-items: center;
+         justify-content: center; min-width: 32px; }
+
+  #liste { flex: 1 1 auto; overflow-y: auto; padding: 12px 12px 60px;
+           -webkit-overflow-scrolling: touch; }
+  #liste h2 { font-size: 15px; margin: 20px 0 6px;
+              border-bottom: 1px solid var(--linie); padding-bottom: 4px;
+              display: flex; align-items: baseline; }
+  #liste h2:first-child { margin-top: 0; }
+  #liste h2 .saison { margin-left: auto; font-weight: 400; font-size: 12px;
+                      color: var(--leise); }
+  #liste table { width: 100%; border-collapse: collapse; }
+  #liste td { padding: 7px 5px; border-bottom: 1px solid var(--linie);
+              vertical-align: top; }
+  #liste td.rang { width: 24px; color: var(--leise);
+                   font-variant-numeric: tabular-nums; }
+  #liste td.wert { text-align: right; width: 46px; font-size: 18px;
+                   font-weight: 700; font-variant-numeric: tabular-nums; }
+  #liste td.hin { width: 62px; text-align: right; }
+  #liste .klein { font-size: 11px; color: var(--leise); }
+  #liste button.hin { border: 1px solid var(--linie); background: transparent;
+                      color: var(--akzent); padding: 5px 9px;
+                      border-radius: 5px; cursor: pointer; font-size: 12px;
+                      min-height: 32px; white-space: nowrap; }
+  #liste .leer { color: var(--leise); font-size: 13px; padding: 8px 0; }
+
   .leiste { display: flex; gap: 6px; overflow-x: auto;
             scrollbar-width: none; padding-bottom: 2px; }
   .leiste::-webkit-scrollbar { display: none; }
@@ -53,6 +84,7 @@
                font-weight: 600; }
 
   #karte { flex: 1 1 auto; min-height: 0; }
+  #karte[hidden], #liste[hidden] { display: none; }
 
   .maplibregl-popup-content {
     background: var(--flaeche); color: var(--text);
@@ -80,7 +112,13 @@
                        padding-left: 10px; }
   .pop tr.hier td { font-weight: 700; }
 
-  .legende { position: absolute; bottom: 20px; left: 10px;
+  .fuss { position: absolute; bottom: 0; left: 0; right: 0;
+          background: rgba(24,28,33,.82); color: var(--leise);
+          font-size: 10.5px; padding: 4px 10px; text-align: center;
+          pointer-events: none; }
+  .fuss a { color: var(--leise); pointer-events: auto; }
+
+  .legende { position: absolute; bottom: 28px; left: 10px;
              background: rgba(24,28,33,.93); padding: 8px 10px;
              border-radius: 8px; font-size: 11px; line-height: 1.5;
              pointer-events: none; }
@@ -103,6 +141,11 @@
 <header>
   <div class="kopfzeile">
     <h1>Pilzkarte</h1>
+    <div class="ansicht">
+      <button class="um aktiv" data-ansicht="karte">Karte</button>
+      <button class="um" data-ansicht="liste">Beste Gebiete</button>
+      <a class="um" href="info.html">?</a>
+    </div>
     <span class="stand" id="stand"></span>
   </div>
   <div class="leiste" id="arten"></div>
@@ -110,6 +153,7 @@
 </header>
 
 <div id="karte"></div>
+<div id="liste" hidden></div>
 <div class="laedt" id="laedt">Lade Daten …</div>
 
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
@@ -174,6 +218,8 @@ function aktualisiere() {
   });
   document.querySelectorAll(".tag").forEach(b =>
     b.classList.toggle("aktiv", +b.dataset.tag === tag));
+
+  if (!document.getElementById("liste").hidden) baueListe();
 }
 
 // ---- Popup ----------------------------------------------------------
@@ -247,6 +293,74 @@ function popupInhalt(z) {
   </div>`;
 }
 
+// ---- Bestenliste ----------------------------------------------------
+function pfeilFuer(z, a) {
+  const liste = z.scores[a];
+  const jetzt = liste[0];
+  if (jetzt === null) return "";
+  const kuenftig = liste.slice(1).filter(w => w !== null);
+  if (!kuenftig.length) return "";
+  if (Math.max(...kuenftig) >= jetzt + 8)
+    return '<span style="color:#2e9e4f" title="wird besser">▲</span>';
+  if (Math.min(...kuenftig) <= jetzt - 8)
+    return '<span style="color:#c0392b" title="wird schlechter">▼</span>';
+  return "";
+}
+
+function baueListe() {
+  const teile = Object.entries(D.arten).map(([a, e]) => {
+    const beste = D.zellen
+      .map(z => [z, z.scores[a][tag]])
+      .filter(([, w]) => w !== null && w > 0)
+      .sort((x, y) => y[1] - x[1])
+      .slice(0, 12);
+
+    if (!beste.length)
+      return `<h2>${e.name}</h2><div class="leer">keine Werte</div>`;
+
+    const zeilen = beste.map(([z, w], i) => `
+      <tr>
+        <td class="rang">${i + 1}</td>
+        <td><b>${z.titel}</b>
+            <div class="klein">${z.bestand || "Bestand unbekannt"}</div></td>
+        <td class="wert" style="color:${farbe(w)}">${w}
+            <div class="klein">${pfeilFuer(z, a)}</div></td>
+        <td class="hin"><button class="hin" data-lat="${z.lat}"
+            data-lon="${z.lon}" data-art="${a}">Zeigen</button></td>
+      </tr>`).join("");
+
+    return `<h2>${e.name}<span class="saison">Saison
+            ${komma(e.saison, 2)}</span></h2><table>${zeilen}</table>`;
+  });
+
+  const el = document.getElementById("liste");
+  el.innerHTML = `<div class="klein" style="margin-bottom:14px">
+      Je Art die zwölf höchsten Zellen für
+      <b>${D.tage[tag].name.toLowerCase()}</b>. Werte unter etwa 40
+      bedeuten geringe Aussichten.</div>` + teile.join("");
+
+  el.querySelectorAll("button.hin").forEach(b => b.onclick = () => {
+    art = b.dataset.art;
+    zeigeAnsicht("karte");
+    aktualisiere();
+    karte.flyTo({ center: [+b.dataset.lon, +b.dataset.lat], zoom: 12 });
+    // Popup der angeflogenen Zelle oeffnen
+    const z = D.zellen.find(x =>
+      x.lat === +b.dataset.lat && x.lon === +b.dataset.lon);
+    if (z) setTimeout(() => new maplibregl.Popup({ maxWidth: "320px" })
+      .setLngLat([z.lon, z.lat]).setHTML(popupInhalt(z)).addTo(karte), 700);
+  });
+}
+
+function zeigeAnsicht(welche) {
+  document.getElementById("karte").hidden = welche !== "karte";
+  document.getElementById("liste").hidden = welche !== "liste";
+  document.querySelectorAll(".um").forEach(b =>
+    b.classList.toggle("aktiv", b.dataset.ansicht === welche));
+  if (welche === "liste") baueListe();
+  else if (karte) karte.resize();
+}
+
 // ---- Aufbau ---------------------------------------------------------
 fetch("daten.json")
   .then(r => r.json())
@@ -269,6 +383,8 @@ fetch("daten.json")
       b.onclick = () => { art = b.dataset.art; aktualisiere(); });
     document.querySelectorAll(".tag").forEach(b =>
       b.onclick = () => { tag = +b.dataset.tag; aktualisiere(); });
+    document.querySelectorAll(".um").forEach(b =>
+      b.onclick = () => zeigeAnsicht(b.dataset.ansicht));
 
     const g = D.gebiet;
     karte = new maplibregl.Map({
@@ -330,6 +446,13 @@ fetch("daten.json")
       box.innerHTML = stufen.map(([w, t]) =>
         `<div><i style="background:${farbe(w)}"></i>${w}+ ${t}</div>`).join("");
       document.getElementById("karte").appendChild(box);
+
+      // Ruhiger Hinweis am unteren Rand statt eines Kastens beim Start
+      const fuss = document.createElement("div");
+      fuss.className = "fuss";
+      fuss.innerHTML = '.' +
+        '<a href="info.html">Wie wird gerechnet?</a>';
+      document.getElementById("karte").appendChild(fuss);
 
       document.getElementById("laedt").remove();
       aktualisiere();
