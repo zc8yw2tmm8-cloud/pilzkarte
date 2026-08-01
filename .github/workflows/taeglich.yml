@@ -56,15 +56,24 @@ jobs:
             echo "Nur sonntags - heute uebersprungen"
           fi
 
-      - name: Ergebnisse zurueckschreiben
+            - name: Ergebnisse zurückschreiben
         run: |
           git config user.name "Pilzkarte"
           git config user.email "actions@github.com"
+
+          # Erst den fremden Stand holen, dann die eigenen Ergebnisse
+          # daraufsetzen. Bei Konflikten in Datendateien gewinnt immer
+          # das, was dieser Lauf gerade berechnet hat - eine Mischung
+          # aus alter und neuer Vorhersage wäre sinnlos.
+          git stash push -- wetter_historie/ wetter_prognose.csv || true
+          git fetch origin main
+          git reset --hard origin/main
+          git stash pop || git checkout --theirs . || true
+
           git add wetter_historie/ wetter_prognose.csv
           if git diff --staged --quiet; then
             echo "Nichts geaendert"
           else
             git commit -m "Wetterdaten $(date +%Y-%m-%d)"
-            git pull --rebase --autostash
             git push
           fi
