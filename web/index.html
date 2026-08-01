@@ -58,6 +58,12 @@
                       border-radius: 5px; cursor: pointer; font-size: 12px;
                       min-height: 32px; white-space: nowrap; }
   #liste .leer { color: var(--leise); font-size: 13px; padding: 8px 0; }
+  #liste details { margin: 0 0 4px; }
+  #liste summary { cursor: pointer; color: var(--akzent); font-size: 13px;
+                   padding: 8px 5px; list-style: none; }
+  #liste summary::-webkit-details-marker { display: none; }
+  #liste summary::before { content: "▸ "; }
+  #liste details[open] summary::before { content: "▾ "; }
 
   .leiste { display: flex; gap: 6px; overflow-x: auto;
             scrollbar-width: none; padding-bottom: 2px; }
@@ -126,6 +132,14 @@
                border-radius: 2px; margin-right: 5px;
                vertical-align: -2px; }
 
+  .meldung { position: fixed; left: 50%; bottom: 24px;
+             transform: translateX(-50%); z-index: 30;
+             background: rgba(30,34,40,.96); color: var(--text);
+             border: 1px solid var(--linie); border-radius: 8px;
+             padding: 10px 14px; font-size: 12.5px; max-width: 88vw;
+             box-shadow: 0 2px 12px rgba(0,0,0,.5); }
+  .meldung[hidden] { display: none; }
+
   .laedt { position: absolute; inset: 0; display: grid; place-items: center;
            background: var(--grund); font-size: 14px; color: var(--leise);
            z-index: 5; }
@@ -181,6 +195,26 @@ const komma = (z, n = 1) =>
   z === null || z === undefined ? "–" : z.toFixed(n).replace(".", ",");
 
 let D = null, art = null, tag = 0, karte = null;
+
+function melde(text, dauer = 6000) {
+  let el = document.getElementById("meldung");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "meldung";
+    el.className = "meldung";
+    document.body.appendChild(el);
+  }
+  el.textContent = text;
+  el.hidden = false;
+  clearTimeout(el._zeit);
+  el._zeit = setTimeout(() => { el.hidden = true; }, dauer);
+}
+
+// Standort geben Browser nur ueber https heraus - sonst passiert beim
+// Antippen schlicht nichts, ohne jede Meldung.
+const sicher = location.protocol === "https:" ||
+               location.hostname === "localhost" ||
+               location.hostname === "127.0.0.1";
 
 // ---- Daten in GeoJSON-Rechtecke umwandeln ---------------------------
 function baueGeoJson() {
@@ -308,17 +342,19 @@ function pfeilFuer(z, a) {
 }
 
 function baueListe() {
-  const teile = Object.entries(D.arten).map(([a, e]) => {
+  // Arten nach ihrer besten Flaeche sortieren - was heute lohnt,
+  // steht oben. Sonst muesste man sich durch sieben Abschnitte
+  // scrollen, um zu sehen, wo ueberhaupt etwas geht.
+  const bloecke = Object.entries(D.arten).map(([a, e]) => {
     const beste = D.zellen
       .map(z => [z, z.scores[a][tag]])
       .filter(([, w]) => w !== null && w > 0)
       .sort((x, y) => y[1] - x[1])
       .slice(0, 12);
+    return { a, e, beste, spitze: beste.length ? beste[0][1] : -1 };
+  }).sort((x, y) => y.spitze - x.spitze);
 
-    if (!beste.length)
-      return `<h2>${e.name}</h2><div class="leer">keine Werte</div>`;
-
-    const zeilen = beste.map(([z, w], i) => `
+  const zeile = ([z, w], i, a) => `
       <tr>
         <td class="rang">${i + 1}</td>
         <td><b>${z.titel}</b>
@@ -327,24 +363,33 @@ function baueListe() {
             <div class="klein">${pfeilFuer(z, a)}</div></td>
         <td class="hin"><button class="hin" data-lat="${z.lat}"
             data-lon="${z.lon}" data-art="${a}">Zeigen</button></td>
-      </tr>`).join("");
+      </tr>`;
+
+  const teile = bloecke.map(({ a, e, beste }) => {
+    if (!beste.length)
+      return `<h2>${e.name}</h2><div class="leer">keine Werte</div>`;
+
+    const oben = beste.slice(0, 3).map((p, i) => zeile(p, i, a)).join("");
+    const rest = beste.slice(3).map((p, i) => zeile(p, i + 3, a)).join("");
 
     return `<h2>${e.name}<span class="saison">Saison
-            ${komma(e.saison, 2)}</span></h2><table>${zeilen}</table>`;
+            ${komma(e.saison, 2)}</span></h2>
+      <table>${oben}</table>
+      ${rest ? `<details><summary>Weitere ${beste.length - 3} Gebiete
+        </summary><table>${rest}</table></details>` : ""}`;
   });
 
   const el = document.getElementById("liste");
   el.innerHTML = `<div class="klein" style="margin-bottom:14px">
-      Je Art die zwölf höchsten Zellen für
+      Sortiert nach Aussichten für
       <b>${D.tage[tag].name.toLowerCase()}</b>. Werte unter etwa 40
-      bedeuten geringe Aussichten.</div>` + teile.join("");
+      bedeuten geringe Chancen.</div>` + teile.join("");
 
   el.querySelectorAll("button.hin").forEach(b => b.onclick = () => {
     art = b.dataset.art;
     zeigeAnsicht("karte");
     aktualisiere();
     karte.flyTo({ center: [+b.dataset.lon, +b.dataset.lat], zoom: 12 });
-    // Popup der angeflogenen Zelle oeffnen
     const z = D.zellen.find(x =>
       x.lat === +b.dataset.lat && x.lon === +b.dataset.lon);
     if (z) setTimeout(() => new maplibregl.Popup({ maxWidth: "320px" })
@@ -411,9 +456,24 @@ fetch("daten.json")
     });
 
     karte.addControl(new maplibregl.NavigationControl({ showCompass: false }));
-    karte.addControl(new maplibregl.GeolocateControl({
-      positionOptions: { enableHighAccuracy: true }, trackUserLocation: true
-    }));
+    const orten = new maplibregl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true, timeout: 12000 },
+      trackUserLocation: true,
+      showUserLocation: true
+    });
+    karte.addControl(orten);
+
+    // Ohne Rueckmeldung bleibt unklar, warum nichts passiert.
+    orten.on("error", e => {
+      const gruende = {
+        1: "Die Seite darf deinen Standort nicht abrufen. In den " +
+           "Browsereinstellungen für diese Seite freigeben.",
+        2: "Standort nicht ermittelbar. Ortungsdienste eingeschaltet?",
+        3: "Zeitüberschreitung. Unter freiem Himmel nochmal versuchen."
+      };
+      melde(gruende[e && e.code] ||
+            "Standort konnte nicht ermittelt werden.");
+    });
     karte.addControl(new maplibregl.ScaleControl({ maxWidth: 90 }));
 
     karte.on("load", () => {
@@ -450,9 +510,17 @@ fetch("daten.json")
       // Ruhiger Hinweis am unteren Rand statt eines Kastens beim Start
       const fuss = document.createElement("div");
       fuss.className = "fuss";
-      fuss.innerHTML = '.' +
+      fuss.innerHTML = 'Zeigt Bedingungen, keine Pilze &ndash; ' +
+        'Bestimmung immer selbst pr&uuml;fen. ' +
         '<a href="info.html">Wie wird gerechnet?</a>';
       document.getElementById("karte").appendChild(fuss);
+
+      if (!sicher) {
+        melde("Ohne verschlüsselte Verbindung (https) gibt der Browser " +
+              "den Standort nicht frei.", 9000);
+      } else if (!navigator.geolocation) {
+        melde("Dieser Browser kennt keine Standortbestimmung.");
+      }
 
       document.getElementById("laedt").remove();
       aktualisiere();

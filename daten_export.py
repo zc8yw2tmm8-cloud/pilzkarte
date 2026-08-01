@@ -69,12 +69,23 @@ def main():
 
         # Scores fuer alle Arten und Stichtage
         scores = {}
+        teile = {}
         for art in artenmodul.ARTEN:
             werte = []
-            for tag in bezugstage:
+            for i, tag in enumerate(bezugstage):
                 kenn = cache.get((tag, ort))
-                werte.append(None if kenn is None else artenmodul.score(
-                    kenn, art, tag, wt["typ"], bd, bst)[0])
+                if kenn is None:
+                    werte.append(None)
+                    continue
+                end, wetter, saison, wald, boden_f, einzeln = \
+                    artenmodul.score(kenn, art, tag, wt["typ"], bd, bst)
+                werte.append(end)
+                if i == 0:
+                    teile[art] = {
+                        "wetter": wetter, "saison": saison,
+                        "bestand": wald, "boden": boden_f,
+                        "einzeln": einzeln,
+                    }
             scores[art] = werte
 
         eintrag = namen.get(ort, {})
@@ -127,6 +138,7 @@ def main():
                 "prognose_tage": kenn_heute.get("prognose_tage"),
             },
             "scores": scores,
+            "teile": teile,
         })
 
     # Belegte Funde, ausgeduennt auf das relevante Zeitfenster
@@ -153,9 +165,24 @@ def main():
                   "datum": (date.today() + timedelta(days=t)).isoformat(),
                   "name": k.tagname(t)} for t in k.ZIELTAGE],
         "arten": {
-            a: {"name": e["name"],
+            a: {
+                "name": e["name"],
                 "saison": round(artenmodul.saison_rohwert(
-                    e, bezugstage[0]), 2)}
+                    e, bezugstage[0]), 2),
+                # Fuer die Erklaerseite: die vollstaendige Saisonkurve
+                # und die Punktbaender, damit sie ein echtes Beispiel
+                # nachrechnen und zeigen kann
+                "saison_jahr": [e["saison"].get(m, 0.0)
+                                for m in range(1, 13)],
+                "baender": {
+                    feld: e[feld] for feld in artenmodul.MOEGLICHE_FELDER
+                    if e.get(feld)
+                },
+                "hoechstpunkte": {
+                    feld: max(b[2] for b in e[feld])
+                    for feld in artenmodul.MOEGLICHE_FELDER if e.get(feld)
+                },
+            }
             for a, e in artenmodul.ARTEN.items()
         },
         "zellen": zellen,

@@ -44,10 +44,6 @@ jobs:
       - name: Daten fuer die Seite erzeugen
         run: python daten_export.py
 
-      - name: Infoseite erzeugen
-        run: |
-          python -c "import infoseite; infoseite.schreibe('web/info.html', dunkel=True)"
-
       - name: Seiten vorbereiten
         uses: actions/configure-pages@v5
 
