@@ -7,10 +7,10 @@ name: Wetterdaten sammeln
 on:
   schedule:
     - cron: "0 6 * * *"
-  workflow_dispatch:        # von Hand ausloesbar
+  workflow_dispatch:
 
 permissions:
-  contents: write           # noetig, um die Ergebnisse zurueckzuschreiben
+  contents: write
 
 concurrency:
   group: taeglich
@@ -46,7 +46,7 @@ jobs:
         run: python prognose.py
 
       # Fehlende Tage nachholen, falls ein Lauf ausgefallen ist.
-      # Laeuft nur sonntags, weil es 1.000 Abrufe kostet.
+      # Nur sonntags, weil es rund 1000 Abrufe kostet.
       - name: Luecken schliessen
         if: github.event.schedule == '0 6 * * *'
         run: |
@@ -56,15 +56,15 @@ jobs:
             echo "Nur sonntags - heute uebersprungen"
           fi
 
-            - name: Ergebnisse zurückschreiben
+      - name: Ergebnisse zurueckschreiben
         run: |
           git config user.name "Pilzkarte"
           git config user.email "actions@github.com"
 
-          # Erst den fremden Stand holen, dann die eigenen Ergebnisse
-          # daraufsetzen. Bei Konflikten in Datendateien gewinnt immer
-          # das, was dieser Lauf gerade berechnet hat - eine Mischung
-          # aus alter und neuer Vorhersage wäre sinnlos.
+          # Erst die eigenen Ergebnisse beiseitelegen, dann sauber auf
+          # den Serverstand zuruecksetzen, dann wieder auflegen. Ohne
+          # Verschmelzen - eine Mischung aus alter und neuer Vorhersage
+          # waere sinnlos.
           git stash push -- wetter_historie/ wetter_prognose.csv || true
           git fetch origin main
           git reset --hard origin/main
