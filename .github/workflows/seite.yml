@@ -1,0 +1,64 @@
+name: Seite bauen
+
+# Laeuft nach dem taeglichen Sammeln und veroeffentlicht die Karte.
+on:
+  workflow_run:
+    workflows: ["Wetterdaten sammeln"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  bauen:
+    # Nur wenn das Sammeln erfolgreich war - sonst wuerde die Seite
+    # mit halben Daten veroeffentlicht.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Projekt holen
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Pakete installieren
+        run: pip install -r requirements.txt
+
+      - name: Daten fuer die Seite erzeugen
+        run: python daten_export.py
+
+      - name: Infoseite erzeugen
+        run: |
+          python -c "import infoseite; infoseite.schreibe('web/info.html', dunkel=True)"
+
+      - name: Seiten vorbereiten
+        uses: actions/configure-pages@v5
+
+      - name: Hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+      - name: Veroeffentlichen
+        id: veroeffentlichen
+        uses: actions/deploy-pages@v4
+
+      - name: Adresse anzeigen
+        run: echo "Die Karte liegt unter ${{ steps.veroeffentlichen.outputs.page_url }}"

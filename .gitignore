@@ -6,9 +6,12 @@ uebersicht.geojson
 relief_weit_stand.npz
 hintergrund.csv
 
-# Erzeugte Seiten
-*.html
-!vorlage.html
+# Erzeugte Seiten - die lokalen Karten von karte.py
+/*.html
+
+# Die Webseite gehoert dagegen ins Repository. Nur daten.json wird
+# beim Bauen erzeugt und braucht nicht eingecheckt zu werden.
+web/daten.json
 
 # Python
 __pycache__/

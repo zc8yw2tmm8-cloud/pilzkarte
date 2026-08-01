@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1,
+      maximum-scale=5, viewport-fit=cover">
+<meta name="description" content="Karte der Fundwahrscheinlichkeit für
+      Speisepilze in der Region Braunschweig, Wolfsburg und südliche
+      Lüneburger Heide.">
+<title>Pilzkarte</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+  :root {
+    --grund: #15181c; --flaeche: #1e2228; --text: #e6e6e6;
+    --leise: #9aa0a6; --linie: #2f353d; --akzent: #5fb763;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body { font: 15px/1.45 system-ui, -apple-system, sans-serif;
+         background: var(--grund); color: var(--text);
+         display: flex; flex-direction: column;
+         -webkit-text-size-adjust: 100%; }
+
+  header { background: var(--flaeche); border-bottom: 1px solid var(--linie);
+           padding: 8px 10px 6px; flex: 0 0 auto; }
+  .kopfzeile { display: flex; align-items: baseline; gap: 8px;
+               margin-bottom: 7px; }
+  h1 { font-size: 15px; font-weight: 600; margin: 0; }
+  .stand { font-size: 11px; color: var(--leise); margin-left: auto; }
+
+  .leiste { display: flex; gap: 6px; overflow-x: auto;
+            scrollbar-width: none; padding-bottom: 2px; }
+  .leiste::-webkit-scrollbar { display: none; }
+  .art { flex: 0 0 auto; border: 1px solid var(--linie);
+         background: var(--grund); color: var(--text);
+         padding: 7px 12px; border-radius: 20px; cursor: pointer;
+         font-size: 13px; min-height: 38px; white-space: nowrap;
+         display: flex; align-items: baseline; gap: 5px; }
+  .art .wert { font-size: 10px; opacity: .6; }
+  .art .wert b { font-size: 14px; opacity: 1; }
+  .art.aktiv { background: var(--akzent); border-color: var(--akzent);
+               color: #10130f; }
+  .art.aktiv .wert { opacity: .75; }
+
+  .tagleiste { display: flex; gap: 4px; margin-top: 6px;
+               overflow-x: auto; scrollbar-width: none; }
+  .tagleiste::-webkit-scrollbar { display: none; }
+  .tag { flex: 0 0 auto; border: 1px solid var(--linie);
+         background: transparent; color: var(--leise);
+         padding: 5px 10px; border-radius: 14px; cursor: pointer;
+         font-size: 12px; min-height: 32px; white-space: nowrap; }
+  .tag.aktiv { border-color: var(--akzent); color: var(--akzent);
+               font-weight: 600; }
+
+  #karte { flex: 1 1 auto; min-height: 0; }
+
+  .maplibregl-popup-content {
+    background: var(--flaeche); color: var(--text);
+    border-radius: 8px; padding: 12px 14px;
+    max-width: 300px; max-height: 60vh; overflow-y: auto;
+    overscroll-behavior: contain; font-size: 12.5px; }
+  .maplibregl-popup-tip { border-top-color: var(--flaeche) !important;
+                          border-bottom-color: var(--flaeche) !important; }
+  .maplibregl-popup-close-button { color: var(--leise); font-size: 20px;
+                                   padding: 2px 8px; }
+
+  .pop .titel { font-size: 14px; font-weight: 600; }
+  .pop .lage { font-size: 10.5px; color: var(--leise); margin-bottom: 8px; }
+  .pop .score { font-size: 13px; }
+  .pop .score b { font-size: 20px; color: var(--akzent); margin-left: 4px; }
+  .pop .score .max { font-size: 11px; color: var(--leise); }
+  .pop .trend { font-size: 12px; margin: 3px 0; }
+  .pop h4 { margin: 10px 0 3px; font-size: 9.5px; font-weight: 700;
+            letter-spacing: .08em; color: var(--leise);
+            border-top: 1px solid var(--linie); padding-top: 5px; }
+  .pop table { width: 100%; border-collapse: collapse; }
+  .pop td { padding: 1px 0; font-size: 12px; }
+  .pop td:last-child { text-align: right; white-space: nowrap;
+                       font-variant-numeric: tabular-nums;
+                       padding-left: 10px; }
+  .pop tr.hier td { font-weight: 700; }
+
+  .legende { position: absolute; bottom: 20px; left: 10px;
+             background: rgba(24,28,33,.93); padding: 8px 10px;
+             border-radius: 8px; font-size: 11px; line-height: 1.5;
+             pointer-events: none; }
+  .legende i { display: inline-block; width: 12px; height: 12px;
+               border-radius: 2px; margin-right: 5px;
+               vertical-align: -2px; }
+
+  .laedt { position: absolute; inset: 0; display: grid; place-items: center;
+           background: var(--grund); font-size: 14px; color: var(--leise);
+           z-index: 5; }
+
+  @media (max-width: 700px) {
+    h1 { font-size: 14px; }
+    .legende { bottom: 12px; left: 8px; font-size: 10px; padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kopfzeile">
+    <h1>Pilzkarte</h1>
+    <span class="stand" id="stand"></span>
+  </div>
+  <div class="leiste" id="arten"></div>
+  <div class="tagleiste" id="tage"></div>
+</header>
+
+<div id="karte"></div>
+<div class="laedt" id="laedt">Lade Daten …</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+// ---- Farbskala, gleiche Werte wie in farben.py (dunkel) -------------
+const SKALA = [
+  [0.00, [150, 40, 70]], [0.25, [225, 70, 55]], [0.50, [250, 155, 40]],
+  [0.65, [255, 225, 90]], [0.85, [130, 220, 70]], [1.00, [45, 175, 75]]
+];
+
+function farbe(wert) {
+  const p = Math.max(0, Math.min(100, wert)) / 100;
+  for (let i = 0; i < SKALA.length - 1; i++) {
+    const [p0, c0] = SKALA[i], [p1, c1] = SKALA[i + 1];
+    if (p >= p0 && p <= p1) {
+      const t = (p - p0) / (p1 - p0);
+      const m = k => Math.round(c0[k] + (c1[k] - c0[k]) * t);
+      return `rgb(${m(0)},${m(1)},${m(2)})`;
+    }
+  }
+  return "rgb(45,175,75)";
+}
+
+const komma = (z, n = 1) =>
+  z === null || z === undefined ? "–" : z.toFixed(n).replace(".", ",");
+
+let D = null, art = null, tag = 0, karte = null;
+
+// ---- Daten in GeoJSON-Rechtecke umwandeln ---------------------------
+function baueGeoJson() {
+  const dLat = D.raster_km / 111 / 2 * 1.02;
+  const dLon = D.raster_km / (111 * Math.cos(52.4 * Math.PI / 180)) / 2 * 1.02;
+
+  return {
+    type: "FeatureCollection",
+    features: D.zellen.map((z, i) => ({
+      type: "Feature",
+      id: i,
+      properties: { i: i, wert: z.scores[art][tag] ?? 0 },
+      geometry: {
+        type: "Polygon",
+        coordinates: [[
+          [z.lon - dLon, z.lat - dLat], [z.lon + dLon, z.lat - dLat],
+          [z.lon + dLon, z.lat + dLat], [z.lon - dLon, z.lat + dLat],
+          [z.lon - dLon, z.lat - dLat]
+        ]]
+      }
+    }))
+  };
+}
+
+function aktualisiere() {
+  if (!karte.getSource("zellen")) return;
+  karte.getSource("zellen").setData(baueGeoJson());
+
+  document.querySelectorAll(".art").forEach(b => {
+    const a = b.dataset.art;
+    b.classList.toggle("aktiv", a === art);
+    const werte = D.zellen.map(z => z.scores[a][tag] ?? 0);
+    const schnitt = Math.round(werte.reduce((s, w) => s + w, 0) / werte.length);
+    b.querySelector(".wert").innerHTML = `<b>${schnitt}</b>/100`;
+  });
+  document.querySelectorAll(".tag").forEach(b =>
+    b.classList.toggle("aktiv", +b.dataset.tag === tag));
+}
+
+// ---- Popup ----------------------------------------------------------
+function trendZeile(z) {
+  const liste = z.scores[art];
+  const jetzt = liste[0];
+  if (jetzt === null) return "";
+  const kuenftig = liste.slice(1).filter(w => w !== null);
+  if (!kuenftig.length) return "";
+
+  const best = Math.max(...kuenftig), tief = Math.min(...kuenftig);
+  if (best >= jetzt + 8) {
+    const i = liste.indexOf(best);
+    const d = new Date(D.tage[i].datum);
+    const wt = ["So","Mo","Di","Mi","Do","Fr","Sa"][d.getDay()];
+    return `<div class="trend"><span style="color:#2e9e4f">▲</span>
+            steigt auf <b>${best}</b> am ${wt}
+            ${d.getDate()}.${d.getMonth() + 1}.</div>`;
+  }
+  if (tief <= jetzt - 8)
+    return `<div class="trend"><span style="color:#c0392b">▼</span>
+            fällt auf ${tief}</div>`;
+  return `<div class="trend"><span style="color:#888">▶</span>
+          bleibt etwa gleich</div>`;
+}
+
+function popupInhalt(z) {
+  const wert = z.scores[art][tag] ?? 0;
+  const k = z.kenn;
+
+  const andere = Object.keys(D.arten)
+    .map(a => [a, z.scores[a][tag] ?? 0])
+    .sort((x, y) => y[1] - x[1])
+    .map(([a, w]) => `<tr${a === art ? ' class="hier"' : ""}>
+      <td>${D.arten[a].name}</td>
+      <td style="color:${farbe(w)};font-weight:600">${w}</td></tr>`).join("");
+
+  const lage = [D.tage[tag].name];
+  if (z.hoehe !== null) lage.push(z.hoehe + " m");
+  lage.push(z.id);
+
+  const boden = z.boden
+    ? `<div>Boden: pH ${komma(z.boden.ph)} · Sand ${z.boden.sand} %
+       · Ton ${z.boden.ton} %</div>` : "";
+
+  return `<div class="pop">
+    <div class="titel">${z.titel}</div>
+    <div class="lage">${lage.join(" · ")}</div>
+    <div class="score">${D.arten[art].name}
+      <b>${wert}</b><span class="max">/100</span></div>
+    ${tag === 0 ? trendZeile(z) : ""}
+
+    <h4>Standort</h4>
+    <div>${z.bestand || "Bestand unbekannt"}</div>
+    ${z.waldanteil !== null
+      ? `<div style="color:var(--leise);font-size:11px">Waldanteil
+         ${Math.round(z.waldanteil * 100)} %</div>` : ""}
+    ${boden}
+
+    <h4>Wichtigste Werte</h4>
+    <table>
+      <tr><td>Bodenfeuchte</td><td>${komma(k.bf07 * 100)} %</td></tr>
+      <tr><td>Bodentemperatur</td><td>${komma(k.bt07)} °C</td></tr>
+      <tr><td>Wasserbilanz 14 Tage</td><td>${komma(k.bilanz_14)} mm</td></tr>
+      <tr><td>Niederschlag Tag 4–14</td><td>${komma(k.regen_reife)} mm</td></tr>
+      <tr><td>Regentage von 14</td><td>${k.regentage}</td></tr>
+    </table>
+
+    <h4>Andere Arten hier</h4>
+    <table>${andere}</table>
+  </div>`;
+}
+
+// ---- Aufbau ---------------------------------------------------------
+fetch("daten.json")
+  .then(r => r.json())
+  .then(daten => {
+    D = daten;
+    art = Object.keys(D.arten)[0];
+
+    const d = new Date(D.stand);
+    document.getElementById("stand").textContent =
+      "Stand " + d.toLocaleDateString("de-DE");
+
+    document.getElementById("arten").innerHTML = Object.entries(D.arten)
+      .map(([a, e]) => `<button class="art" data-art="${a}">${e.name}
+        <span class="wert"></span></button>`).join("");
+    document.getElementById("tage").innerHTML = D.tage
+      .map((t, i) => `<button class="tag" data-tag="${i}">${t.name}</button>`)
+      .join("");
+
+    document.querySelectorAll(".art").forEach(b =>
+      b.onclick = () => { art = b.dataset.art; aktualisiere(); });
+    document.querySelectorAll(".tag").forEach(b =>
+      b.onclick = () => { tag = +b.dataset.tag; aktualisiere(); });
+
+    const g = D.gebiet;
+    karte = new maplibregl.Map({
+      container: "karte",
+      style: {
+        version: 8,
+        sources: {
+          grund: {
+            type: "raster",
+            tiles: ["https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+                    "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+                    "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"],
+            tileSize: 256,
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">' +
+              'OpenStreetMap</a>, © <a href="https://carto.com/">CARTO</a> · ' +
+              'Wetter <a href="https://open-meteo.com/">Open-Meteo</a> · ' +
+              'Baumarten <a href="https://atlas.thuenen.de/">Thünen-Institut</a>'
+          }
+        },
+        layers: [{ id: "grund", type: "raster", source: "grund" }]
+      },
+      bounds: [[g.west, g.sued], [g.ost, g.nord]],
+      fitBoundsOptions: { padding: 20 }
+    });
+
+    karte.addControl(new maplibregl.NavigationControl({ showCompass: false }));
+    karte.addControl(new maplibregl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true }, trackUserLocation: true
+    }));
+    karte.addControl(new maplibregl.ScaleControl({ maxWidth: 90 }));
+
+    karte.on("load", () => {
+      karte.addSource("zellen", { type: "geojson", data: baueGeoJson() });
+      karte.addLayer({
+        id: "flaechen", type: "fill", source: "zellen",
+        paint: {
+          "fill-color": ["interpolate", ["linear"], ["get", "wert"],
+            0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
+            50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
+            85, "rgb(130,220,70)", 100, "rgb(45,175,75)"],
+          "fill-opacity": 0.72
+        }
+      });
+
+      karte.on("click", "flaechen", e => {
+        const z = D.zellen[e.features[0].properties.i];
+        new maplibregl.Popup({ maxWidth: "320px" })
+          .setLngLat(e.lngLat).setHTML(popupInhalt(z)).addTo(karte);
+      });
+      karte.on("mouseenter", "flaechen",
+        () => karte.getCanvas().style.cursor = "pointer");
+      karte.on("mouseleave", "flaechen",
+        () => karte.getCanvas().style.cursor = "");
+
+      const stufen = [[95, "sehr gut"], [80, "gut"], [60, "möglich"],
+                      [40, "schwach"], [15, "kaum"]];
+      const box = document.createElement("div");
+      box.className = "legende";
+      box.innerHTML = stufen.map(([w, t]) =>
+        `<div><i style="background:${farbe(w)}"></i>${w}+ ${t}</div>`).join("");
+      document.getElementById("karte").appendChild(box);
+
+      document.getElementById("laedt").remove();
+      aktualisiere();
+    });
+  })
+  .catch(e => {
+    document.getElementById("laedt").textContent =
+      "Daten konnten nicht geladen werden: " + e.message;
+  });
+</script>
+</body>
+</html>
