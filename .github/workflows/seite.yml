@@ -44,6 +44,9 @@ jobs:
       - name: Daten fuer die Seite erzeugen
         run: python daten_export.py
 
+      - name: Kartenbilder erzeugen
+        run: python web_bilder.py
+
       - name: Seiten vorbereiten
         uses: actions/configure-pages@v5
 

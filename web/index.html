@@ -250,25 +250,31 @@ function baueGeoJson() {
   };
 }
 
-function bauePunkte() {
-  // Fuer die weiche Darstellung: ein Punkt je Zelle. Der Score wird
-  // als Gewicht mitgegeben - MapLibre macht daraus die Farbe.
-  return {
-    type: "FeatureCollection",
-    features: D.zellen.map(z => ({
-      type: "Feature",
-      properties: { w: z.scores[art][tag] ?? 0 },
-      geometry: { type: "Point", coordinates: [z.lon, z.lat] }
-    }))
-  };
+const LEERBILD = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEA" +
+  "AAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+
+// Die vorgerechneten Bilder, aus karten.json
+let bilder = null;
+
+function zeigeWeichbild() {
+  if (!bilder || !karte.getSource("weichbild")) return;
+
+  const datei = (bilder.bilder[art] || {})[String(tag)];
+  const g = bilder.grenzen;
+  if (!datei || !g) return;
+
+  // Ecken im Uhrzeigersinn ab oben links
+  karte.getSource("weichbild").updateImage({
+    url: datei,
+    coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
+                  [g[1][1], g[0][0]], [g[0][1], g[0][0]]]
+  });
 }
 
 function aktualisiere() {
   if (!karte.getSource("zellen")) return;
   karte.getSource("zellen").setData(baueGeoJson());
-  if (karte.getSource("punkte")) {
-    karte.getSource("punkte").setData(bauePunkte());
-  }
+  zeigeWeichbild();
 
   document.querySelectorAll(".art").forEach(b => {
     const a = b.dataset.art;
@@ -604,31 +610,21 @@ fetch("daten.json")
       // Zwei Quellen: Rechtecke fuers Anklicken, Punkte fuer die
       // weiche Darstellung.
       karte.addSource("zellen", { type: "geojson", data: baueGeoJson() });
-      karte.addSource("punkte", { type: "geojson", data: bauePunkte() });
 
-      // Weiche Farbflaechen: ein Kreis je Zelle, der nach aussen
-      // ausblendet. Ueberlappende Kreise ergeben zusammen eine
-      // durchgehende Flaeche.
-      //
-      // Kein Waermebild - das stellt Dichte dar, nicht Werte, und
-      // erzeugt bei gleichmaessig verteilten Punkten einen harten
-      // Kern mit schwachem Rand.
+      // Die weiche Darstellung kommt als fertiges Bild. Der Browser
+      // kann sie nicht selbst erzeugen: uebereinandergelegte halb-
+      // durchsichtige Flaechen addieren sich auf, statt sich zu
+      // mitteln - in der Zellmitte staende dann ein dunkler Fleck.
+      // Gerechnet wird sie beim taeglichen Bauvorgang, mit demselben
+      // gewichteten Mittel wie in der oertlichen Karte.
+      karte.addSource("weichbild", {
+        type: "image",
+        url: LEERBILD,
+        coordinates: [[0, 0], [0, 0], [0, 0], [0, 0]]
+      });
       karte.addLayer({
-        id: "weich", type: "circle", source: "punkte",
-        paint: {
-          "circle-color": ["interpolate", ["linear"], ["get", "w"],
-            0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
-            50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
-            85, "rgb(130,220,70)", 100, "rgb(45,175,75)"],
-          // Radius in Metern statt Pixeln - so bleibt die Groesse
-          // beim Zoomen an der Landschaft haengen
-          "circle-radius": ["interpolate", ["exponential", 2], ["zoom"],
-            6, 2, 8, 4, 10, 15, 12, 60, 14, 240, 16, 961, 18, 1000],
-          // Weicher Rand: der Verlauf macht aus den Kreisen eine
-          // zusammenhaengende Flaeche
-          "circle-blur": 1.1,
-          "circle-opacity": 0.55
-        }
+        id: "weich", type: "raster", source: "weichbild",
+        paint: { "raster-opacity": 0.88, "raster-fade-duration": 120 }
       });
 
       // Unsichtbare Klickflaechen darueber
@@ -673,6 +669,11 @@ fetch("daten.json")
       } else if (!navigator.geolocation) {
         melde("Dieser Browser kennt keine Standortbestimmung.");
       }
+
+      fetch("karten.json")
+        .then(r => r.ok ? r.json() : null)
+        .then(b => { bilder = b; zeigeWeichbild(); })
+        .catch(() => {});
 
       fetch("relief.json")
         .then(r => r.ok ? r.json() : [])

@@ -31,6 +31,7 @@ VOLL_KM = 1.3
 AUS_KM = 2.6
 
 ORDNER = "bilder"
+BILDORDNER = ORDNER
 
 
 def _farbtabelle(dunkel):
@@ -62,7 +63,7 @@ def erzeuge(werte, dateiname, rand_km=3.0, dunkel=False):
     if len(werte) < 3:
         return None, None
 
-    os.makedirs(ORDNER, exist_ok=True)
+    os.makedirs(BILDORDNER, exist_ok=True)
 
     lats = np.array([w[0] for w in werte], dtype=np.float64)
     lons = np.array([w[1] for w in werte], dtype=np.float64)
@@ -157,7 +158,7 @@ def erzeuge(werte, dateiname, rand_km=3.0, dunkel=False):
     # Letzter Schliff: nimmt die Restkanten der Alpha-Maske
     ergebnis = ergebnis.filter(ImageFilter.GaussianBlur(radius=1.2))
 
-    pfad = os.path.join(ORDNER, dateiname)
+    pfad = os.path.join(BILDORDNER, dateiname)
     ergebnis.save(pfad, compress_level=6)
 
     grenzen = [[float(sued), float(west)], [float(nord), float(ost)]]
