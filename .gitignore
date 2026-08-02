@@ -11,6 +11,8 @@ hintergrund.csv
 
 # Die Webseite gehoert dagegen ins Repository. Nur daten.json wird
 # beim Bauen erzeugt und braucht nicht eingecheckt zu werden.
+# Die Reliefbilder in web/relief/ dagegen schon - sie aendern sich
+# nie und werden nicht in der Cloud erzeugt.
 web/daten.json
 
 # Python

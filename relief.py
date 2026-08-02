@@ -18,6 +18,7 @@ Braucht numpy und pillow. Kein Netzzugang.
 """
 import os
 import glob
+import csv
 import math
 import re
 import numpy as np
@@ -27,10 +28,20 @@ Image.MAX_IMAGE_PIXELS = None
 
 DGM_ORDNER = "dgm"
 BILDORDNER = "bilder"
+GRENZEN_DATEI = "relief_grenzen.csv"
 
 # Umgebungsradius fuer die Senkentiefe, in Metern.
 # 150 m fasst eine Talmulde, 30 m nur einen Graben.
 UMGEBUNG_M = 150
+
+# Nur Waldflaechen einfaerben. Ohne das laufen die Farben ueber
+# Aecker, Ortschaften und den Mittellandkanal - und behaupten dort
+# feuchte Senken, wo keine Pilze wachsen.
+NUR_WALD = True
+
+# Umkreis um einen Waldpunkt, der als Wald gilt (in Metern).
+# Die Waldpunkte stehen im 2-km-Raster, deshalb grosszuegig.
+WALD_UMKREIS_M = 1400
 
 # Auf diese Rasterweite ausduennen. 2 m reicht fuer die Darstellung
 # und viertelt den Speicherbedarf.
@@ -92,9 +103,9 @@ def kachelkoordinaten(pfad):
     return kandidaten[0] if kandidaten else None
 
 
-def lade_kacheln():
-    pfade = sorted(glob.glob(os.path.join(DGM_ORDNER, "*.tif"))
-                   + glob.glob(os.path.join(DGM_ORDNER, "*.tiff")))
+def lade_kacheln(ordner=DGM_ORDNER):
+    pfade = sorted(glob.glob(os.path.join(ordner, "*.tif"))
+                   + glob.glob(os.path.join(ordner, "*.tiff")))
     if not pfade:
         return None, None
 
@@ -225,87 +236,184 @@ def schummerung(dem, gueltig, dateiname):
     return pfad.replace(os.sep, "/")
 
 
-def main():
-    if not os.path.isdir(DGM_ORDNER):
-        print(f"Ordner {DGM_ORDNER}/ fehlt.")
-        print("Dort die DGM1-Kacheln ablegen, dann nochmal starten.")
-        return
+def lade_waldpunkte():
+    """Waldpunkte als UTM-Koordinaten, fuer die Maske."""
+    import csv as _csv
+    punkte = []
+    quelle = ("baumarten.csv" if os.path.exists("baumarten.csv")
+              else "waldpunkte.csv" if os.path.exists("waldpunkte.csv")
+              else None)
+    if quelle is None:
+        return []
 
-    print(f"Lese Kacheln aus {DGM_ORDNER}/ ...")
-    dem, rahmen = lade_kacheln()
+    with open(quelle, "r", encoding="utf-8") as f:
+        for z in _csv.DictReader(f):
+            if quelle == "baumarten.csv":
+                try:
+                    if float(z.get("waldanteil") or 0) < 0.05:
+                        continue
+                except ValueError:
+                    continue
+            punkte.append(wgs84_zu_utm(float(z["lat"]), float(z["lon"])))
+    return punkte
+
+
+def wgs84_zu_utm(lat, lon):
+    e, n = 600000.0, 5800000.0
+    for _ in range(40):
+        b, l = utm_zu_wgs84(e, n)
+        n += (lat - b) * 111000
+        e += (lon - l) * 111000 * math.cos(math.radians(lat))
+    return e, n
+
+
+def waldmaske(form, rahmen, waldpunkte, schritt):
+    """
+    True, wo Wald ist. Ein Kreis je Waldpunkt, gerastert.
+    """
+    if not NUR_WALD or not waldpunkte:
+        return np.ones(form, dtype=bool)
+
+    hoehe, breite = form
+    ost_min, nord_min, ost_max, nord_max = rahmen
+    maske = np.zeros(form, dtype=bool)
+    radius = int(WALD_UMKREIS_M / schritt)
+
+    y, x = np.ogrid[-radius:radius + 1, -radius:radius + 1]
+    kreis = (x * x + y * y) <= radius * radius
+
+    for e, n in waldpunkte:
+        if not (ost_min - WALD_UMKREIS_M <= e <= ost_max + WALD_UMKREIS_M):
+            continue
+        if not (nord_min - WALD_UMKREIS_M <= n <= nord_max + WALD_UMKREIS_M):
+            continue
+
+        px = int((e - ost_min) / schritt)
+        py = int((nord_max - n) / schritt)
+
+        y0, y1 = max(0, py - radius), min(hoehe, py + radius + 1)
+        x0, x1 = max(0, px - radius), min(breite, px + radius + 1)
+        if y0 >= y1 or x0 >= x1:
+            continue
+
+        ky0 = y0 - (py - radius)
+        kx0 = x0 - (px - radius)
+        maske[y0:y1, x0:x1] |= kreis[ky0:ky0 + (y1 - y0),
+                                     kx0:kx0 + (x1 - x0)]
+
+    return maske
+
+
+def ein_gebiet(schluessel, ordner, titel, waldpunkte=None):
+    """Rechnet ein Gebiet durch. Rueckgabe: Zeile fuer die Grenzendatei."""
+    print(f"\n=== {titel} ===")
+    dem, rahmen = lade_kacheln(ordner)
     if dem is None:
-        print("Keine brauchbare Kachel gefunden.")
-        return
+        print("  keine brauchbare Kachel")
+        return None
 
     ost_min, nord_min, ost_max, nord_max = rahmen
-    print(f"\nGesamtgitter: {dem.shape[1]} x {dem.shape[0]} m")
+    print(f"  Gitter {dem.shape[1]} x {dem.shape[0]} m")
 
     dem = dem[::SPARSAM, ::SPARSAM]
     gueltig = dem > LEERWERT + 1
     if not gueltig.any():
-        print("Nur Leerwerte.")
-        return
+        print("  nur Leerwerte")
+        return None
 
     hoehen = dem[gueltig]
-    print(f"Hoehe {round(float(hoehen.min()), 1)} bis "
-          f"{round(float(hoehen.max()), 1)} m NHN, "
-          f"Spanne {round(float(hoehen.max() - hoehen.min()), 1)} m")
+    print(f"  Hoehe {round(float(hoehen.min()), 1)} bis "
+          f"{round(float(hoehen.max()), 1)} m, Spanne "
+          f"{round(float(hoehen.max() - hoehen.min()), 1)} m")
 
-    # --- Senkentiefe ---
     radius = max(1, int(UMGEBUNG_M / SPARSAM))
     umgebung, hat = kastenmittel(dem, gueltig, radius)
-    tiefe = np.where(gueltig & hat, umgebung - dem, 0.0)
-    tiefe = np.clip(tiefe, 0, None)
+    tiefe = np.clip(np.where(gueltig & hat, umgebung - dem, 0.0), 0, None)
 
-    # --- Hangneigung in Grad ---
-    # Luecken mit dem Umgebungsmittel fuellen. Sonst erzeugt jeder
-    # Datenrand einen scheinbaren Steilhang.
     geglaettet = np.where(gueltig, dem, umgebung).astype(np.float32)
     gy, gx = np.gradient(geglaettet, float(SPARSAM))
-    neigung = np.degrees(np.arctan(np.sqrt(gx ** 2 + gy ** 2)))
-    neigung = np.clip(neigung, 0, 60)
-
-    # --- Nordexposition: 1 = Norden, 0 = Sueden ---
+    neigung = np.clip(np.degrees(np.arctan(np.sqrt(gx ** 2 + gy ** 2))), 0, 60)
     richtung = np.arctan2(gx, gy)
     nordanteil = (np.cos(richtung) + 1) / 2
 
-    # --- Feuchteindex ---
-    t_teil = np.clip(tiefe / 3.0, 0, 1)                    # 3 m = voll
-    n_teil = np.clip(1 - neigung / 12.0, 0, 1)             # ab 12 Grad null
+    t_teil = np.clip(tiefe / 3.0, 0, 1)
+    n_teil = np.clip(1 - neigung / 12.0, 0, 1)
     nord_teil = np.where(neigung > 2, nordanteil, 0.5)
+    feuchte = np.where(gueltig,
+                       0.60 * t_teil + 0.28 * n_teil + 0.12 * nord_teil, 0.0)
 
-    feuchte = 0.60 * t_teil + 0.28 * n_teil + 0.12 * nord_teil
+    # Nur ueber Wald einfaerben
+    maske = waldmaske(dem.shape, rahmen, waldpunkte or [],
+                      float(SPARSAM))
+    gueltig = gueltig & maske
     feuchte = np.where(gueltig, feuchte, 0.0)
+    anteil_wald = float(maske.mean()) * 100
+    print(f"  Waldanteil im Ausschnitt: {anteil_wald:.0f} %")
 
-    print(f"\nSenkentiefe: Median "
-          f"{round(float(np.median(tiefe[gueltig])), 2)} m, "
-          f"tiefste Stelle {round(float(tiefe[gueltig].max()), 1)} m")
-    print(f"Hangneigung: Median "
-          f"{round(float(np.median(neigung[gueltig])), 1)} Grad, "
-          f"steilste {round(float(neigung[gueltig].max()), 1)} Grad")
-
-    for grenze in (0.5, 0.6, 0.7):
+    print(f"  Senkentiefe Median "
+          f"{round(float(np.median(tiefe[gueltig])), 2)} m, tiefste "
+          f"{round(float(tiefe[gueltig].max()), 1)} m")
+    for grenze in (0.6, 0.7):
         anteil = float((feuchte[gueltig] >= grenze).mean()) * 100
-        print(f"Feuchteindex ueber {grenze}: {round(anteil, 1)} % der Flaeche")
+        print(f"  Feuchteindex ueber {grenze}: {round(anteil, 1)} %")
 
     skala = [(0.0, (250, 250, 235)), (0.45, (200, 220, 180)),
              (0.65, (120, 180, 170)), (0.82, (50, 130, 165)),
              (1.0, (20, 60, 120))]
-    p1 = faerbe(feuchte, gueltig, skala, "relief_feuchte.png")
-    p2 = schummerung(geglaettet, gueltig, "relief_schummerung.png")
+    faerbe(feuchte, gueltig, skala, f"relief_{schluessel}_feuchte.png")
+    schummerung(geglaettet, gueltig, f"relief_{schluessel}_schummerung.png")
 
     sued, west = utm_zu_wgs84(ost_min, nord_min)
     nord, ost = utm_zu_wgs84(ost_max, nord_max)
+    return {"gebiet": schluessel, "titel": titel,
+            "sued": round(sued, 6), "west": round(west, 6),
+            "nord": round(nord, 6), "ost": round(ost, 6)}
 
-    print(f"\n{p1}")
-    print(f"{p2}")
-    print(f"\nEckkoordinaten fuer die Karte:")
-    print(f"  RELIEF_GRENZEN = [[{round(sued, 6)}, {round(west, 6)}], "
-          f"[{round(nord, 6)}, {round(ost, 6)}]]")
 
-    with open("relief_grenzen.txt", "w", encoding="utf-8") as f:
-        f.write(f"{sued},{west},{nord},{ost}\n")
-    print("\nAuch in relief_grenzen.txt gespeichert - karte.py liest das.")
+def main():
+    if not os.path.isdir(DGM_ORDNER):
+        print(f"Ordner {DGM_ORDNER}/ fehlt.")
+        return
+
+    try:
+        import gebiete
+        bekannt = gebiete.aktive()
+    except ImportError:
+        bekannt = {}
+
+    # Unterordner je Gebiet, oder flache Kacheln als ein Gebiet
+    unterordner = [d for d in sorted(os.listdir(DGM_ORDNER))
+                   if os.path.isdir(os.path.join(DGM_ORDNER, d))]
+    if unterordner:
+        aufgaben = [(d, os.path.join(DGM_ORDNER, d),
+                     bekannt.get(d, {}).get("name", d)) for d in unterordner]
+    else:
+        aufgaben = [("gebiet", DGM_ORDNER, "Gelaende")]
+
+    waldpunkte = lade_waldpunkte()
+    if NUR_WALD:
+        print(f"{len(waldpunkte)} Waldpunkte fuer die Maske"
+              if waldpunkte else
+              "Keine Waldpunkte gefunden - es wird alles eingefaerbt")
+
+    zeilen = []
+    for schluessel, ordner, titel in aufgaben:
+        ergebnis = ein_gebiet(schluessel, ordner, titel, waldpunkte)
+        if ergebnis:
+            zeilen.append(ergebnis)
+
+    if not zeilen:
+        print("\nNichts erzeugt.")
+        return
+
+    with open(GRENZEN_DATEI, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["gebiet", "titel", "sued",
+                                              "west", "nord", "ost"])
+        writer.writeheader()
+        writer.writerows(zeilen)
+
+    print(f"\n{len(zeilen)} Gebiete in {GRENZEN_DATEI}.")
+    print("Weiter mit: python karte.py")
 
 
 if __name__ == "__main__":

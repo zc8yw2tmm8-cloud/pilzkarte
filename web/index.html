@@ -88,6 +88,8 @@
          font-size: 12px; min-height: 32px; white-space: nowrap; }
   .tag.aktiv { border-color: var(--akzent); color: var(--akzent);
                font-weight: 600; }
+  #ebenen .tag { border-style: dashed; }
+  #ebenen .tag.aktiv { border-style: solid; }
 
   #karte { flex: 1 1 auto; min-height: 0; }
   #karte[hidden], #liste[hidden] { display: none; }
@@ -164,6 +166,7 @@
   </div>
   <div class="leiste" id="arten"></div>
   <div class="tagleiste" id="tage"></div>
+  <div class="tagleiste" id="ebenen" hidden></div>
 </header>
 
 <div id="karte"></div>
@@ -325,6 +328,67 @@ function popupInhalt(z) {
     <h4>Andere Arten hier</h4>
     <table>${andere}</table>
   </div>`;
+}
+
+// ---- Reliefebenen ---------------------------------------------------
+// Zwei Bildebenen je Revier: die Feuchtekarte zeigt Senken, die
+// Schummerung das Gelaende wie bei tiefstehender Sonne. Beide liegen
+// in 1-m-Aufloesung und sind nur fuer die Reviere da, in die man
+// tatsaechlich faehrt.
+let relief = [];
+
+function reliefEinbinden() {
+  if (!relief.length) return;
+
+  relief.forEach(g => {
+    Object.entries(g.dateien).forEach(([art, datei]) => {
+      const kennung = `relief_${g.gebiet}_${art}`;
+      karte.addSource(kennung, {
+        type: "image",
+        url: datei,
+        coordinates: [
+          [g.grenzen[0][1], g.grenzen[1][0]],
+          [g.grenzen[1][1], g.grenzen[1][0]],
+          [g.grenzen[1][1], g.grenzen[0][0]],
+          [g.grenzen[0][1], g.grenzen[0][0]]
+        ]
+      });
+      karte.addLayer({
+        id: kennung, type: "raster", source: kennung,
+        paint: { "raster-opacity": art === "schummerung" ? 0.55 : 0.75 },
+        layout: { visibility: "none" }
+      });
+    });
+  });
+
+  const leiste = document.getElementById("ebenen");
+  leiste.hidden = false;
+  leiste.innerHTML = '<span class="tag" style="border:0;cursor:default;' +
+    'color:var(--leise)">Gelände:</span>' +
+    relief.map(g => `
+      <button class="tag" data-relief="${g.gebiet}">${g.titel}</button>`)
+      .join("");
+
+  leiste.querySelectorAll("[data-relief]").forEach(b => b.onclick = () => {
+    const an = !b.classList.contains("aktiv");
+    // Immer nur ein Revier - sonst ueberlagern sich die Bilder
+    leiste.querySelectorAll("[data-relief]").forEach(x =>
+      x.classList.remove("aktiv"));
+    relief.forEach(g => Object.keys(g.dateien).forEach(art =>
+      karte.setLayoutProperty(`relief_${g.gebiet}_${art}`,
+        "visibility", "none")));
+
+    if (an) {
+      b.classList.add("aktiv");
+      const g = relief.find(x => x.gebiet === b.dataset.relief);
+      Object.keys(g.dateien).forEach(art =>
+        karte.setLayoutProperty(`relief_${g.gebiet}_${art}`,
+          "visibility", "visible"));
+      karte.fitBounds([[g.grenzen[0][1], g.grenzen[0][0]],
+                       [g.grenzen[1][1], g.grenzen[1][0]]],
+                      { padding: 30 });
+    }
+  });
 }
 
 // ---- Bestenliste ----------------------------------------------------
@@ -521,6 +585,11 @@ fetch("daten.json")
       } else if (!navigator.geolocation) {
         melde("Dieser Browser kennt keine Standortbestimmung.");
       }
+
+      fetch("relief.json")
+        .then(r => r.ok ? r.json() : [])
+        .then(r => { relief = r; reliefEinbinden(); })
+        .catch(() => {});
 
       document.getElementById("laedt").remove();
       aktualisiere();

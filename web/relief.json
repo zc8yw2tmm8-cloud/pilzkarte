@@ -1,0 +1,92 @@
+[
+ {
+  "gebiet": "braunschweig",
+  "titel": "Braunschweig",
+  "grenzen": [
+   [
+    52.197733,
+    10.433883
+   ],
+   [
+    52.347431,
+    10.673631
+   ]
+  ],
+  "dateien": {
+   "feuchte": "relief/relief_braunschweig_feuchte.png",
+   "schummerung": "relief/relief_braunschweig_schummerung.jpg"
+  }
+ },
+ {
+  "gebiet": "ehra_lessien",
+  "titel": "Ehra-Lessien",
+  "grenzen": [
+   [
+    52.592068,
+    10.535303
+   ],
+   [
+    52.74108,
+    10.807189
+   ]
+  ],
+  "dateien": {
+   "feuchte": "relief/relief_ehra_lessien_feuchte.png",
+   "schummerung": "relief/relief_ehra_lessien_schummerung.jpg"
+  }
+ },
+ {
+  "gebiet": "elm",
+  "titel": "Elm",
+  "grenzen": [
+   [
+    52.112505,
+    10.752447
+   ],
+   [
+    52.270536,
+    10.993185
+   ]
+  ],
+  "dateien": {
+   "feuchte": "relief/relief_elm_feuchte.png",
+   "schummerung": "relief/relief_elm_schummerung.jpg"
+  }
+ },
+ {
+  "gebiet": "koenigslutter",
+  "titel": "Koenigslutter",
+  "grenzen": [
+   [
+    52.193815,
+    10.72638
+   ],
+   [
+    52.324939,
+    10.96628
+   ]
+  ],
+  "dateien": {
+   "feuchte": "relief/relief_koenigslutter_feuchte.png",
+   "schummerung": "relief/relief_koenigslutter_schummerung.jpg"
+  }
+ },
+ {
+  "gebiet": "wolfsburg",
+  "titel": "Wolfsburg",
+  "grenzen": [
+   [
+    52.35683,
+    10.644616
+   ],
+   [
+    52.496859,
+    10.900281
+   ]
+  ],
+  "dateien": {
+   "feuchte": "relief/relief_wolfsburg_feuchte.png",
+   "schummerung": "relief/relief_wolfsburg_schummerung.jpg"
+  }
+ }
+]
