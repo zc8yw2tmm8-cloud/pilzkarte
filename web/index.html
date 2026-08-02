@@ -623,9 +623,14 @@ fetch("daten.json")
             0.85, "rgba(130,220,70,0.75)",
             1.0, "rgba(45,175,75,0.75)"
           ],
+          // Der Radius muss mindestens dem halben Zellabstand
+          // entsprechen, damit sich benachbarte Zellen ueberlappen
+          // und eine zusammenhaengende Flaeche entsteht. Bei 2 km
+          // Raster sind das rund 1 km - grosszuegig gerechnet, weil
+          // Pilze auch am Waldrand und ausserhalb wachsen.
           "heatmap-radius": ["interpolate", ["exponential", 2], ["zoom"],
-            7, 12, 9, 26, 11, 70, 13, 250, 15, 900],
-          "heatmap-opacity": 0.85
+            6, 6, 8, 6, 10, 17, 12, 69, 14, 274, 16, 500],
+          "heatmap-opacity": 0.9
         }
       });
 
