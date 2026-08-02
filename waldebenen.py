@@ -137,6 +137,14 @@ def erzeuge():
     # Nach Flaeche sortieren, "Wald gesamt" bleibt vorn
     kopf, rest = ebenen[0], ebenen[1:]
     rest.sort(key=lambda e: -e[2])
+    # Grenzen ablegen, damit web_wald.py sie findet
+    try:
+        with open(os.path.join(ORDNER, "wald_grenzen.txt"), "w",
+                  encoding="utf-8") as f:
+            f.write(f"{SUED},{WEST},{NORD},{OST}\n")
+    except Exception:
+        pass
+
     return [kopf] + rest, grenzen
 
 

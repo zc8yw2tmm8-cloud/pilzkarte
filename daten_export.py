@@ -141,16 +141,17 @@ def main():
             "teile": teile,
         })
 
-    # Belegte Funde, ausgeduennt auf das relevante Zeitfenster
+    # Belegte Funde mit Tag im Jahr - die Auswahl nach Zeitfenster
+    # trifft der Browser, damit sie sich mit dem Stichtag mitbewegt.
     fundpunkte = {}
     for art, liste in funde.items():
-        treffer = [f for f in liste
-                   if k.tage_im_jahr_abstand(f["tag"], bezugstage[0])
-                   <= k.FUNDE_FENSTER]
+        # Neueste zuerst, damit bei der Begrenzung die aktuellen bleiben
+        sortiert = sorted(liste, key=lambda x: -x["tag"].toordinal())
         fundpunkte[art] = [
             {"lat": round(f["lat"], 5), "lon": round(f["lon"], 5),
-             "jahr": f["tag"].year, "datum": f["tag"].strftime("%d.%m.%Y")}
-            for f in sorted(treffer, key=lambda x: -x["tag"].year)[:400]]
+             "d": f["tag"].strftime("%d.%m.%Y"),
+             "t": f["tag"].timetuple().tm_yday}
+            for f in sortiert[:1200]]
 
     daten = {
         "stand": date.today().isoformat(),
@@ -187,6 +188,7 @@ def main():
         },
         "zellen": zellen,
         "funde": fundpunkte,
+        "fund_fenster": 30,
     }
 
     os.makedirs(ORDNER, exist_ok=True)

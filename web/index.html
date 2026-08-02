@@ -122,6 +122,10 @@
                        font-variant-numeric: tabular-nums;
                        padding-left: 10px; }
   .pop tr.hier td { font-weight: 700; }
+  .navi { display: block; margin-top: 12px; padding: 10px;
+          background: var(--akzent); color: #10130f; text-align: center;
+          border-radius: 6px; text-decoration: none; font-weight: 600;
+          font-size: 13px; }
 
   .fuss { position: absolute; bottom: 0; left: 0; right: 0;
           background: rgba(24,28,33,.82); color: var(--leise);
@@ -174,6 +178,10 @@
     <button class="tag aktiv" data-stil="weich">weich</button>
     <button class="tag" data-stil="hart">Raster</button>
     <button class="tag" data-stil="aus">nur Karte</button>
+    <span style="width:8px"></span>
+    <button class="tag" data-schalter="funde">&#9679; Funde</button>
+    <button class="tag" data-schalter="wald" hidden>Wald</button>
+    <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
   </div>
 </header>
 
@@ -275,14 +283,22 @@ function aktualisiere() {
   if (!karte.getSource("zellen")) return;
   karte.getSource("zellen").setData(baueGeoJson());
   zeigeWeichbild();
+  aktualisiereFunde();
 
-  document.querySelectorAll(".art").forEach(b => {
+  // Arten nach Aussichten sortieren - was heute lohnt, steht links
+  const leiste = document.getElementById("arten");
+  const knoepfe = [...leiste.querySelectorAll(".art")];
+  const bewertet = knoepfe.map(b => {
     const a = b.dataset.art;
-    b.classList.toggle("aktiv", a === art);
     const werte = D.zellen.map(z => z.scores[a][tag] ?? 0);
-    const schnitt = Math.round(werte.reduce((s, w) => s + w, 0) / werte.length);
+    const schnitt = Math.round(
+      werte.reduce((s, w) => s + w, 0) / werte.length);
+    b.classList.toggle("aktiv", a === art);
     b.querySelector(".wert").innerHTML = `<b>${schnitt}</b>/100`;
+    return { b, schnitt };
   });
+  bewertet.sort((x, y) => y.schnitt - x.schnitt)
+    .forEach(({ b }) => leiste.appendChild(b));
   document.querySelectorAll(".tag").forEach(b =>
     b.classList.toggle("aktiv", +b.dataset.tag === tag));
 
@@ -357,7 +373,72 @@ function popupInhalt(z) {
 
     <h4>Andere Arten hier</h4>
     <table>${andere}</table>
+
+    ${navigationsknopf(z.lat, z.lon)}
   </div>`;
+}
+
+// ---- Belegte Funde --------------------------------------------------
+// Gemeldete Funde derselben Jahreszeit. Nicht "hier steht jetzt ein
+// Pilz", sondern "hier wurde um diese Zeit schon einmal einer
+// gefunden" - ueber alle Jahre hinweg.
+function baueFunde() {
+  if (!D.funde || !D.funde[art]) return { type: "FeatureCollection", features: [] };
+
+  const fenster = D.fund_fenster || 30;
+  const stichtag = new Date(D.tage[tag].datum);
+  const jahrestag = Math.floor(
+    (stichtag - new Date(stichtag.getFullYear(), 0, 0)) / 86400000);
+
+  const passt = t => {
+    const d = Math.abs(t - jahrestag);
+    return Math.min(d, 365 - d) <= fenster;
+  };
+
+  let punkte = D.funde[art].filter(f => passt(f.t));
+
+  if (nurNah && meinOrt) {
+    punkte = punkte.filter(f => abstandKm(
+      meinOrt[1], meinOrt[0], f.lat, f.lon) <= 1.0);
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: punkte.map(f => ({
+      type: "Feature",
+      properties: { d: f.d },
+      geometry: { type: "Point", coordinates: [f.lon, f.lat] }
+    }))
+  };
+}
+
+// Navigation zum Punkt. Apple Karten auf iPhone und Mac, sonst
+// Google Maps - beide oeffnen die App, wenn sie installiert ist.
+function navigationsknopf(lat, lon) {
+  const apple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+  const ziel = apple
+    ? `https://maps.apple.com/?daddr=${lat},${lon}&dirflg=d`
+    : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+  return `<a class="navi" href="${ziel}" target="_blank" rel="noopener">
+    &#10148; Route dorthin</a>`;
+}
+
+function abstandKm(lat1, lon1, lat2, lon2) {
+  const R = 6371, r = Math.PI / 180;
+  const dLat = (lat2 - lat1) * r, dLon = (lon2 - lon1) * r;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * r) * Math.cos(lat2 * r) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+let nurNah = false, meinOrt = null;
+
+function aktualisiereFunde() {
+  if (karte.getSource("funde")) {
+    karte.getSource("funde").setData(baueFunde());
+  }
+  const b = document.querySelector("[data-schalter=nah]");
+  if (b) b.hidden = !meinOrt;
 }
 
 // ---- Reliefebenen ---------------------------------------------------
@@ -543,6 +624,24 @@ fetch("daten.json")
       b.onclick = () => { tag = +b.dataset.tag; aktualisiere(); });
     document.querySelectorAll(".um").forEach(b =>
       b.onclick = () => zeigeAnsicht(b.dataset.ansicht));
+    document.querySelectorAll("[data-schalter]").forEach(b =>
+      b.onclick = () => {
+        const was = b.dataset.schalter;
+        const an = !b.classList.contains("aktiv");
+        b.classList.toggle("aktiv", an);
+
+        if (was === "funde" && karte.getLayer("funde")) {
+          karte.setLayoutProperty("funde", "visibility",
+            an ? "visible" : "none");
+        } else if (was === "wald" && karte.getLayer("wald")) {
+          karte.setLayoutProperty("wald", "visibility",
+            an ? "visible" : "none");
+        } else if (was === "nah") {
+          nurNah = an;
+          aktualisiereFunde();
+        }
+      });
+
     document.querySelectorAll("[data-stil]").forEach(b =>
       b.onclick = () => {
         document.querySelectorAll("[data-stil]").forEach(x =>
@@ -593,6 +692,13 @@ fetch("daten.json")
     });
     karte.addControl(orten);
 
+    orten.on("geolocate", e => {
+      meinOrt = [e.coords.longitude, e.coords.latitude];
+      const b = document.querySelector("[data-schalter=nah]");
+      if (b) b.hidden = false;
+      if (nurNah) aktualisiereFunde();
+    });
+
     // Ohne Rueckmeldung bleibt unklar, warum nichts passiert.
     orten.on("error", e => {
       const gruende = {
@@ -637,6 +743,38 @@ fetch("daten.json")
       karte.addLayer({ id: "beschriftung", type: "raster",
                        source: "beschriftung" });
 
+      // Belegte Funde ganz oben - sie sollen nichts verdecken, aber
+      // auch von nichts verdeckt werden
+      karte.addSource("funde", { type: "geojson", data: baueFunde() });
+      karte.addLayer({
+        id: "funde", type: "circle", source: "funde",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-radius": ["interpolate", ["linear"], ["zoom"],
+            8, 3, 12, 5, 15, 7],
+          "circle-color": "#b57edc",
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#2a1a35",
+          "circle-opacity": 0.9
+        }
+      });
+
+      karte.on("click", "funde", e => {
+        const f = e.features[0];
+        new maplibregl.Popup({ maxWidth: "220px", closeButton: false })
+          .setLngLat(f.geometry.coordinates)
+          .setHTML(`<div class="pop"><b>Belegter Fund</b>
+            <div class="lage">${D.arten[art].name} &middot;
+            ${f.properties.d}</div>
+            ${navigationsknopf(f.geometry.coordinates[1],
+                               f.geometry.coordinates[0])}</div>`)
+          .addTo(karte);
+      });
+      karte.on("mouseenter", "funde",
+        () => karte.getCanvas().style.cursor = "pointer");
+      karte.on("mouseleave", "funde",
+        () => karte.getCanvas().style.cursor = "");
+
       karte.on("click", "flaechen", e => {
         const z = D.zellen[e.features[0].properties.i];
         new maplibregl.Popup({ maxWidth: "320px" })
@@ -669,6 +807,26 @@ fetch("daten.json")
       } else if (!navigator.geolocation) {
         melde("Dieser Browser kennt keine Standortbestimmung.");
       }
+
+      fetch("wald.json")
+        .then(r => r.ok ? r.json() : null)
+        .then(w => {
+          if (!w) return;
+          const g = w.grenzen;
+          karte.addSource("wald", {
+            type: "image", url: w.datei,
+            coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
+                          [g[1][1], g[0][0]], [g[0][1], g[0][0]]]
+          });
+          karte.addLayer({
+            id: "wald", type: "raster", source: "wald",
+            layout: { visibility: "none" },
+            paint: { "raster-opacity": 0.5 }
+          }, "weich");
+          const b = document.querySelector("[data-schalter=wald]");
+          if (b) b.hidden = false;
+        })
+        .catch(() => {});
 
       fetch("karten.json")
         .then(r => r.ok ? r.json() : null)
