@@ -90,6 +90,9 @@
                font-weight: 600; }
   #ebenen .tag { border-style: dashed; }
   #ebenen .tag.aktiv { border-style: solid; }
+  #darstellung { margin-top: 5px; }
+  #darstellung .tag { font-size: 11px; padding: 4px 9px;
+                      min-height: 28px; }
 
   #karte { flex: 1 1 auto; min-height: 0; }
   #karte[hidden], #liste[hidden] { display: none; }
@@ -167,6 +170,11 @@
   <div class="leiste" id="arten"></div>
   <div class="tagleiste" id="tage"></div>
   <div class="tagleiste" id="ebenen" hidden></div>
+  <div class="tagleiste" id="darstellung">
+    <button class="tag aktiv" data-stil="weich">weich</button>
+    <button class="tag" data-stil="hart">Raster</button>
+    <button class="tag" data-stil="aus">nur Karte</button>
+  </div>
 </header>
 
 <div id="karte"></div>
@@ -242,9 +250,25 @@ function baueGeoJson() {
   };
 }
 
+function bauePunkte() {
+  // Fuer die weiche Darstellung: ein Punkt je Zelle. Der Score wird
+  // als Gewicht mitgegeben - MapLibre macht daraus die Farbe.
+  return {
+    type: "FeatureCollection",
+    features: D.zellen.map(z => ({
+      type: "Feature",
+      properties: { g: (z.scores[art][tag] ?? 0) / 100 },
+      geometry: { type: "Point", coordinates: [z.lon, z.lat] }
+    }))
+  };
+}
+
 function aktualisiere() {
   if (!karte.getSource("zellen")) return;
   karte.getSource("zellen").setData(baueGeoJson());
+  if (karte.getSource("punkte")) {
+    karte.getSource("punkte").setData(bauePunkte());
+  }
 
   document.querySelectorAll(".art").forEach(b => {
     const a = b.dataset.art;
@@ -357,7 +381,9 @@ function reliefEinbinden() {
         id: kennung, type: "raster", source: kennung,
         paint: { "raster-opacity": art === "schummerung" ? 0.55 : 0.75 },
         layout: { visibility: "none" }
-      });
+      // Vor die Beschriftung einhaengen, damit Ortsnamen sichtbar
+      // bleiben
+      }, karte.getLayer("beschriftung") ? "beschriftung" : undefined);
     });
   });
 
@@ -461,6 +487,21 @@ function baueListe() {
   });
 }
 
+function setzeStil(stil) {
+  if (!karte || !karte.getLayer("weich")) return;
+  karte.setLayoutProperty("weich", "visibility",
+    stil === "weich" ? "visible" : "none");
+  karte.setPaintProperty("flaechen", "fill-opacity",
+    stil === "hart" ? 0.72 : 0);
+  karte.setPaintProperty("flaechen", "fill-color",
+    stil === "hart"
+      ? ["interpolate", ["linear"], ["get", "wert"],
+         0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
+         50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
+         85, "rgb(130,220,70)", 100, "rgb(45,175,75)"]
+      : "#000");
+}
+
 function zeigeAnsicht(welche) {
   document.getElementById("karte").hidden = welche !== "karte";
   document.getElementById("liste").hidden = welche !== "liste";
@@ -494,6 +535,13 @@ fetch("daten.json")
       b.onclick = () => { tag = +b.dataset.tag; aktualisiere(); });
     document.querySelectorAll(".um").forEach(b =>
       b.onclick = () => zeigeAnsicht(b.dataset.ansicht));
+    document.querySelectorAll("[data-stil]").forEach(b =>
+      b.onclick = () => {
+        document.querySelectorAll("[data-stil]").forEach(x =>
+          x.classList.remove("aktiv"));
+        b.classList.add("aktiv");
+        setzeStil(b.dataset.stil);
+      });
 
     const g = D.gebiet;
     karte = new maplibregl.Map({
@@ -501,16 +549,26 @@ fetch("daten.json")
       style: {
         version: 8,
         sources: {
+          // CARTO liefert die Grundkarte in zwei Teilen: Flaechen und
+          // Beschriftung getrennt. Damit koennen Strassennamen und
+          // Ortsschilder UEBER den Farbflaechen liegen statt darunter.
           grund: {
             type: "raster",
-            tiles: ["https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-                    "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-                    "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"],
+            tiles: ["https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
+                    "https://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
+                    "https://c.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png"],
             tileSize: 256,
             attribution: '© <a href="https://www.openstreetmap.org/copyright">' +
               'OpenStreetMap</a>, © <a href="https://carto.com/">CARTO</a> · ' +
               'Wetter <a href="https://open-meteo.com/">Open-Meteo</a> · ' +
               'Baumarten <a href="https://atlas.thuenen.de/">Thünen-Institut</a>'
+          },
+          beschriftung: {
+            type: "raster",
+            tiles: ["https://a.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png",
+                    "https://b.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png",
+                    "https://c.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png"],
+            tileSize: 256
           }
         },
         layers: [{ id: "grund", type: "raster", source: "grund" }]
@@ -541,17 +599,45 @@ fetch("daten.json")
     karte.addControl(new maplibregl.ScaleControl({ maxWidth: 90 }));
 
     karte.on("load", () => {
+      // Zwei Quellen: Rechtecke fuers Anklicken, Punkte fuer die
+      // weiche Darstellung.
       karte.addSource("zellen", { type: "geojson", data: baueGeoJson() });
+      karte.addSource("punkte", { type: "geojson", data: bauePunkte() });
+
+      // Weiche Farbverlaeufe statt harter Kacheln. Der Radius waechst
+      // mit dem Zoom, damit die Flaechen bei jeder Stufe zusammen-
+      // haengen statt in Flecken zu zerfallen.
       karte.addLayer({
-        id: "flaechen", type: "fill", source: "zellen",
+        id: "weich", type: "heatmap", source: "punkte",
         paint: {
-          "fill-color": ["interpolate", ["linear"], ["get", "wert"],
-            0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
-            50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
-            85, "rgb(130,220,70)", 100, "rgb(45,175,75)"],
-          "fill-opacity": 0.72
+          "heatmap-weight": ["get", "g"],
+          "heatmap-intensity": 1,
+          // Der Score steuert die Farbe, nicht die Dichte
+          "heatmap-color": [
+            "interpolate", ["linear"], ["heatmap-density"],
+            0, "rgba(0,0,0,0)",
+            0.01, "rgba(150,40,70,0.75)",
+            0.25, "rgba(225,70,55,0.75)",
+            0.50, "rgba(250,155,40,0.75)",
+            0.65, "rgba(255,225,90,0.75)",
+            0.85, "rgba(130,220,70,0.75)",
+            1.0, "rgba(45,175,75,0.75)"
+          ],
+          "heatmap-radius": ["interpolate", ["exponential", 2], ["zoom"],
+            7, 12, 9, 26, 11, 70, 13, 250, 15, 900],
+          "heatmap-opacity": 0.85
         }
       });
+
+      // Unsichtbare Klickflaechen darueber
+      karte.addLayer({
+        id: "flaechen", type: "fill", source: "zellen",
+        paint: { "fill-color": "#000", "fill-opacity": 0 }
+      });
+
+      // Strassen und Ortsnamen ueber die Farbflaechen legen
+      karte.addLayer({ id: "beschriftung", type: "raster",
+                       source: "beschriftung" });
 
       karte.on("click", "flaechen", e => {
         const z = D.zellen[e.features[0].properties.i];
