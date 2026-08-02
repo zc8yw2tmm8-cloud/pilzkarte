@@ -88,7 +88,8 @@
          font-size: 12px; min-height: 32px; white-space: nowrap; }
   .tag.aktiv { border-color: var(--akzent); color: var(--akzent);
                font-weight: 600; }
-  #ebenen .tag { border-style: dashed; }
+  #ebenen .tag, #baumleiste .tag { border-style: dashed; }
+  #baumleiste .tag.aktiv { border-style: solid; }
   #ebenen .tag.aktiv { border-style: solid; }
   #darstellung { margin-top: 5px; }
   #darstellung .tag { font-size: 11px; padding: 4px 9px;
@@ -173,6 +174,7 @@
   </div>
   <div class="leiste" id="arten"></div>
   <div class="tagleiste" id="tage"></div>
+  <div class="tagleiste" id="baumleiste" hidden></div>
   <div class="tagleiste" id="ebenen" hidden></div>
   <div class="tagleiste" id="darstellung">
     <button class="tag aktiv" data-stil="weich">weich</button>
@@ -180,7 +182,6 @@
     <button class="tag" data-stil="aus">nur Karte</button>
     <span style="width:8px"></span>
     <button class="tag" data-schalter="funde">&#9679; Funde</button>
-    <button class="tag" data-schalter="wald" hidden>Wald</button>
     <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
   </div>
 </header>
@@ -633,9 +634,6 @@ fetch("daten.json")
         if (was === "funde" && karte.getLayer("funde")) {
           karte.setLayoutProperty("funde", "visibility",
             an ? "visible" : "none");
-        } else if (was === "wald" && karte.getLayer("wald")) {
-          karte.setLayoutProperty("wald", "visibility",
-            an ? "visible" : "none");
         } else if (was === "nah") {
           nurNah = an;
           aktualisiereFunde();
@@ -811,20 +809,47 @@ fetch("daten.json")
       fetch("wald.json")
         .then(r => r.ok ? r.json() : null)
         .then(w => {
-          if (!w) return;
+          if (!w || !w.ebenen) return;
           const g = w.grenzen;
-          karte.addSource("wald", {
-            type: "image", url: w.datei,
-            coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
-                          [g[1][1], g[0][0]], [g[0][1], g[0][0]]]
+
+          w.ebenen.forEach(e => {
+            const kennung = "wald_" + e.schluessel;
+            karte.addSource(kennung, {
+              type: "image", url: e.datei,
+              coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
+                            [g[1][1], g[0][0]], [g[0][1], g[0][0]]]
+            });
+            // Unter die Farbflaechen, damit die Bewertung oben bleibt
+            karte.addLayer({
+              id: kennung, type: "raster", source: kennung,
+              layout: { visibility: "none" },
+              paint: { "raster-opacity": 0.55 }
+            }, "weich");
           });
-          karte.addLayer({
-            id: "wald", type: "raster", source: "wald",
-            layout: { visibility: "none" },
-            paint: { "raster-opacity": 0.5 }
-          }, "weich");
-          const b = document.querySelector("[data-schalter=wald]");
-          if (b) b.hidden = false;
+
+          const leiste = document.getElementById("baumleiste");
+          leiste.innerHTML =
+            '<span class="tag" style="border:0;cursor:default;' +
+            'color:var(--leise)">Wald:</span>' +
+            w.ebenen.map(e => `<button class="tag"
+              data-baum="${e.schluessel}">${e.name}</button>`).join("");
+          leiste.hidden = false;
+
+          leiste.querySelectorAll("[data-baum]").forEach(b =>
+            b.onclick = () => {
+              const an = !b.classList.contains("aktiv");
+              // Immer nur eine Baumart - sonst ueberlagern sich die
+              // Masken und man sieht nur noch eine Flaeche
+              leiste.querySelectorAll("[data-baum]").forEach(x =>
+                x.classList.remove("aktiv"));
+              w.ebenen.forEach(e => karte.setLayoutProperty(
+                "wald_" + e.schluessel, "visibility", "none"));
+              if (an) {
+                b.classList.add("aktiv");
+                karte.setLayoutProperty("wald_" + b.dataset.baum,
+                  "visibility", "visible");
+              }
+            });
         })
         .catch(() => {});
 
