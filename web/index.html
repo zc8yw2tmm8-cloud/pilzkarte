@@ -257,7 +257,7 @@ function bauePunkte() {
     type: "FeatureCollection",
     features: D.zellen.map(z => ({
       type: "Feature",
-      properties: { g: (z.scores[art][tag] ?? 0) / 100 },
+      properties: { w: z.scores[art][tag] ?? 0 },
       geometry: { type: "Point", coordinates: [z.lon, z.lat] }
     }))
   };
@@ -491,6 +491,8 @@ function setzeStil(stil) {
   if (!karte || !karte.getLayer("weich")) return;
   karte.setLayoutProperty("weich", "visibility",
     stil === "weich" ? "visible" : "none");
+  // Bei "nur Karte" auch die Klickflaechen unsichtbar lassen -
+  // anklicken geht trotzdem
   karte.setPaintProperty("flaechen", "fill-opacity",
     stil === "hart" ? 0.72 : 0);
   karte.setPaintProperty("flaechen", "fill-color",
@@ -604,33 +606,28 @@ fetch("daten.json")
       karte.addSource("zellen", { type: "geojson", data: baueGeoJson() });
       karte.addSource("punkte", { type: "geojson", data: bauePunkte() });
 
-      // Weiche Farbverlaeufe statt harter Kacheln. Der Radius waechst
-      // mit dem Zoom, damit die Flaechen bei jeder Stufe zusammen-
-      // haengen statt in Flecken zu zerfallen.
+      // Weiche Farbflaechen: ein Kreis je Zelle, der nach aussen
+      // ausblendet. Ueberlappende Kreise ergeben zusammen eine
+      // durchgehende Flaeche.
+      //
+      // Kein Waermebild - das stellt Dichte dar, nicht Werte, und
+      // erzeugt bei gleichmaessig verteilten Punkten einen harten
+      // Kern mit schwachem Rand.
       karte.addLayer({
-        id: "weich", type: "heatmap", source: "punkte",
+        id: "weich", type: "circle", source: "punkte",
         paint: {
-          "heatmap-weight": ["get", "g"],
-          "heatmap-intensity": 1,
-          // Der Score steuert die Farbe, nicht die Dichte
-          "heatmap-color": [
-            "interpolate", ["linear"], ["heatmap-density"],
-            0, "rgba(0,0,0,0)",
-            0.01, "rgba(150,40,70,0.75)",
-            0.25, "rgba(225,70,55,0.75)",
-            0.50, "rgba(250,155,40,0.75)",
-            0.65, "rgba(255,225,90,0.75)",
-            0.85, "rgba(130,220,70,0.75)",
-            1.0, "rgba(45,175,75,0.75)"
-          ],
-          // Der Radius muss mindestens dem halben Zellabstand
-          // entsprechen, damit sich benachbarte Zellen ueberlappen
-          // und eine zusammenhaengende Flaeche entsteht. Bei 2 km
-          // Raster sind das rund 1 km - grosszuegig gerechnet, weil
-          // Pilze auch am Waldrand und ausserhalb wachsen.
-          "heatmap-radius": ["interpolate", ["exponential", 2], ["zoom"],
-            6, 6, 8, 6, 10, 17, 12, 69, 14, 274, 16, 500],
-          "heatmap-opacity": 0.9
+          "circle-color": ["interpolate", ["linear"], ["get", "w"],
+            0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
+            50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
+            85, "rgb(130,220,70)", 100, "rgb(45,175,75)"],
+          // Radius in Metern statt Pixeln - so bleibt die Groesse
+          // beim Zoomen an der Landschaft haengen
+          "circle-radius": ["interpolate", ["exponential", 2], ["zoom"],
+            6, 2, 8, 4, 10, 15, 12, 60, 14, 240, 16, 961, 18, 1000],
+          // Weicher Rand: der Verlauf macht aus den Kreisen eine
+          // zusammenhaengende Flaeche
+          "circle-blur": 1.1,
+          "circle-opacity": 0.55
         }
       });
 
