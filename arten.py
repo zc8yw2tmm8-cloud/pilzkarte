@@ -23,16 +23,31 @@ BODEN_MINDEST = 0.5
 SAISON_WEICH = True
 
 # Wie stark ein geringer Waldanteil in der Zelle daempft.
-# Voreinstellung, wird je Art ueberschrieben.
 #
-# Nicht alle Pilze sind Waldpilze: Der Parasol steht auf Wiesen und
-# Weiden, der Schwefelporling am einzelnen Baum - Alleeeiche, Kopfweide,
-# alter Obstbaum -, der Birkenpilz ueberall dort, wo eine Birke steht.
-# Fuer diese Arten waere eine Daempfung nach Waldanteil schlicht falsch.
-# Pfifferling und Marone brauchen dagegen geschlossenen Bestand.
+# ACHTUNG, das ist eine heiklere Groesse als sie aussieht:
 #
-# Diese Werte sind geschaetzt, nicht gemessen.
-WALDANTEIL_WIRKUNG = 0.25
+# Der Waldanteil misst, wie wahrscheinlich eine ZUFAELLIGE Stelle in
+# der Zelle Wald ist. Das beantwortet die Frage "wie viele Pilze
+# stehen in dieser Zelle insgesamt".
+#
+# Ein Sammler fragt aber etwas anderes: "Wenn ich in DEM Waldstueck
+# dort suche - wie stehen meine Chancen?" Dafuer ist es gleichgueltig,
+# ob drumherum Acker liegt. Niemand sucht auf dem Acker.
+#
+# Deshalb daempft der Waldanteil nur noch schwach. Was bleibt, ist
+# nicht die Trefferwahrscheinlichkeit, sondern der Umstand, dass ein
+# kleines Waldstueck weniger Flaeche zum Absuchen bietet - und dass
+# bei sehr wenig Wald die Baumartenangabe unsicherer wird, weil sie
+# aus wenigen Bildpunkten stammt.
+#
+# Frueher standen hier Werte bis 0.40. Das hat kleine Waelder
+# bestraft, ohne dass es dem Sammler etwas gesagt haette.
+WALDANTEIL_WIRKUNG = 0.10
+
+# Unterhalb dieses Waldanteils wird staerker gedaempft - dort ist
+# nicht die Pilzdichte das Problem, sondern die Datenlage: Baumarten
+# und Boden stammen dann aus einer sehr kleinen Flaeche.
+WALDANTEIL_UNSICHER = 0.04
 
 
 # Klassen der Thuenen-Baumartenkarte (Blickensdoerfer et al. 2024).
@@ -124,10 +139,11 @@ ARTEN = {
                       "kiefer": 0.85, "eiche": 0.75, "douglasie": 0.45,
                       "laerche": 0.5, "laub_lang": 0.45, "birke": 0.25,
                       "laub_kurz": 0.25, "erle": 0.12},
-        "waldanteil_wirkung": 0.30,
+        "waldanteil_wirkung": 0.10,
         # gemessen: leicht 0.71, stark 0.23 (nur Nov)
         "frost_abzug": (15, 40),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.04, 6: 0.04, 7: 0.13, 8: 0.46, 9: 1.0, 10: 0.76, 11: 0.53, 12: 0.08},
+        "saison": {1: 0.0, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.02, 6: 0.02,
+                   7: 0.21, 8: 0.37, 9: 1.00, 10: 0.70, 11: 0.44, 12: 0.04},
         # Mykorrhiza mit Fichte, Buche, Kiefer, Eiche - breit aufgestellt
         "baumarten": {"fichte": 1.0, "buche": 1.0, "tanne": 0.9,
                       "kiefer": 0.85, "eiche": 0.8, "douglasie": 0.5,
@@ -158,10 +174,11 @@ ARTEN = {
                      (7.0, None, 0.85)],
         "boden_ton": [(18, None, 1.0), (14, 18, 0.85), (None, 14, 0.65)],
         # warme Eichenbestaende, auch offen und licht
-        "waldanteil_wirkung": 0.25,
+        "waldanteil_wirkung": 0.10,
         # geschaetzt - im Juni gibt es keinen Frost
         "frost_abzug": (15, 35),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.08, 6: 1.0, 7: 0.74, 8: 0.2, 9: 0.04, 10: 0.01, 11: 0.01, 12: 0.0},
+        "saison": {1: 0.0, 2: 0.01, 3: 0.02, 4: 0.0, 5: 0.05, 6: 1.00,
+                   7: 0.89, 8: 0.32, 9: 0.06, 10: 0.01, 11: 0.01, 12: 0.0},
         # Kalkbuchenwald und Eiche - der Elm ist klassisches Revier
         # Waermeliebender Laubwaldpilz: Eiche und Buche, keine Nadelhoelzer
         "baumarten": {"eiche": 1.0, "buche": 1.0, "laub_lang": 0.7,
@@ -202,10 +219,11 @@ ARTEN = {
                       "laerche": 0.8, "douglasie": 0.6, "buche": 0.5,
                       "eiche": 0.35, "birke": 0.35, "laub_lang": 0.25,
                       "laub_kurz": 0.2, "erle": 0.3},
-        "waldanteil_wirkung": 0.35,
+        "waldanteil_wirkung": 0.12,
         # KORREKTUR: nicht frosthart. Leicht 0.00 im Nov
         "frost_abzug": (20, 35),   # (leichter, starker Frost)
-        "saison": {1: 0.03, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.09, 7: 0.17, 8: 0.37, 9: 0.99, 10: 1.0, 11: 0.89, 12: 0.15},
+        "saison": {1: 0.01, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.06,
+                   7: 0.21, 8: 0.33, 9: 1.00, 10: 0.99, 11: 0.75, 12: 0.08},
         # Nadelwaldpilz. In dieser Region faellt Fichte praktisch aus,
         # Kiefer traegt sie.
         "baumarten": {"fichte": 1.0, "kiefer": 0.95, "tanne": 0.9,
@@ -236,10 +254,11 @@ ARTEN = {
         "boden_ph": [(None, 5.5, 1.0), (5.5, 6.1, 0.85), (6.1, None, 0.6)],
         "boden_ton": [(13, 20, 1.0), (20, None, 0.9), (None, 13, 0.75)],
         # am staerksten an geschlossenen Wald gebunden
-        "waldanteil_wirkung": 0.40,
+        "waldanteil_wirkung": 0.14,
         # geschaetzt, zu wenige Spaetfunde
         "frost_abzug": (18, 40),   # (leichter, starker Frost)
-        "saison": {1: 0.05, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.49, 7: 1.0, 8: 0.49, 9: 0.46, 10: 0.15, 11: 0.03, 12: 0.16},
+        "saison": {1: 0.02, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.37,
+                   7: 1.00, 8: 0.53, 9: 0.57, 10: 0.20, 11: 0.07, 12: 0.11},
         # Saure, moosige Nadelwaelder, auch Buche auf saurem Grund
         "baumarten": {"fichte": 1.0, "kiefer": 0.9, "tanne": 0.85,
                       "buche": 0.6, "eiche": 0.55, "douglasie": 0.5,
@@ -269,10 +288,11 @@ ARTEN = {
         "boden_ton": [(12, 16, 1.0), (16, 22, 0.8), (None, 12, 0.65),
                       (22, None, 0.8)],
         # nur die Birke zaehlt - auch in Heide, Park, Garten
-        "waldanteil_wirkung": 0.12,
+        "waldanteil_wirkung": 0.05,
         # KORREKTUR: nicht frosthart, wie die anderen
         "frost_abzug": (18, 40),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, 7: 0.22, 8: 0.28, 9: 1.0, 10: 0.91, 11: 0.29, 12: 0.0},
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0,
+                   7: 0.14, 8: 0.19, 9: 1.00, 10: 0.70, 11: 0.18, 12: 0.0},
         # zwingend an Birke gebunden - Bruchwald ist hier gut
         # Zwingend an Birke gebunden. Der Anteil zaehlt, nicht die
         # Hauptbaumart - Birke steht oft als Beimischung im Kiefernforst.
@@ -314,10 +334,11 @@ ARTEN = {
                       "laub_lang": 1.0, "laub_kurz": 1.0, "kiefer": 0.9,
                       "laerche": 0.85, "buche": 0.7, "fichte": 0.85,
                       "douglasie": 0.7, "tanne": 0.7},
-        "waldanteil_wirkung": 0.05,
+        "waldanteil_wirkung": 0.02,
         # gemessen: leicht 0.64, stark 0.00 (nur Nov)
         "frost_abzug": (20, 45),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.02, 3: 0.0, 4: 0.0, 5: 0.12, 6: 0.51, 7: 0.52, 8: 0.6, 9: 1.0, 10: 0.69, 11: 0.46, 12: 0.0},
+        "saison": {1: 0.0, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.07, 6: 0.31,
+                   7: 0.42, 8: 0.51, 9: 1.00, 10: 0.68, 11: 0.39, 12: 0.0},
         # Waldraender und Lichtungen - Waldtyp fast egal
         # Zersetzer an Waldraendern und Lichtungen - Baumart fast egal
         "baumarten": {"eiche": 1.0, "birke": 1.0, "laub_lang": 1.0,
@@ -357,10 +378,11 @@ ARTEN = {
                       "laub_lang": 0.8, "buche": 0.4, "birke": 0.3,
                       "laerche": 0.15, "kiefer": 0.12, "fichte": 0.06,
                       "douglasie": 0.08, "tanne": 0.08},
-        "waldanteil_wirkung": 0.10,
+        "waldanteil_wirkung": 0.04,
         # gemessen: leicht 1.74 - Holzbewohner, unbeeindruckt
         "frost_abzug": (0, 8),   # (leichter, starker Frost)
-        "saison": {1: 0.03, 2: 0.01, 3: 0.03, 4: 0.14, 5: 1.0, 6: 0.37, 7: 0.08, 8: 0.11, 9: 0.13, 10: 0.02, 11: 0.01, 12: 0.02},
+        "saison": {1: 0.02, 2: 0.01, 3: 0.02, 4: 0.07, 5: 1.00, 6: 0.50,
+                   7: 0.13, 8: 0.19, 9: 0.19, 10: 0.03, 11: 0.02, 12: 0.02},
         # Eiche, Weide, Kirsche, Robinie - reiner Laubholzbewohner
         # Eiche ist der Hauptwirt, dazu Weide, Kirsche, Robinie.
         # Auf Nadelholz kaum, und von dort auch nicht zu empfehlen.
@@ -467,13 +489,22 @@ def baumart_faktor(einstellung, bestand):
     f = sum(anteil / summe * gewichte.get(art, 0.5)
             for art, anteil in anteile.items())
 
-    # Wenig Wald in der Zelle heisst wenig Gelegenheit - aber nur bei
-    # den Arten, die tatsaechlich Wald brauchen.
+    # Waldanteil: schwache Daempfung, siehe die Erklaerung oben bei
+    # WALDANTEIL_WIRKUNG. Der Sammler sucht im Waldstueck, nicht auf
+    # der ganzen Zelle.
     wirkung = einstellung.get("waldanteil_wirkung", WALDANTEIL_WIRKUNG)
     waldanteil = bestand.get("waldanteil")
-    if waldanteil is not None and wirkung > 0:
-        deckung = min(1.0, waldanteil / 0.5)
-        f *= (1.0 - wirkung) + wirkung * deckung
+
+    if waldanteil is not None:
+        if wirkung > 0:
+            deckung = min(1.0, waldanteil / 0.30)
+            f *= (1.0 - wirkung) + wirkung * deckung
+
+        # Sehr wenig Wald: hier geht es nicht um Pilzdichte, sondern
+        # darum, dass Baumarten und Boden aus wenigen Bildpunkten
+        # stammen und entsprechend unsicher sind.
+        if waldanteil < WALDANTEIL_UNSICHER:
+            f *= 0.75
 
     return max(0.0, min(1.0, f))
 

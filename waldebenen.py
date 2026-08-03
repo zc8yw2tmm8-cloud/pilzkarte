@@ -139,7 +139,7 @@ def erzeuge():
     rest.sort(key=lambda e: -e[2])
     # Grenzen ablegen, damit web_wald.py sie findet
     try:
-        with open(os.path.join(ORDNER, "wald_grenzen.txt"), "w",
+        with open(os.path.join(BILDORDNER, "wald_grenzen.txt"), "w",
                   encoding="utf-8") as f:
             f.write(f"{SUED},{WEST},{NORD},{OST}\n")
     except Exception:

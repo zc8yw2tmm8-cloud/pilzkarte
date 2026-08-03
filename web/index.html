@@ -79,6 +79,18 @@
                color: #10130f; }
   .art.aktiv .wert { opacity: .75; }
 
+  .regler { display: flex; align-items: center; gap: 10px;
+            margin-top: 8px; }
+  .regler.zweit { margin-top: 6px; }
+  .regler input[type=range] { flex: 1; min-width: 0; height: 26px;
+                              accent-color: var(--akzent);
+                              cursor: pointer; }
+  .regler #tagname { flex: 0 0 auto; font-size: 13px; font-weight: 600;
+                     color: var(--akzent); min-width: 74px;
+                     text-align: right; }
+  .regler .marke { flex: 0 0 auto; font-size: 11px;
+                   color: var(--leise); min-width: 62px; }
+
   .tagleiste { display: flex; gap: 4px; margin-top: 6px;
                overflow-x: auto; scrollbar-width: none; }
   .tagleiste::-webkit-scrollbar { display: none; }
@@ -177,9 +189,17 @@
     <span class="stand" id="stand"></span>
   </div>
   <div class="leiste" id="arten"></div>
-  <div class="tagleiste" id="tage"></div>
+  <div class="regler">
+    <input type="range" id="tagregler" min="0" max="6" value="0" step="1">
+    <span id="tagname">Heute</span>
+  </div>
   <div class="tagleiste" id="baumleiste" hidden></div>
   <div class="tagleiste" id="ebenen" hidden></div>
+  <div class="regler zweit">
+    <span class="marke">Deckkraft</span>
+    <input type="range" id="deckregler" min="15" max="100" value="88"
+           step="5">
+  </div>
   <div class="tagleiste" id="darstellung">
     <button class="tag aktiv" data-stil="weich">weich</button>
     <button class="tag" data-stil="hart">Raster</button>
@@ -220,6 +240,17 @@ const komma = (z, n = 1) =>
 
 let D = null, art = null, tag = 0, karte = null;
 let offenesPopup = null;
+
+const WOCHENTAGE = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+
+function tagname(i) {
+  const t = D.tage[i];
+  if (!t) return "";
+  if (t.versatz === 0) return "Heute";
+  if (t.versatz === 1) return "Morgen";
+  const d = new Date(t.datum);
+  return `${WOCHENTAGE[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`;
+}
 
 function zeigePopup(ort, inhalt) {
   offenesPopup = new maplibregl.Popup({
@@ -337,8 +368,8 @@ function aktualisiere() {
   });
   bewertet.sort((x, y) => y.schnitt - x.schnitt)
     .forEach(({ b }) => leiste.appendChild(b));
-  document.querySelectorAll(".tag").forEach(b =>
-    b.classList.toggle("aktiv", +b.dataset.tag === tag));
+  const tn = document.getElementById("tagname");
+  if (tn) tn.textContent = tagname(tag);
 
   if (!document.getElementById("liste").hidden) baueListe();
 }
@@ -355,10 +386,8 @@ function trendZeile(z) {
   if (best >= jetzt + 8) {
     const i = liste.indexOf(best);
     const d = new Date(D.tage[i].datum);
-    const wt = ["So","Mo","Di","Mi","Do","Fr","Sa"][d.getDay()];
     return `<div class="trend"><span style="color:#2e9e4f">▲</span>
-            steigt auf <b>${best}</b> am ${wt}
-            ${d.getDate()}.${d.getMonth() + 1}.</div>`;
+            steigt auf <b>${best}</b> am ${tagname(i)}</div>`;
   }
   if (tief <= jetzt - 8)
     return `<div class="trend"><span style="color:#c0392b">▼</span>
@@ -378,7 +407,7 @@ function popupInhalt(z) {
       <td>${D.arten[a].name}</td>
       <td style="color:${farbe(w)};font-weight:600">${w}</td></tr>`).join("");
 
-  const lage = [D.tage[tag].name];
+  const lage = [tagname(tag)];
   if (z.hoehe !== null) lage.push(z.hoehe + " m");
   lage.push(z.id);
 
@@ -597,7 +626,7 @@ function baueListe() {
   const el = document.getElementById("liste");
   el.innerHTML = `<div class="klein" style="margin-bottom:14px">
       Sortiert nach Aussichten für
-      <b>${D.tage[tag].name.toLowerCase()}</b>. Werte unter etwa 40
+      <b>${tagname(tag).toLowerCase()}</b>. Werte unter etwa 40
       bedeuten geringe Chancen.</div>` + teile.join("");
 
   el.querySelectorAll("button.hin").forEach(b => b.onclick = () => {
@@ -652,16 +681,30 @@ fetch("daten.json")
     document.getElementById("arten").innerHTML = Object.entries(D.arten)
       .map(([a, e]) => `<button class="art" data-art="${a}">${e.name}
         <span class="wert"></span></button>`).join("");
-    document.getElementById("tage").innerHTML = D.tage
-      .map((t, i) => `<button class="tag" data-tag="${i}">${t.name}</button>`)
-      .join("");
+    const regler = document.getElementById("tagregler");
+    regler.max = D.tage.length - 1;
+    regler.oninput = () => { tag = +regler.value; aktualisiere(); };
 
     document.querySelectorAll(".art").forEach(b =>
       b.onclick = () => { art = b.dataset.art; aktualisiere(); });
-    document.querySelectorAll(".tag").forEach(b =>
-      b.onclick = () => { tag = +b.dataset.tag; aktualisiere(); });
+
     document.querySelectorAll(".um").forEach(b =>
       b.onclick = () => zeigeAnsicht(b.dataset.ansicht));
+    const deck = document.getElementById("deckregler");
+    deck.oninput = () => {
+      const wert = +deck.value / 100;
+      if (karte.getLayer("weich")) {
+        karte.setPaintProperty("weich", "raster-opacity", wert);
+      }
+      if (karte.getLayer("flaechen")) {
+        const stil = document.querySelector("[data-stil].aktiv");
+        if (stil && stil.dataset.stil === "hart") {
+          karte.setPaintProperty("flaechen", "fill-opacity",
+                                 wert * 0.82);
+        }
+      }
+    };
+
     document.querySelectorAll("[data-schalter]").forEach(b =>
       b.onclick = () => {
         const was = b.dataset.schalter;

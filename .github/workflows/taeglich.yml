@@ -1,12 +1,18 @@
 name: Wetterdaten sammeln
 
-# Jeden Morgen um 6 Uhr UTC, also 8 Uhr im Sommer und 7 Uhr im Winter.
-# GitHub kann geplante Laeufe um bis zu 15 Minuten verschieben oder bei
-# hoher Last auslassen - fuer Tageswerte ist das unerheblich, weil das
-# Skript beim naechsten Lauf nachholt.
+# Viermal taeglich, jeweils kurz nach den ICON-D2-Laeufen des DWD.
+# Der Vortag wird nur beim ersten Lauf geholt - er aendert sich nicht
+# mehr. Die Vorhersage dagegen jedes Mal: sie wird alle drei Stunden
+# neu gerechnet, und ein Regengebiet kann anders ziehen als gedacht.
+#
+# Krumme Minuten, weil GitHub geplante Laeufe zur vollen Stunde
+# haeufiger verschiebt oder ausfallen laesst.
 on:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "17 4 * * *"     # 6:17 Sommerzeit
+    - cron: "17 10 * * *"    # 12:17
+    - cron: "17 14 * * *"    # 16:17
+    - cron: "17 18 * * *"    # 20:17
   workflow_dispatch:
 
 permissions:
@@ -17,8 +23,6 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Sonst puffert Python die Ausgabe und man sieht bei einem
-  # abgebrochenen Lauf ueberhaupt nichts.
   PYTHONUNBUFFERED: "1"
 
 jobs:
@@ -39,16 +43,22 @@ jobs:
       - name: Pakete installieren
         run: pip install -r requirements.txt
 
+      # Nur im Fruehlauf. Spaeter am Tag ist der Vortag laengst da,
+      # und das Skript wuerde ohnehin "nichts zu tun" melden.
       - name: Vortag sammeln
+        if: >
+          github.event_name == 'workflow_dispatch' ||
+          github.event.schedule == '17 4 * * *'
         run: python sammeln.py
 
+      # Bei jedem Lauf - das ist der Grund fuer die vier Termine
       - name: Vorhersage holen
         run: python prognose.py
 
       # Fehlende Tage nachholen, falls ein Lauf ausgefallen ist.
-      # Nur sonntags, weil es rund 1000 Abrufe kostet.
+      # Nur sonntags frueh, weil es rund 1000 Abrufe kostet.
       - name: Luecken schliessen
-        if: github.event.schedule == '0 6 * * *'
+        if: github.event.schedule == '17 4 * * *'
         run: |
           if [ "$(date +%u)" = "7" ]; then
             python nachfuellen.py
@@ -74,6 +84,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "Nichts geaendert"
           else
-            git commit -m "Wetterdaten $(date +%Y-%m-%d)"
+            git commit -m "Wetterdaten $(date -u +%Y-%m-%d\ %H:%M)"
             git push
           fi

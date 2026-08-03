@@ -39,7 +39,7 @@ except ImportError:
 # ===== Einstellungen =====
 # Welche Arten erzeugt werden. None = alle aus arten.py
 NUR_ARTEN = None
-ZIELTAGE = [0, 1, 2, 3, 7]
+ZIELTAGE = [0, 1, 2, 3, 4, 5, 6]
 RASTER_KM = 2.0
 
 # True = weiche Verlaeufe (braucht numpy und pillow)
@@ -1529,4 +1529,8 @@ def main():
               f"(Schnitt {round(eintraege[0][2])})")
 
 
-main()
+# Nur ausfuehren, wenn direkt gestartet - dieses Modul
+# wird von anderen Skripten importiert, und dann darf
+# nichts von selbst losrechnen.
+if __name__ == "__main__":
+    main()

@@ -335,20 +335,27 @@ Schwefelporling 0,6&times;1,0 + 0,3&times;0,1 + 0,1&times;0,3 = 0,66.
 Damit zaehlt auch eine Beimischung: Ein Kiefernforst mit 20 % Birke
 ist fuer den Birkenpilz brauchbar, obwohl die Hauptbaumart Kiefer ist.</p>
 
-<p>Zusaetzlich daempft ein geringer Waldanteil in der Zelle - aber
-<b>je nach Art unterschiedlich stark</b>. Nicht alle Pilze sind
-Waldpilze: Der Parasol steht auf Wiesen und Weiden, der Schwefelporling
-am einzelnen Baum (Alleeeiche, Kopfweide, alter Obstbaum), der
-Birkenpilz ueberall dort, wo eine Birke waechst. Fuer sie wirkt die
-Daempfung kaum. Pfifferling und Marone brauchen dagegen geschlossenen
-Bestand, bei ihnen wirkt sie deutlich.</p>
+<p>Der <b>Waldanteil</b> der Zelle wirkt nur noch schwach - und das
+hat einen Grund, der nicht auf der Hand liegt.</p>
 
-<div class="hinweis">Grundsaetzliche Grenze: Die Karte zeigt nur Zellen,
-die in OpenStreetMap als Wald eingetragen sind. Wiesen, Parks,
+<p>Der Waldanteil sagt, wie wahrscheinlich eine <i>zufaellige</i>
+Stelle in der Zelle Wald ist. Das beantwortet die Frage, wie viele
+Pilze in der ganzen Zelle stehen. Ein Sammler fragt aber etwas
+anderes: <i>Wenn ich in dem Waldstueck dort suche - wie stehen meine
+Chancen?</i> Dafuer ist gleichgueltig, ob drumherum Acker liegt.
+Niemand sucht auf dem Acker.</p>
+
+<p>Eine starke Daempfung wuerde also kleine Waelder bestrafen, ohne
+dass es dem Sammler etwas sagt. Was bleibt, ist zweierlei: Ein
+kleines Waldstueck bietet weniger Flaeche zum Absuchen. Und
+unterhalb von etwa vier Prozent Waldanteil werden Baumarten- und
+Bodenangaben unsicher, weil sie aus sehr wenigen Bildpunkten
+stammen.</p>
+
+<div class="hinweis">Grundsaetzliche Grenze: Die Karte zeigt nur
+Zellen, in denen OpenStreetMap Wald verzeichnet. Wiesen, Parks,
 Streuobstwiesen, Hecken und Alleen fehlen ganz - obwohl gerade dort
-Parasol und Schwefelporling haeufig stehen. Ein Fuenftel der
-ausgewerteten Fundmeldungen liegt in Siedlungsgebiet und damit
-ausserhalb dieser Karte.</div>
+Parasol und Schwefelporling haeufig stehen.</div>
 
 <p>Die Gewichte stammen aus der Pilzliteratur und wurden an
 Fundmeldungen geprueft. Dabei zeigte sich ein Fallstrick: Ein erster
