@@ -332,6 +332,26 @@ const sicher = location.protocol === "https:" ||
                location.hostname === "127.0.0.1";
 
 // ---- Daten in GeoJSON-Rechtecke umwandeln ---------------------------
+const LEERBILD = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEA" +
+  "AAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+
+// Die vorgerechneten Bilder der weichen Darstellung, aus karten.json
+let bilder = null;
+
+function zeigeWeichbild() {
+  if (!bilder || !karte.getSource("weichbild")) return;
+
+  const datei = (bilder.bilder[art] || {})[String(tag)];
+  const g = bilder.grenzen;
+  if (!datei || !g) return;
+
+  karte.getSource("weichbild").updateImage({
+    url: datei,
+    coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
+                  [g[1][1], g[0][0]], [g[0][1], g[0][0]]]
+  });
+}
+
 // Kacheln am Gitter ausrichten, nicht am Punkt.
 //
 // Jede Zelle gehoert zu einem Feld des Waldrasters. Wird die Kachel
