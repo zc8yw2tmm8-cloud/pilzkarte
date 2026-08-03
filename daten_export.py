@@ -23,6 +23,7 @@ Ergebnis: web/daten.json
 """
 import os
 import json
+import math
 from datetime import date, timedelta
 
 import karte as k
@@ -31,6 +32,23 @@ from kennwerte import berechne
 
 ORDNER = "web"
 DATEI = "daten.json"
+
+
+def gitter_angaben():
+    """
+    Ursprung und Schrittweite des Waldrasters.
+
+    Muss zu waldraster.py und waldraster_ergaenzen.py passen -
+    dieselben Zahlen, damit die Kacheln genau auf den Feldern liegen.
+    """
+    sued, west = 52.05, 10.10
+    nord = 52.85
+    schritt_lat = k.RASTER_KM / 111.0
+    mitte = (sued + nord) / 2
+    schritt_lon = k.RASTER_KM / (111.0 * math.cos(math.radians(mitte)))
+    return {"sued": sued, "west": west,
+            "schritt_lat": round(schritt_lat, 8),
+            "schritt_lon": round(schritt_lon, 8)}
 
 
 def runde(wert, stellen=2):
@@ -162,6 +180,10 @@ def main():
             "ost": max(z["lon"] for z in zellen),
         },
         "raster_km": k.RASTER_KM,
+        # Gitterursprung und Schrittweite. Damit kann die Karte die
+        # Kacheln am Gitter ausrichten statt am Punkt - sonst sitzt
+        # eine Kachel am Feldrand und ragt in die Nachbarzelle.
+        "gitter": gitter_angaben(),
         "tage": [{"versatz": t,
                   "datum": (date.today() + timedelta(days=t)).isoformat(),
                   "name": k.tagname(t)} for t in k.ZIELTAGE],

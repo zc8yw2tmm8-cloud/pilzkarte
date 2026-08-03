@@ -24,7 +24,12 @@ BILD_KM = 0.25
 
 # Wie weit eine Zelle ausstrahlt. Bei 2 km Zellabstand sorgen 1.3 km
 # fuer sanfte Uebergaenge ohne Verwaschen.
-STREUUNG_KM = 1.3
+# Wie weit eine Zelle in ihre Umgebung ausstrahlt.
+#
+# Faustregel: etwa zwei Drittel des Punktabstands. Bei dichteren
+# Punkten darf enger gestreut werden - dann bleiben Unterschiede
+# zwischen Nachbarzellen sichtbar, statt sich wegzumitteln.
+STREUUNG_KM = 0.9
 
 # Ab welcher Entfernung zur naechsten Zelle das Bild durchsichtig wird
 VOLL_KM = 1.3

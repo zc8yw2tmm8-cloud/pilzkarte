@@ -332,47 +332,50 @@ const sicher = location.protocol === "https:" ||
                location.hostname === "127.0.0.1";
 
 // ---- Daten in GeoJSON-Rechtecke umwandeln ---------------------------
-function baueGeoJson() {
-  const dLat = D.raster_km / 111 / 2 * 1.02;
-  const dLon = D.raster_km / (111 * Math.cos(52.4 * Math.PI / 180)) / 2 * 1.02;
+// Kacheln am Gitter ausrichten, nicht am Punkt.
+//
+// Jede Zelle gehoert zu einem Feld des Waldrasters. Wird die Kachel
+// um den Punkt herum gezeichnet, sitzt sie schief im Feld und ragt in
+// die Nachbarzelle - die Punkte liegen naemlich nicht exakt in der
+// Feldmitte. Am Feld ausgerichtet fuegen sie sich lueckenlos.
+function feldgrenzen(z) {
+  const g = D.gitter;
+  if (!g) {
+    // Ohne Gitterangabe: um den Punkt herum, halber Abstand
+    const mitteLat = (D.gebiet.sued + D.gebiet.nord) / 2;
+    const dLat = D.raster_km / 111 / 2;
+    const dLon = D.raster_km /
+                 (111 * Math.cos(mitteLat * Math.PI / 180)) / 2;
+    return [z.lat - dLat, z.lon - dLon, z.lat + dLat, z.lon + dLon];
+  }
 
-  return {
-    type: "FeatureCollection",
-    features: D.zellen.map((z, i) => ({
-      type: "Feature",
-      id: i,
-      properties: { i: i, wert: z.scores[art][tag] ?? 0 },
-      geometry: {
-        type: "Polygon",
-        coordinates: [[
-          [z.lon - dLon, z.lat - dLat], [z.lon + dLon, z.lat - dLat],
-          [z.lon + dLon, z.lat + dLat], [z.lon - dLon, z.lat + dLat],
-          [z.lon - dLon, z.lat - dLat]
-        ]]
-      }
-    }))
-  };
+  const zeile = Math.floor((z.lat - g.sued) / g.schritt_lat);
+  const spalte = Math.floor((z.lon - g.west) / g.schritt_lon);
+
+  return [
+    g.sued + zeile * g.schritt_lat,
+    g.west + spalte * g.schritt_lon,
+    g.sued + (zeile + 1) * g.schritt_lat,
+    g.west + (spalte + 1) * g.schritt_lon
+  ];
 }
 
-const LEERBILD = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEA" +
-  "AAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
-
-// Die vorgerechneten Bilder, aus karten.json
-let bilder = null;
-
-function zeigeWeichbild() {
-  if (!bilder || !karte.getSource("weichbild")) return;
-
-  const datei = (bilder.bilder[art] || {})[String(tag)];
-  const g = bilder.grenzen;
-  if (!datei || !g) return;
-
-  // Ecken im Uhrzeigersinn ab oben links
-  karte.getSource("weichbild").updateImage({
-    url: datei,
-    coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
-                  [g[1][1], g[0][0]], [g[0][1], g[0][0]]]
-  });
+function baueGeoJson() {
+  return {
+    type: "FeatureCollection",
+    features: D.zellen.map((z, i) => {
+      const [s, w, n, o] = feldgrenzen(z);
+      return {
+        type: "Feature",
+        id: i,
+        properties: { i: i, wert: z.scores[art][tag] ?? 0 },
+        geometry: {
+          type: "Polygon",
+          coordinates: [[[w, s], [o, s], [o, n], [w, n], [w, s]]]
+        }
+      };
+    })
+  };
 }
 
 function aktualisiere() {
@@ -939,6 +942,7 @@ fetch("daten.json")
           offenesPopup.remove();
           return;
         }
+        e.originalEvent.stopPropagation();
         const f = e.features[0];
         zeigePopup(f.geometry.coordinates,
           `<div class="pop"><b>Belegter Fund</b>
@@ -953,6 +957,14 @@ fetch("daten.json")
         () => karte.getCanvas().style.cursor = "");
 
       karte.on("click", "flaechen", e => {
+        // Liegt an dieser Stelle ein Fund oder ein Buendel? Dann hat
+        // der seinen eigenen Handler - die Zellflaeche darf den Tipp
+        // nicht abfangen.
+        const drueber = karte.queryRenderedFeatures(e.point, {
+          layers: ["funde", "funde_buendel"].filter(l => karte.getLayer(l))
+        });
+        if (drueber.length) return;
+
         // Ein zweiter Klick soll erst schliessen, nicht sofort ein
         // neues Fenster oeffnen
         if (offenesPopup) {
