@@ -95,6 +95,7 @@ KARTE_ZOOM = 9
 # =========================
 
 PROGNOSE = "wetter_prognose.csv"
+PUNKTE_DATEI = "waldpunkte.csv"
 TYPEN_DATEI = "waldtypen.csv"
 HOEHEN_DATEI = "hoehen.csv"
 NAMEN_DATEI = "ortsnamen.csv"
@@ -161,14 +162,33 @@ def tagname(tag):
     return TAG_NAMEN.get(tag, f"In {tag} Tagen")
 
 
+def gueltige_punkte():
+    """
+    Die Punkte, die auf der Karte erscheinen sollen.
+
+    WICHTIG: Massgeblich ist waldpunkte.csv, nicht die Wetterhistorie.
+    Wird ein Punkt aus dem Raster entfernt - etwa weil zwei im selben
+    Feld lagen -, bleibt seine Historie bestehen. Ohne diesen Filter
+    taucht er weiter auf der Karte auf, und zwei Kacheln liegen
+    uebereinander.
+    """
+    if not os.path.exists(PUNKTE_DATEI):
+        return None
+    with open(PUNKTE_DATEI, "r", encoding="utf-8") as f:
+        return {z["id"] for z in csv.DictReader(f)}
+
+
 def lade_reihen():
     punkte = {}
     reihen = defaultdict(dict)
+    erlaubt = gueltige_punkte()
 
     # Nur die Monate lesen, die ins Zeitfenster fallen
     grenze = (date.today() - timedelta(days=100)).isoformat()
     for z in historie.lese(grenze):
         ort = z["ort"]
+        if erlaubt is not None and ort not in erlaubt:
+            continue
         punkte[ort] = (float(z["lat"]), float(z["lon"]))
 
         regen = zahl(z.get("regen_icon"))
@@ -192,6 +212,8 @@ def lade_reihen():
         with open(PROGNOSE, "r", encoding="utf-8") as f:
             for z in csv.DictReader(f):
                 ort = z["ort"]
+                if erlaubt is not None and ort not in erlaubt:
+                    continue
                 tag = date.fromisoformat(z["datum"])
                 if ort not in punkte:
                     punkte[ort] = (float(z["lat"]), float(z["lon"]))
