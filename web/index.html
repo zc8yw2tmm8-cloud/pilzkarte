@@ -81,7 +81,6 @@
 
   .regler { display: flex; align-items: center; gap: 10px;
             margin-top: 8px; }
-  .regler.zweit { margin-top: 6px; }
   .regler input[type=range] { flex: 1; min-width: 0; height: 26px;
                               accent-color: var(--akzent);
                               cursor: pointer; }
@@ -90,6 +89,19 @@
                      text-align: right; }
   .regler .marke { flex: 0 0 auto; font-size: 11px;
                    color: var(--leise); min-width: 62px; }
+  .regler #deckwert { flex: 0 0 auto; font-size: 12px;
+                      color: var(--leise); min-width: 74px;
+                      text-align: right; }
+
+  .mehr { margin-top: 7px; background: transparent; border: 0;
+          color: var(--leise); font-size: 12px; cursor: pointer;
+          padding: 5px 0; display: flex; align-items: center;
+          gap: 6px; min-height: 32px; }
+  .mehr .pfeil { display: inline-block; transition: transform .18s; }
+  .mehr.offen .pfeil { transform: rotate(180deg); }
+  .mehr.offen { color: var(--akzent); }
+  #einstellungen[hidden] { display: none; }
+  #einstellungen { padding-bottom: 2px; }
 
   .tagleiste { display: flex; gap: 4px; margin-top: 6px;
                overflow-x: auto; scrollbar-width: none; }
@@ -190,24 +202,39 @@
   </div>
   <div class="leiste" id="arten"></div>
   <div class="regler">
+    <span class="marke">Ausblick</span>
     <input type="range" id="tagregler" min="0" max="6" value="0" step="1">
     <span id="tagname">Heute</span>
   </div>
-  <div class="tagleiste" id="baumleiste" hidden></div>
-  <div class="tagleiste" id="ebenen" hidden></div>
-  <div class="regler zweit">
-    <span class="marke">Deckkraft</span>
-    <input type="range" id="deckregler" min="15" max="100" value="88"
-           step="5">
+
+  <button class="mehr" id="mehrknopf">
+    <span class="pfeil">&#9662;</span> Einstellungen
+  </button>
+
+  <div id="einstellungen" hidden>
+    <div class="regler">
+      <span class="marke">Deckkraft</span>
+      <input type="range" id="deckregler" min="15" max="100" value="88"
+             step="5">
+      <span id="deckwert">88 %</span>
+    </div>
+
+    <div class="tagleiste" id="darstellung">
+      <button class="tag aktiv" data-stil="weich">weich</button>
+      <button class="tag" data-stil="hart">Raster</button>
+      <button class="tag" data-stil="aus">nur Karte</button>
+      <span style="width:8px"></span>
+      <button class="tag" data-schalter="funde">&#9679; Funde</button>
+      <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
+    </div>
+
+    <div class="tagleiste" id="baumleiste" hidden></div>
+    <div class="tagleiste" id="ebenen" hidden></div>
+    <div class="tagleiste" id="kontoleiste" hidden>
+      <span id="kontostand"></span>
+    </div>
   </div>
-  <div class="tagleiste" id="darstellung">
-    <button class="tag aktiv" data-stil="weich">weich</button>
-    <button class="tag" data-stil="hart">Raster</button>
-    <button class="tag" data-stil="aus">nur Karte</button>
-    <span style="width:8px"></span>
-    <button class="tag" data-schalter="funde">&#9679; Funde</button>
-    <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
-  </div>
+
 </header>
 
 <div id="karte"></div>
@@ -690,9 +717,21 @@ fetch("daten.json")
 
     document.querySelectorAll(".um").forEach(b =>
       b.onclick = () => zeigeAnsicht(b.dataset.ansicht));
+    const mehr = document.getElementById("mehrknopf");
+    const feld = document.getElementById("einstellungen");
+    mehr.onclick = () => {
+      const offen = feld.hidden;
+      feld.hidden = !offen;
+      mehr.classList.toggle("offen", offen);
+      mehr.lastChild.textContent = offen ? " Einstellungen schliessen"
+                                         : " Einstellungen";
+      if (karte) setTimeout(() => karte.resize(), 210);
+    };
+
     const deck = document.getElementById("deckregler");
     deck.oninput = () => {
       const wert = +deck.value / 100;
+      document.getElementById("deckwert").textContent = deck.value + " %";
       if (karte.getLayer("weich")) {
         karte.setPaintProperty("weich", "raster-opacity", wert);
       }
@@ -711,9 +750,13 @@ fetch("daten.json")
         const an = !b.classList.contains("aktiv");
         b.classList.toggle("aktiv", an);
 
-        if (was === "funde" && karte.getLayer("funde")) {
-          karte.setLayoutProperty("funde", "visibility",
-            an ? "visible" : "none");
+        if (was === "funde") {
+          ["funde", "funde_buendel", "funde_zahl"].forEach(e => {
+            if (karte.getLayer(e)) {
+              karte.setLayoutProperty(e, "visibility",
+                an ? "visible" : "none");
+            }
+          });
         } else if (was === "nah") {
           nurNah = an;
           aktualisiereFunde();
@@ -825,19 +868,71 @@ fetch("daten.json")
 
       // Belegte Funde ganz oben - sie sollen nichts verdecken, aber
       // auch von nichts verdeckt werden
-      karte.addSource("funde", { type: "geojson", data: baueFunde() });
+      // Funde gebuendelt: bei kleinem Massstab liegen hunderte
+      // Punkte uebereinander. MapLibre fasst sie zusammen und loest
+      // sie beim Hineinzoomen wieder auf.
+      karte.addSource("funde", {
+        type: "geojson", data: baueFunde(),
+        cluster: true, clusterMaxZoom: 12, clusterRadius: 45
+      });
+
+      karte.addLayer({
+        id: "funde_buendel", type: "circle", source: "funde",
+        filter: ["has", "point_count"],
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": "#8e5fb5",
+          "circle-radius": ["step", ["get", "point_count"],
+            15, 10, 20, 40, 26],
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "rgba(181,126,220,.45)",
+          "circle-opacity": 0.85
+        }
+      });
+
+      karte.addLayer({
+        id: "funde_zahl", type: "symbol", source: "funde",
+        filter: ["has", "point_count"],
+        layout: {
+          visibility: "none",
+          "text-field": ["get", "point_count_abbreviated"],
+          "text-size": 12,
+          "text-font": ["Noto Sans Regular"],
+          "text-allow-overlap": true
+        },
+        paint: { "text-color": "#ffffff" }
+      });
+
+      // Einzelpunkte: grosszuegiger Radius, damit sie sich auf dem
+      // Telefon treffen lassen
       karte.addLayer({
         id: "funde", type: "circle", source: "funde",
+        filter: ["!", ["has", "point_count"]],
         layout: { visibility: "none" },
         paint: {
           "circle-radius": ["interpolate", ["linear"], ["zoom"],
-            8, 3, 12, 5, 15, 7],
+            10, 7, 13, 10, 16, 13],
           "circle-color": "#b57edc",
-          "circle-stroke-width": 1,
-          "circle-stroke-color": "#2a1a35",
-          "circle-opacity": 0.9
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "rgba(42,26,53,.8)",
+          "circle-opacity": 0.92
         }
       });
+
+      // Tippen auf ein Buendel zoomt hinein
+      karte.on("click", "funde_buendel", e => {
+        const b = e.features[0];
+        karte.getSource("funde").getClusterExpansionZoom(
+          b.properties.cluster_id).then(z =>
+            karte.easeTo({ center: b.geometry.coordinates,
+                           zoom: Math.min(z + 0.5, 15) }))
+          .catch(() => karte.easeTo({
+            center: b.geometry.coordinates, zoom: karte.getZoom() + 2 }));
+      });
+      karte.on("mouseenter", "funde_buendel",
+        () => karte.getCanvas().style.cursor = "pointer");
+      karte.on("mouseleave", "funde_buendel",
+        () => karte.getCanvas().style.cursor = "");
 
       karte.on("click", "funde", e => {
         if (offenesPopup) {

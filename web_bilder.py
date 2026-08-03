@@ -55,11 +55,20 @@ def main():
 
     print(f"{len(zellen)} Zellen, {len(arten)} Arten, {len(tage)} Tage\n")
 
+    # WICHTIG: bei jedem Bild ALLE Zellen uebergeben.
+    #
+    # Die Bildgrenzen werden aus den uebergebenen Punkten berechnet.
+    # Laesst man Zellen ohne Wert weg, bekommt jedes Bild eine andere
+    # Ausdehnung - in karten.json steht aber nur eine. Die Bilder
+    # werden dann auf dieselbe Flaeche gestreckt und liegen versetzt
+    # uebereinander.
+    #
+    # Zellen ohne Wert bekommen 0. Das ist auch inhaltlich richtig:
+    # keine Daten heisst keine Aussicht.
     for art in arten:
         for i, tag in enumerate(tage):
-            werte = [(z["lat"], z["lon"], z["scores"][art][i])
-                     for z in zellen
-                     if z["scores"][art][i] is not None]
+            werte = [(z["lat"], z["lon"], z["scores"][art][i] or 0)
+                     for z in zellen]
             if len(werte) < 3:
                 continue
 
