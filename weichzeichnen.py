@@ -26,14 +26,14 @@ BILD_KM = 0.25
 # fuer sanfte Uebergaenge ohne Verwaschen.
 # Wie weit eine Zelle in ihre Umgebung ausstrahlt.
 #
-# Faustregel: etwa zwei Drittel des Punktabstands. Bei dichteren
-# Punkten darf enger gestreut werden - dann bleiben Unterschiede
-# zwischen Nachbarzellen sichtbar, statt sich wegzumitteln.
-STREUUNG_KM = 0.9
+# Muss zum Punktabstand passen. Bei 2 km Raster reichen 0,9 km nicht
+# von Reihe zu Reihe - dazwischen bleiben dunkle Streifen. Etwa
+# zwei Drittel des Abstands ist die Untergrenze, mehr schadet nicht.
+STREUUNG_KM = 1.4
 
 # Ab welcher Entfernung zur naechsten Zelle das Bild durchsichtig wird
-VOLL_KM = 1.3
-AUS_KM = 2.6
+VOLL_KM = 1.6
+AUS_KM = 3.0
 
 ORDNER = "bilder"
 BILDORDNER = ORDNER

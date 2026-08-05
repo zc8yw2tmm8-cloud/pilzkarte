@@ -55,6 +55,48 @@ def runde(wert, stellen=2):
     return None if wert is None else round(wert, stellen)
 
 
+def letzter_regen(reihe, stichtag, mindest_mm=1.0):
+    """
+    Der letzte Tag mit nennenswertem Regen und wie viel es war.
+
+    Unter 1 mm ist Nieselregen - der erreicht den Waldboden unter
+    dem Kronendach oft gar nicht.
+
+    Rueckgabe: {"datum": "05.08.2026", "mm": 12.4, "vor": 3} oder None
+    """
+    beste = None
+    for r in reihe:
+        if r.get("tag") is None or r["tag"] > stichtag:
+            continue
+        regen = r.get("regen")
+        if regen is None or regen < mindest_mm:
+            continue
+        if beste is None or r["tag"] > beste["tag"]:
+            beste = r
+
+    if beste is None:
+        return None
+
+    return {"datum": beste["tag"].strftime("%d.%m.%Y"),
+            "mm": round(beste["regen"], 1),
+            "vor": (stichtag - beste["tag"]).days}
+
+
+def regenereignis(ereignisse, stichtag):
+    """
+    Das letzte Regenereignis - mindestens 15 mm in drei Tagen.
+
+    Das ist der Ausloeser fuer einen Schub, nicht jeder Nieselregen.
+    """
+    vergangen = [e for e in ereignisse if e["tag"] <= stichtag]
+    if not vergangen:
+        return None
+    letztes = vergangen[-1]
+    return {"datum": letztes["tag"].strftime("%d.%m.%Y"),
+            "mm": letztes["mm"],
+            "vor": (stichtag - letztes["tag"]).days}
+
+
 def main():
     print("Lese Daten ...")
     punkte, reihen, ergaenzt = k.lade_reihen()
@@ -126,8 +168,10 @@ def main():
                 for a, w in oben)
             waldanteil = bst.get("waldanteil")
 
-        schub, _ = k.schub_hinweis("steinpilz", ereignisse.get(ort, []),
-                                   bezugstage[0])
+        # Wann hat es zuletzt geregnet, und wie viel?
+        regen_zuletzt = letzter_regen(reihen[ort], bezugstage[0])
+        regen_ereignis = regenereignis(ereignisse.get(ort, []),
+                                       bezugstage[0])
 
         zellen.append({
             "id": ort,
@@ -155,6 +199,8 @@ def main():
                 "frosttage": kenn_heute.get("frosttage"),
                 "prognose_tage": kenn_heute.get("prognose_tage"),
             },
+            "regen_zuletzt": regen_zuletzt,
+            "regen_ereignis": regen_ereignis,
             "scores": scores,
             "teile": teile,
         })
