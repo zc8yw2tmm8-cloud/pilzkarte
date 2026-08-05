@@ -85,14 +85,36 @@
   .regler input[type=range] { flex: 1; min-width: 0; height: 26px;
                               accent-color: var(--akzent);
                               cursor: pointer; }
+  /* Pfeile nur am Rechner - auf dem Telefon ist der Regler mit dem
+     Finger schneller und der Platz knapp. */
+  .pfeilknopf { flex: 0 0 auto; border: 1px solid var(--linie);
+                background: transparent; color: var(--text);
+                width: 30px; height: 30px; border-radius: 6px;
+                cursor: pointer; font-size: 11px; line-height: 1;
+                padding: 0; }
+  .pfeilknopf:hover { border-color: var(--akzent);
+                      color: var(--akzent); }
+  .pfeilknopf:disabled { opacity: .3; cursor: default;
+                         border-color: var(--linie); color: var(--text); }
+  @media (max-width: 700px) { .pfeilknopf { display: none; } }
+
   .regler #tagname { flex: 0 0 auto; font-size: 13px; font-weight: 600;
                      color: var(--akzent); min-width: 74px;
                      text-align: right; }
-  .regler .marke { flex: 0 0 auto; font-size: 11px;
-                   color: var(--leise); min-width: 62px; }
+  .regler .marke { flex: 0 0 62px; font-size: 11px;
+                   color: var(--leise); }
   .regler #deckwert { flex: 0 0 auto; font-size: 12px;
                       color: var(--leise); min-width: 74px;
                       text-align: right; }
+
+  /* Alle Einstellungszeilen gleich aufgebaut: Ueberbegriff links in
+     fester Breite, danach die Knoepfe - so beginnen sie in einer
+     Spalte. */
+  .zeile { display: flex; align-items: center; gap: 10px;
+           margin-top: 6px; }
+  .zeile > .marke { flex: 0 0 62px; font-size: 11px;
+                    color: var(--leise); }
+  .zeile .tagleiste { margin-top: 0; flex: 1; min-width: 0; }
 
   .mehr { margin-top: 7px; background: transparent; border: 0;
           color: var(--leise); font-size: 12px; cursor: pointer;
@@ -113,8 +135,7 @@
          font-size: 12px; min-height: 32px; white-space: nowrap; }
   .tag.aktiv { border-color: var(--akzent); color: var(--akzent);
                font-weight: 600; }
-  #ebenen .tag, #baumleiste .tag { border-style: dashed; }
-  #baumleiste .tag.aktiv { border-style: solid; }
+
   #ebenen .tag.aktiv { border-style: solid; }
   #darstellung { margin-top: 5px; }
   #darstellung .tag { font-size: 11px; padding: 4px 9px;
@@ -128,7 +149,16 @@
     border-radius: 8px; padding: 12px 14px;
     max-width: 300px; font-size: 12.5px; }
   .pop { max-height: 52vh; overflow-y: auto;
-         overscroll-behavior: contain; }
+         overscroll-behavior: contain;
+         /* Platz fuer die Bildlaufleiste, sonst verdeckt sie rechts
+            die Zahlen */
+         padding-right: 10px;
+         scrollbar-width: thin;
+         scrollbar-color: var(--linie) transparent; }
+  .pop::-webkit-scrollbar { width: 7px; }
+  .pop::-webkit-scrollbar-thumb { background: var(--linie);
+                                  border-radius: 4px; }
+  .pop::-webkit-scrollbar-track { background: transparent; }
   .maplibregl-popup-tip { border-top-color: var(--flaeche) !important;
                           border-bottom-color: var(--flaeche) !important; }
   .maplibregl-popup-close-button { color: var(--leise); font-size: 20px;
@@ -147,7 +177,7 @@
   .pop td { padding: 1px 0; font-size: 12px; }
   .pop td:last-child { text-align: right; white-space: nowrap;
                        font-variant-numeric: tabular-nums;
-                       padding-left: 10px; }
+                       padding-left: 10px; padding-right: 2px; }
   .pop tr.hier td { font-weight: 700; }
   .navi { display: block; margin-top: 12px; padding: 10px;
           background: var(--akzent); color: #10130f; text-align: center;
@@ -204,7 +234,11 @@
   <div class="leiste" id="arten"></div>
   <div class="regler">
     <span class="marke">Ausblick</span>
+    <button class="pfeilknopf" id="tagzurueck"
+            title="ein Tag zurueck">&#9664;</button>
     <input type="range" id="tagregler" min="0" max="6" value="0" step="1">
+    <button class="pfeilknopf" id="tagvor"
+            title="ein Tag vor">&#9654;</button>
     <span id="tagname">Heute</span>
   </div>
 
@@ -220,17 +254,26 @@
       <span id="deckwert">88 %</span>
     </div>
 
-    <div class="tagleiste" id="darstellung">
-      <button class="tag aktiv" data-stil="weich">weich</button>
-      <button class="tag" data-stil="hart">Raster</button>
-      <button class="tag" data-stil="aus">nur Karte</button>
-      <span style="width:8px"></span>
-      <button class="tag" data-schalter="funde">&#9679; Funde</button>
-      <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
+    <div class="zeile">
+      <span class="marke">Ansicht</span>
+      <div class="tagleiste">
+        <button class="tag" data-stil="weich">weich</button>
+        <button class="tag aktiv" data-stil="hart">Raster</button>
+        <button class="tag" data-stil="aus">nur Karte</button>
+        <button class="tag" data-schalter="funde">&#9679; Funde</button>
+        <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
+      </div>
     </div>
 
-    <div class="tagleiste" id="baumleiste" hidden></div>
-    <div class="tagleiste" id="ebenen" hidden></div>
+    <div class="zeile" id="baumzeile" hidden>
+      <span class="marke">Wald</span>
+      <div class="tagleiste" id="baumleiste"></div>
+    </div>
+
+    <div class="zeile" id="gelaendezeile" hidden>
+      <span class="marke">Gel&auml;nde</span>
+      <div class="tagleiste" id="ebenen"></div>
+    </div>
     <div class="tagleiste" id="kontoleiste" hidden>
       <span id="kontostand"></span>
     </div>
@@ -421,6 +464,10 @@ function aktualisiere() {
     .forEach(({ b }) => leiste.appendChild(b));
   const tn = document.getElementById("tagname");
   if (tn) tn.textContent = tagname(tag);
+  const zurueck = document.getElementById("tagzurueck");
+  const vor = document.getElementById("tagvor");
+  if (zurueck) zurueck.disabled = tag <= 0;
+  if (vor) vor.disabled = tag >= D.tage.length - 1;
 
   if (!document.getElementById("liste").hidden) baueListe();
 }
@@ -445,6 +492,35 @@ function trendZeile(z) {
             fällt auf ${tief}</div>`;
   return `<div class="trend"><span style="color:#888">▶</span>
           bleibt etwa gleich</div>`;
+}
+
+function tageText(n) {
+  if (n === 0) return "heute";
+  if (n === 1) return "gestern";
+  return `vor ${n} Tagen`;
+}
+
+function regenzeilen(z) {
+  // Wann hat es zuletzt geregnet? Zwei Angaben, die verschiedene
+  // Fragen beantworten: der letzte Regen ueberhaupt, und das letzte
+  // Ereignis von mindestens 15 mm - das ist der Ausloeser fuer
+  // einen Schub, Nieselregen dagegen nicht.
+  const a = z.regen_zuletzt, b = z.regen_ereignis;
+  if (!a && !b) return "";
+
+  let zeilen = "";
+  if (a) {
+    zeilen += `<tr><td>Letzter Regen</td><td><b>${komma(a.mm)} mm</b>
+      ${tageText(a.vor)}</td></tr>`;
+  }
+  // Nur zeigen, wenn es ein anderer Tag war - sonst steht dasselbe
+  // zweimal da
+  if (b && (!a || b.datum !== a.datum)) {
+    zeilen += `<tr><td>Letztes gr&ouml;&szlig;eres Ereignis</td>
+      <td>${komma(b.mm)} mm ${tageText(b.vor)}</td></tr>`;
+  }
+
+  return `<h4>Regen</h4><table>${zeilen}</table>`;
 }
 
 function popupInhalt(z) {
@@ -488,6 +564,7 @@ function popupInhalt(z) {
       <tr><td>Niederschlag Tag 4–14</td><td>${komma(k.regen_reife)} mm</td></tr>
       <tr><td>Regentage von 14</td><td>${k.regentage}</td></tr>
     </table>
+    ${regenzeilen(z)}
 
     <h4>Andere Arten hier</h4>
     <table>${andere}</table>
@@ -593,12 +670,10 @@ function reliefEinbinden() {
   });
 
   const leiste = document.getElementById("ebenen");
-  leiste.hidden = false;
-  leiste.innerHTML = '<span class="tag" style="border:0;cursor:default;' +
-    'color:var(--leise)">Gelände:</span>' +
-    relief.map(g => `
-      <button class="tag" data-relief="${g.gebiet}">${g.titel}</button>`)
-      .join("");
+  leiste.innerHTML = relief.map(g => `
+    <button class="tag" data-relief="${g.gebiet}">${g.titel}</button>`)
+    .join("");
+  document.getElementById("gelaendezeile").hidden = false;
 
   leiste.querySelectorAll("[data-relief]").forEach(b => b.onclick = () => {
     const an = !b.classList.contains("aktiv");
@@ -692,14 +767,30 @@ function baueListe() {
   });
 }
 
+function setzeDeckkraft() {
+  // Eine Stelle fuer beide Darstellungsarten - sonst geht der
+  // eingestellte Wert beim Umschalten verloren.
+  const deck = document.getElementById("deckregler");
+  if (!karte || !deck) return;
+  const wert = +deck.value / 100;
+  const stil = (document.querySelector("[data-stil].aktiv") || {})
+    .dataset || {};
+
+  if (karte.getLayer("weich")) {
+    karte.setPaintProperty("weich", "raster-opacity", wert);
+  }
+  if (karte.getLayer("flaechen")) {
+    karte.setPaintProperty("flaechen", "fill-opacity",
+      stil.stil === "hart" ? wert * 0.82 : 0);
+  }
+}
+
 function setzeStil(stil) {
   if (!karte || !karte.getLayer("weich")) return;
   karte.setLayoutProperty("weich", "visibility",
     stil === "weich" ? "visible" : "none");
-  // Bei "nur Karte" auch die Klickflaechen unsichtbar lassen -
+  // Bei "nur Karte" bleiben die Klickflaechen unsichtbar -
   // anklicken geht trotzdem
-  karte.setPaintProperty("flaechen", "fill-opacity",
-    stil === "hart" ? 0.72 : 0);
   karte.setPaintProperty("flaechen", "fill-color",
     stil === "hart"
       ? ["interpolate", ["linear"], ["get", "wert"],
@@ -707,6 +798,7 @@ function setzeStil(stil) {
          50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
          85, "rgb(130,220,70)", 100, "rgb(45,175,75)"]
       : "#000");
+  setzeDeckkraft();
 }
 
 function zeigeAnsicht(welche) {
@@ -749,6 +841,24 @@ fetch("daten.json")
     regler.max = D.tage.length - 1;
     regler.oninput = () => { tag = +regler.value; aktualisiere(); };
 
+    const schiebe = richtung => {
+      const neu = Math.max(0, Math.min(D.tage.length - 1, tag + richtung));
+      if (neu === tag) return;
+      tag = neu;
+      regler.value = tag;
+      aktualisiere();
+    };
+    document.getElementById("tagzurueck").onclick = () => schiebe(-1);
+    document.getElementById("tagvor").onclick = () => schiebe(1);
+
+    // Auch mit den Pfeiltasten, solange kein Eingabefeld den Fokus hat
+    document.addEventListener("keydown", e => {
+      if (e.target.tagName === "INPUT"
+          && e.target.type !== "range") return;
+      if (e.key === "ArrowLeft") schiebe(-1);
+      if (e.key === "ArrowRight") schiebe(1);
+    });
+
     document.querySelectorAll(".art").forEach(b =>
       b.onclick = () => { art = b.dataset.art; aktualisiere(); });
 
@@ -767,18 +877,8 @@ fetch("daten.json")
 
     const deck = document.getElementById("deckregler");
     deck.oninput = () => {
-      const wert = +deck.value / 100;
       document.getElementById("deckwert").textContent = deck.value + " %";
-      if (karte.getLayer("weich")) {
-        karte.setPaintProperty("weich", "raster-opacity", wert);
-      }
-      if (karte.getLayer("flaechen")) {
-        const stil = document.querySelector("[data-stil].aktiv");
-        if (stil && stil.dataset.stil === "hart") {
-          karte.setPaintProperty("flaechen", "fill-opacity",
-                                 wert * 0.82);
-        }
-      }
+      setzeDeckkraft();
     };
 
     document.querySelectorAll("[data-schalter]").forEach(b =>
@@ -890,13 +990,23 @@ fetch("daten.json")
       });
       karte.addLayer({
         id: "weich", type: "raster", source: "weichbild",
+        // Voreinstellung ist die Rasteransicht - sie zeigt genau,
+        // welche Zelle welchen Wert hat, ohne dass benachbarte
+        // Werte ineinanderlaufen
+        layout: { visibility: "none" },
         paint: { "raster-opacity": 0.88, "raster-fade-duration": 120 }
       });
 
       // Unsichtbare Klickflaechen darueber
       karte.addLayer({
         id: "flaechen", type: "fill", source: "zellen",
-        paint: { "fill-color": "#000", "fill-opacity": 0 }
+        paint: {
+          "fill-color": ["interpolate", ["linear"], ["get", "wert"],
+            0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
+            50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
+            85, "rgb(130,220,70)", 100, "rgb(45,175,75)"],
+          "fill-opacity": 0.72
+        }
       });
 
       // Strassen und Ortsnamen ueber die Farbflaechen legen
@@ -1058,12 +1168,9 @@ fetch("daten.json")
           });
 
           const leiste = document.getElementById("baumleiste");
-          leiste.innerHTML =
-            '<span class="tag" style="border:0;cursor:default;' +
-            'color:var(--leise)">Wald:</span>' +
-            w.ebenen.map(e => `<button class="tag"
+          leiste.innerHTML = w.ebenen.map(e => `<button class="tag"
               data-baum="${e.schluessel}">${e.name}</button>`).join("");
-          leiste.hidden = false;
+          document.getElementById("baumzeile").hidden = false;
 
           leiste.querySelectorAll("[data-baum]").forEach(b =>
             b.onclick = () => {
@@ -1093,6 +1200,7 @@ fetch("daten.json")
         .then(r => { relief = r; reliefEinbinden(); })
         .catch(() => {});
 
+      setzeDeckkraft();
       document.getElementById("laedt").remove();
       aktualisiere();
     });
