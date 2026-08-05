@@ -171,8 +171,13 @@ def main():
              "t": f["tag"].timetuple().tm_yday}
             for f in sortiert[:1200]]
 
+    # Alter der Daten mitgeben, damit die Website warnen kann
+    letzter_gemessen = k.juengste_messung(reihen)
+
     daten = {
         "stand": date.today().isoformat(),
+        "gemessen_bis": (letzter_gemessen.isoformat()
+                         if letzter_gemessen else None),
         "gebiet": {
             "sued": min(z["lat"] for z in zellen),
             "west": min(z["lon"] for z in zellen),

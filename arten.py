@@ -49,6 +49,20 @@ WALDANTEIL_WIRKUNG = 0.10
 # und Boden stammen dann aus einer sehr kleinen Flaeche.
 WALDANTEIL_UNSICHER = 0.04
 
+# Was gilt, wenn Baumarten oder Boden einer Zelle unbekannt sind?
+#
+# Naheliegend waere 1.0 - "kein Abzug ohne Grund". Das ist aber
+# falsch herum: Eine Zelle, ueber die nichts bekannt ist, bekaeme
+# dann einen hoeheren Wert als jede vermessene, und stuende in der
+# Bestenliste ganz oben. Nicht weil sie gut ist, sondern weil nichts
+# gegen sie spricht.
+#
+# Richtig ist der typische Wert der Region. Eine unbekannte Zelle
+# wird damit als durchschnittlich behandelt, nicht als perfekt.
+# Die Werte sind die Mediane ueber alle vermessenen Zellen.
+UNBEKANNT_BESTAND = 0.78
+UNBEKANNT_BODEN = 0.85
+
 
 # Klassen der Thuenen-Baumartenkarte (Blickensdoerfer et al. 2024).
 # Die englischen Namen kommen so aus dem Dienst.
@@ -475,7 +489,8 @@ def baumart_faktor(einstellung, bestand):
     Schwefelporling 0.6*1.0 + 0.3*0.1 + 0.1*0.3 = 0.66.
     """
     if not bestand:
-        return None
+        # Unbekannt heisst durchschnittlich, nicht perfekt
+        return UNBEKANNT_BESTAND
 
     gewichte = einstellung.get("baumarten")
     anteile = bestand.get("anteile") or {}
@@ -524,7 +539,7 @@ def boden_faktor(einstellung, boden):
     in dieselbe Richtung zeigen.
     """
     if not boden:
-        return 1.0
+        return UNBEKANNT_BODEN
     # Ton statt Sand: Ton haelt Wasser, ist das staerkere Mass und
     # zu Sand ohnehin gegenlaeufig - beides zu nehmen zaehlte doppelt.
     f = (_faktor_band(boden.get("ph"), einstellung.get("boden_ph"))

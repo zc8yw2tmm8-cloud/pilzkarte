@@ -27,6 +27,7 @@
                margin-bottom: 7px; }
   h1 { font-size: 15px; font-weight: 600; margin: 0; }
   .stand { font-size: 11px; color: var(--leise); margin-left: auto; }
+  .veraltet { color: #e8a33d; font-weight: 600; }
 
   .ansicht { display: flex; gap: 3px; margin-left: 10px; }
   .um { border: 1px solid var(--linie); background: transparent;
@@ -725,8 +726,21 @@ fetch("daten.json")
     art = Object.keys(D.arten)[0];
 
     const d = new Date(D.stand);
-    document.getElementById("stand").textContent =
-      "Stand " + d.toLocaleDateString("de-DE");
+    const standEl = document.getElementById("stand");
+    standEl.textContent = "Stand " + d.toLocaleDateString("de-DE");
+
+    // Warnen, wenn die Wetterdaten alt sind. Ohne das sieht eine
+    // Karte mit fuenf Tage alten Werten genauso aus wie eine
+    // aktuelle - und man faehrt nach falschen Zahlen los.
+    if (D.gemessen_bis) {
+      const m = new Date(D.gemessen_bis);
+      const alter = Math.round((Date.now() - m) / 86400000);
+      if (alter >= 3) {
+        standEl.innerHTML = `<span class="veraltet">Daten vom
+          ${m.toLocaleDateString("de-DE")} &middot; ${alter} Tage
+          alt</span>`;
+      }
+    }
 
     document.getElementById("arten").innerHTML = Object.entries(D.arten)
       .map(([a, e]) => `<button class="art" data-art="${a}">${e.name}

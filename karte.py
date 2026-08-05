@@ -237,7 +237,57 @@ def lade_reihen():
 
     fertig = {ort: sorted(tage.values(), key=lambda r: r["tag"])
               for ort, tage in reihen.items()}
+
+    warne_bei_alten_daten(fertig)
     return punkte, fertig, ergaenzt
+
+
+def juengste_messung(reihen):
+    """
+    Der letzte Tag mit gemessenen Werten - Prognosetage zaehlen nicht.
+    """
+    heute = date.today()
+    juengste = None
+    for reihe in reihen.values():
+        for r in reihe:
+            if r.get("prognose"):
+                continue
+            if r["tag"] <= heute and (juengste is None
+                                      or r["tag"] > juengste):
+                juengste = r["tag"]
+    return juengste
+
+
+def warne_bei_alten_daten(reihen, ab_tagen=3):
+    """
+    Warnt, wenn die Wetterdaten veraltet sind.
+
+    Faellt der taegliche Lauf aus, rechnet die Karte sonst
+    stillschweigend mit alten Werten weiter - und sieht dabei genauso
+    aus wie eine aktuelle. Im September faehrt man dann nach Zahlen
+    los, die eine Woche alt sind.
+    """
+    juengste = juengste_messung(reihen)
+    if juengste is None:
+        return
+
+    alter = (date.today() - juengste).days
+    if alter < ab_tagen:
+        return
+
+    print()
+    print("!" * 60)
+    print("ACHTUNG: Die juengsten gemessenen Wetterdaten sind vom")
+    print(f"{juengste.strftime('%d.%m.%Y')} - also {alter} Tage alt.")
+    print(f"Von den 14 ausgewerteten Tagen fehlen die letzten "
+          f"{min(alter, 14)}.")
+    print("Die Karte rechnet mit veralteten Werten weiter.")
+    print()
+    print("Pruefen, ob der taegliche Lauf noch geht:")
+    print("  github.com/zc8yw2tmm8-cloud/pilzkarte/actions")
+    print("Oder von Hand nachholen: python sammeln.py")
+    print("!" * 60)
+    print()
 
 
 def lade_waldtypen():

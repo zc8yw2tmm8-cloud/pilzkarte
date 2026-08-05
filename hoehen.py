@@ -1,26 +1,39 @@
 """
 Holt die Hoehenlage fuer alle Waldpunkte.
 
-Open-Meteo hat eine eigene Hoehen-API, die bis zu 100 Koordinaten
-pro Aufruf annimmt - fuer 1046 Punkte also rund 11 Aufrufe.
+Open-Meteo nimmt bis zu 100 Koordinaten pro Aufruf an.
 
-Laeuft EINMAL. Ergebnis: hoehen.csv
+Setzt fort: Vorhandene Hoehen bleiben stehen, es werden nur fehlende
+geholt. Schlaegt ein Block fehl, gehen keine alten Daten verloren -
+frueher wurde die Datei komplett neu geschrieben, und ein
+gescheiterter Lauf hat den halben Bestand geloescht.
+
+Ergebnis: hoehen.csv
 """
-import requests
+import os
 import csv
 import time
+import requests
 
 PUNKTE_DATEI = "waldpunkte.csv"
 DATEI = "hoehen.csv"
 BLOCK = 100
+ANLAEUFE = 4
 
 
 def lade_punkte():
-    punkte = []
     with open(PUNKTE_DATEI, "r", encoding="utf-8") as f:
-        for z in csv.DictReader(f):
-            punkte.append((z["id"], float(z["lat"]), float(z["lon"])))
-    return punkte
+        return [(z["id"], float(z["lat"]), float(z["lon"]))
+                for z in csv.DictReader(f)]
+
+
+def lade_vorhandene():
+    """Was schon da ist - id -> Zeile."""
+    if not os.path.exists(DATEI):
+        return {}
+    with open(DATEI, "r", encoding="utf-8") as f:
+        return {z["id"]: z for z in csv.DictReader(f)
+                if (z.get("hoehe") or "").strip()}
 
 
 def hole_hoehen(teil):
@@ -29,52 +42,82 @@ def hole_hoehen(teil):
         "latitude": ",".join(str(p[1]) for p in teil),
         "longitude": ",".join(str(p[2]) for p in teil),
     }
-    try:
-        antwort = requests.get(url, params=parameter, timeout=60)
-        daten = antwort.json()
-    except Exception as e:
-        print("  Fehler:", e)
-        return None
 
-    return daten.get("elevation")
+    for anlauf in range(1, ANLAEUFE + 1):
+        try:
+            antwort = requests.get(url, params=parameter, timeout=90)
+            if antwort.status_code == 429:
+                wartezeit = 30 * anlauf
+                print(f"    gedrosselt, warte {wartezeit} s", flush=True)
+                time.sleep(wartezeit)
+                continue
+            if antwort.status_code != 200:
+                print(f"    HTTP {antwort.status_code}", flush=True)
+                time.sleep(5 * anlauf)
+                continue
+            hoehen = antwort.json().get("elevation")
+            if hoehen and len(hoehen) == len(teil):
+                return hoehen
+        except Exception as e:
+            print(f"    {str(e)[:60]}", flush=True)
+        time.sleep(5 * anlauf)
+
+    return None
+
+
+def schreibe(vorhanden):
+    with open(DATEI, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["id", "lat", "lon", "hoehe"])
+        writer.writeheader()
+        for z in vorhanden.values():
+            writer.writerow({k: z[k] for k in
+                             ("id", "lat", "lon", "hoehe")})
 
 
 def main():
     punkte = lade_punkte()
-    print(f"{len(punkte)} Punkte in Bloecken von {BLOCK}\n")
+    vorhanden = lade_vorhandene()
 
-    zeilen = []
+    offen = [p for p in punkte if p[0] not in vorhanden]
 
-    for start in range(0, len(punkte), BLOCK):
-        teil = punkte[start:start + BLOCK]
-        hoehen = None
-        for versuch in range(3):
-            hoehen = hole_hoehen(teil)
-            if hoehen is not None:
-                break
-            print(f"  Block ab {start}: Versuch {versuch + 1} fehlgeschlagen, warte ...")
-            time.sleep(5)
+    print(f"{len(punkte)} Punkte, {len(vorhanden)} schon bekannt, "
+          f"{len(offen)} offen\n", flush=True)
 
-        if hoehen is None or len(hoehen) != len(teil):
-            print(f"  Block ab {start}: fehlgeschlagen")
+    if not offen:
+        print("Nichts zu holen.")
+        return
+
+    fehler = 0
+    for start in range(0, len(offen), BLOCK):
+        teil = offen[start:start + BLOCK]
+        hoehen = hole_hoehen(teil)
+
+        if hoehen is None:
+            print(f"  Block ab {start}: fehlgeschlagen, "
+                  f"beim naechsten Lauf nochmal", flush=True)
+            fehler += len(teil)
             continue
 
         for (name, lat, lon), h in zip(teil, hoehen):
-            zeilen.append({"id": name, "lat": lat, "lon": lon, "hoehe": h})
+            vorhanden[name] = {"id": name, "lat": lat, "lon": lon,
+                               "hoehe": h}
 
-        print(f"  {len(zeilen)} von {len(punkte)} ...")
+        # Nach jedem Block sichern - ein Abbruch kostet dann nur den
+        # laufenden Block
+        schreibe(vorhanden)
+        print(f"  {len(vorhanden)} von {len(punkte)} ...", flush=True)
         time.sleep(0.5)
 
-    with open(DATEI, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["id", "lat", "lon", "hoehe"])
-        writer.writeheader()
-        writer.writerows(zeilen)
+    schreibe(vorhanden)
 
-    if zeilen:
-        werte = sorted(z["hoehe"] for z in zeilen)
-        print(f"\n{len(zeilen)} Hoehen gespeichert.")
-        print(f"Von {werte[0]} bis {werte[-1]} m, "
-              f"Median {werte[len(werte) // 2]} m")
+    werte = sorted(float(z["hoehe"]) for z in vorhanden.values())
+    print(f"\n{len(vorhanden)} Hoehen in {DATEI}.")
+    if werte:
+        print(f"Von {werte[0]:.0f} bis {werte[-1]:.0f} m, "
+              f"Median {werte[len(werte) // 2]:.0f} m")
+    if fehler:
+        print(f"{fehler} Punkte offen - nochmal starten, "
+              f"es wird fortgesetzt.")
 
 
 main()
