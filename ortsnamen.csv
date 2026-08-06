@@ -9,10 +9,10 @@ W1047,Wald bei Ziegelei,,Ziegelei,0.8
 W0017,Wald bei Steinlah,,Steinlah,1.1
 W0018,Wald bei Bismarckturm,,Bismarckturm,0.9
 W0019,Wald bei Beinum,,Beinum,1.3
-W0020,Ohlendorfer Grite bei Pumpmühle,Ohlendorfer Grite,Pumpmühle,1.0
+W0020,Wald bei Pumpmühle,,Pumpmühle,1.0
 W1048,Wald bei Ohlendorf,,Ohlendorf,0.4
 W1049,Wald bei Nienrode,,Nienrode,0.6
-W0021,Oderwald bei Klein Flöthe,Oderwald,Klein Flöthe,1.9
+W0021,Wald bei Klein Flöthe,,Klein Flöthe,1.9
 W0022,Wald bei Heiningen,,Heiningen,1.0
 W1050,Wald bei Heiningen,,Heiningen,1.4
 W1051,Wald bei Tempelhof,,Tempelhof,0.8
@@ -48,7 +48,7 @@ W0029,Wald bei Calbecht,,Calbecht,1.1
 W1074,Wald bei Beinum,,Beinum,0.4
 W1075,Wald bei Flachstöckheim,,Flachstöckheim,1.0
 W1076,Wald bei Windmühle Klein Flöthe,,Windmühle Klein Flöthe,1.0
-W0030,Oderwald bei Klein Flöthe,Oderwald,Klein Flöthe,2.0
+W0030,Wald bei Klein Flöthe,,Klein Flöthe,2.0
 W0031,Wald bei Dorstadt,,Dorstadt,1.8
 W0032,Wald bei Dorstadt,,Dorstadt,1.3
 W1077,Wald bei Börßum,,Börßum,1.0
@@ -84,8 +84,8 @@ W1102,Wald bei Calbecht,,Calbecht,0.4
 W1103,Wald bei Lobmachtersen,,Lobmachtersen,1.1
 W1104,Wald bei Flachstöckheim,,Flachstöckheim,1.0
 W1105,Wald bei Groß Flöthe,,Groß Flöthe,1.0
-W1106,Oderwald bei Windmühle Klein Flöthe,Oderwald,Windmühle Klein Flöthe,1.9
-W1107,Oderwald bei Dorstadt,Oderwald,Dorstadt,2.4
+W1106,Wald bei Windmühle Klein Flöthe,,Windmühle Klein Flöthe,1.9
+W1107,Wald bei Dorstadt,,Dorstadt,2.4
 W1108,Wald bei Dorstadt,,Dorstadt,0.4
 W1109,Wald bei Bornum,,Bornum,0.7
 W1110,Wald bei Groß Biewende,,Groß Biewende,0.8
@@ -112,15 +112,15 @@ W0035,Wald bei Grasdorf,,Grasdorf,0.5
 W1126,Wald bei Grasdorf,,Grasdorf,0.9
 W0036,Wald bei Oelber am weißen Wege,,Oelber am weißen Wege,1.0
 W0037,Wald bei Oelber am weißen Wege,,Oelber am weißen Wege,1.5
-W0038,Lichtenberge bei Altenhagen,Lichtenberge,Altenhagen,1.5
+W0038,Wald bei Altenhagen,,Altenhagen,1.5
 W0039,Wald bei Gustedt,,Gustedt,1.1
-W0040,Lichtenberge bei Gebhardshagen,Lichtenberge,Gebhardshagen,1.4
+W0040,Wald bei Gebhardshagen,,Gebhardshagen,1.4
 W0041,Wald bei Gebhardshagen,,Gebhardshagen,0.8
 W1127,Wald bei Heerte,,Heerte,1.4
 W1128,Wald bei Barum,,Barum,1.2
 W1129,Wald bei Cramme,,Cramme,0.4
 W0042,Wald bei Groß Flöthe,,Groß Flöthe,2.2
-W0043,Oderwald bei Windmühle Klein Flöthe,Oderwald,Windmühle Klein Flöthe,3.3
+W0043,Wald bei Windmühle Klein Flöthe,,Windmühle Klein Flöthe,3.3
 W0044,Wald bei Dorstadt,,Dorstadt,1.6
 W1130,Wald bei Ohrum,,Ohrum,0.7
 W1131,Wald bei Kissenbrück,,Kissenbrück,0.3
@@ -143,20 +143,20 @@ W1146,Wald bei Glashütte,,Glashütte,1.0
 W1147,Wald bei Barneberg,,Barneberg,1.2
 W1148,Wald bei Üplingen,,Üplingen,1.3
 W1149,Wald bei Üplingen,,Üplingen,0.9
-W0046,Vorholz bei Astenbeck,Vorholz,Astenbeck,1.9
-W0047,Vorholz bei Grasdorf,Vorholz,Grasdorf,1.6
+W0046,Wald bei Astenbeck,,Astenbeck,1.9
+W0047,Wald bei Grasdorf,,Grasdorf,1.6
 W0048,Wald bei Luttrum,,Luttrum,0.6
 W0049,Wald bei Westerlinde,,Westerlinde,0.4
-W0050,Lichtenberge bei Osterlinde,Lichtenberge,Osterlinde,0.7
-W0051,Lichtenberge bei Lichtenberg,Lichtenberge,Lichtenberg,1.1
-W0052,Lichtenberge bei Lichtenberg,Lichtenberge,Lichtenberg,1.3
+W0050,Wald bei Osterlinde,,Osterlinde,0.7
+W0051,Wald bei Lichtenberg,,Lichtenberg,1.1
+W0052,Wald bei Lichtenberg,,Lichtenberg,1.3
 W0053,Wald bei Salder,,Salder,1.6
 W1150,Wald bei Salder,,Salder,1.3
 W0054,Wald bei Heerte,,Heerte,0.6
 W1151,Wald bei Barum,,Barum,1.3
 W1152,Wald bei Leinde,,Leinde,0.6
-W0055,Oderwald bei Naturfreundehaus Oderwald,Oderwald,Naturfreundehaus Oderwald,2.0
-W0056,Oderwald bei Naturfreundehaus Oderwald,Oderwald,Naturfreundehaus Oderwald,1.8
+W0055,Wald bei Naturfreundehaus Oderwald,,Naturfreundehaus Oderwald,2.0
+W0056,Wald bei Naturfreundehaus Oderwald,,Naturfreundehaus Oderwald,1.8
 W0057,Wald bei Bungenstedter Turm,,Bungenstedter Turm,1.2
 W0058,Wald bei Bahnhaus (Neindorf),,Bahnhaus (Neindorf),0.2
 W1153,Wald bei Neindorf,,Neindorf,0.7
@@ -180,7 +180,7 @@ W1163,Wald bei Völpke,,Völpke,1.2
 W1164,Wald bei Völpke,,Völpke,1.5
 W1165,Wald bei Üplingen,,Üplingen,1.7
 W0065,Wald bei Wöhle,,Wöhle,0.8
-W0066,Vorholz bei Wöhle,Vorholz,Wöhle,2.0
+W0066,Wald bei Wöhle,,Wöhle,2.0
 W0067,Wald bei Nordassel,,Nordassel,1.2
 W0068,Wald bei Hohenassel,,Hohenassel,0.4
 W1166,Wald bei Burgdorf,,Burgdorf,1.1
@@ -196,17 +196,17 @@ W0071,Wald bei Naturfreundehaus Oderwald,,Naturfreundehaus Oderwald,0.9
 W0072,Wald bei Halchter,,Halchter,0.4
 W0073,Wald bei Klein Denkte,,Klein Denkte,1.0
 W1171,Wald bei Klein Denkte,,Klein Denkte,0.7
-W0074,Asse bei Wittmar,Asse,Wittmar,1.3
-W0075,Asse bei Mönchevahlberg,Asse,Mönchevahlberg,0.8
+W0074,Wald bei Wittmar,,Wittmar,1.3
+W0075,Wald bei Mönchevahlberg,,Mönchevahlberg,0.8
 W0076,Wald bei Groß Vahlberg,,Groß Vahlberg,0.5
 W0077,Wald bei Groß Vahlberg,,Groß Vahlberg,1.6
 W1172,Wald bei Kuckucksmühle,,Kuckucksmühle,0.5
 W1173,Wald bei Twelkenmühle,,Twelkenmühle,0.7
 W1174,Wald bei Küblingen,,Küblingen,0.7
-W0090,Elm bei Watzumer Häuschen,Elm,Watzumer Häuschen,1.2
+W0090,Wald bei Watzumer Häuschen,,Watzumer Häuschen,1.2
 W0078,Wald bei Groß Dahlum,,Groß Dahlum,1.2
 W0079,Wald bei Wobeck,,Wobeck,0.9
-W0080,Elm bei Twieflingen,Elm,Twieflingen,1.7
+W0080,Wald bei Twieflingen,,Twieflingen,1.7
 W0081,Wald bei Schöningen,,Schöningen,0.7
 W0095,Wald bei Esbeck,,Esbeck,1.7
 W0096,Wald bei Büddenstedt,,Büddenstedt,1.5
@@ -218,15 +218,15 @@ W1177,Wald bei Badeleben,,Badeleben,1.7
 W1585,Wald bei Dingelbe,,Dingelbe,1.5
 W1178,Wald bei Helmersen,,Helmersen,0.1
 W1179,Wald bei Nettlingen,,Nettlingen,1.2
-W0099,Bereler Ries bei Berel,Bereler Ries,Berel,1.3
+W0099,Wald bei Berel,,Berel,1.3
 W1180,Wald bei Berel,,Berel,1.1
 W1181,Wald bei Lesse,,Lesse,0.7
 W1182,Wald bei Reppner,,Reppner,1.3
 W1183,Wald bei Reppner,,Reppner,1.1
 W0100,Wald bei Engelnstedt,,Engelnstedt,1.1
-W1184,Hallendorfer Holz bei Hallendorf,Hallendorfer Holz,Hallendorf,1.5
+W1184,Wald bei Hallendorf,,Hallendorf,1.5
 W0101,Wald bei Beddingen,,Beddingen,0.8
-W0102,Beddinger Holz bei Hoheweg,Beddinger Holz,Hoheweg,1.5
+W0102,Wald bei Hoheweg,,Hoheweg,1.5
 W0103,Wald bei Hoheweg,,Hoheweg,1.2
 W1185,Wald bei Fümmelse-Ziegelei,,Fümmelse-Ziegelei,0.3
 W0104,Wald bei Kurzes Holz,,Kurzes Holz,0.7
@@ -237,11 +237,11 @@ W1189,Wald bei Dettum,,Dettum,1.4
 W1586,Wald bei Dettum,,Dettum,0.9
 W1190,Wald bei Eilum,,Eilum,1.4
 W1587,Wald bei Eilum,,Eilum,0.9
-W0105,Elm bei Kneitlingen,Elm,Kneitlingen,1.2
-W0106,Elm bei Watzumer Häuschen,Elm,Watzumer Häuschen,1.6
-W0107,Elm bei Brunsleberfeld,Elm,Brunsleberfeld,0.7
-W0108,Elm bei Brunsleberfeld,Elm,Brunsleberfeld,1.8
-W0109,Elm bei Elmgarten,Elm,Elmgarten,1.5
+W0105,Wald bei Kneitlingen,,Kneitlingen,1.2
+W0106,Wald bei Watzumer Häuschen,,Watzumer Häuschen,1.6
+W0107,Wald bei Brunsleberfeld,,Brunsleberfeld,0.7
+W0108,Wald bei Brunsleberfeld,,Brunsleberfeld,1.8
+W0109,Wald bei Elmgarten,,Elmgarten,1.5
 W0110,Wald bei Elmgarten,,Elmgarten,0.6
 W0111,Wald bei Kißleberfeld,,Kißleberfeld,0.7
 W0112,Wald bei Büddenstedt,,Büddenstedt,2.3
@@ -265,22 +265,22 @@ W1200,Wald bei Sauingen,,Sauingen,0.5
 W1201,Wald bei Beddingen,,Beddingen,1.1
 W1202,Wald bei Thiede,,Thiede,1.0
 W1203,Wald bei Thiede,,Thiede,1.0
-W0119,Lechlumer Holz bei Schwedenschanze,Lechlumer Holz,Schwedenschanze,1.8
+W0119,Wald bei Schwedenschanze,,Schwedenschanze,1.8
 W1204,Wald bei Kurzes Holz,,Kurzes Holz,1.1
 W1205,Wald bei Schlickerberg,,Schlickerberg,0.4
 W0120,Wald bei Apelnstedt,,Apelnstedt,0.8
 W1206,Wald bei Volzum,,Volzum,1.4
 W0121,Wald bei Hachum,,Hachum,0.9
 W0122,Wald bei Obstbauernsiedlung,,Obstbauernsiedlung,0.3
-W0123,Elm bei Weidehof,Elm,Weidehof,1.5
-W0124,Elm bei Groß Rode,Elm,Groß Rode,0.2
-W0125,Elm bei Tetzelstein,Elm,Tetzelstein,1.3
-W0126,Elm bei Brunsleberfeld,Elm,Brunsleberfeld,1.4
+W0123,Wald bei Weidehof,,Weidehof,1.5
+W0124,Wald bei Groß Rode,,Groß Rode,0.2
+W0125,Wald bei Tetzelstein,,Tetzelstein,1.3
+W0126,Wald bei Brunsleberfeld,,Brunsleberfeld,1.4
 W0127,Wald bei Räbke,,Räbke,0.8
 W1589,Wald bei Räbke,,Räbke,1.3
 W0128,Wald bei Wolsdorf,,Wolsdorf,0.9
 W0129,Wald bei Wolsdorf,,Wolsdorf,1.1
-W1590,Eitz bei Kißleberfeld,Eitz,Kißleberfeld,2.0
+W1590,Wald bei Kißleberfeld,,Kißleberfeld,2.0
 W1207,Wald bei Büddenstedt,,Büddenstedt,1.9
 W0130,Wald bei Harbke,,Harbke,0.7
 W0131,Wald bei Harbke,,Harbke,1.9
@@ -308,15 +308,15 @@ W1226,Wald bei Mühle,,Mühle,0.4
 W1227,Wald bei Neuhof,,Neuhof,0.8
 W1228,Wald bei Kupfermühle,,Kupfermühle,0.6
 W1229,Wald bei Erkerode,,Erkerode,0.2
-W1592,Elm bei Weidehof,Elm,Weidehof,1.4
-W1230,Elm bei Weidehof,Elm,Weidehof,0.8
-W1593,Elm bei Tetzelstein,Elm,Tetzelstein,0.8
-W1594,Elm bei Langeleben,Elm,Langeleben,1.1
+W1592,Wald bei Weidehof,,Weidehof,1.4
+W1230,Wald bei Weidehof,,Weidehof,0.8
+W1593,Wald bei Tetzelstein,,Tetzelstein,0.8
+W1594,Wald bei Langeleben,,Langeleben,1.1
 W1595,Wald bei Lelm,,Lelm,1.9
 W1231,Wald bei Räbke,,Räbke,0.8
 W1232,Wald bei Frellstedt,,Frellstedt,0.2
-W1233,Elz bei Am Tekenberge,Elz,Am Tekenberge,0.2
-W1234,Elz bei Alte Försterei,Elz,Alte Försterei,1.9
+W1233,Wald bei Am Tekenberge,,Am Tekenberge,0.2
+W1234,Wald bei Alte Försterei,,Alte Försterei,1.9
 W1235,Wald bei Helmstedt,,Helmstedt,2.8
 W1236,Wald bei Harbke,,Harbke,2.1
 W1237,Wald bei Harbke Autobahn,,Harbke Autobahn,1.5
@@ -337,19 +337,19 @@ W1248,Wald bei Groß Gleidingen,,Groß Gleidingen,1.7
 W1249,Wald bei Übergabebahnhof Beddingen,,Übergabebahnhof Beddingen,0.9
 W1250,Wald bei Stiddien,,Stiddien,1.1
 W1251,Wald bei Rüningen,,Rüningen,0.2
-W0134,Lechlumer Holz bei Stöckheim,Lechlumer Holz,Stöckheim,1.3
-W0135,Nieder- und Oberdahlumer Holz bei Mascherode,Nieder- und Oberdahlumer Holz,Mascherode,1.4
+W0134,Wald bei Stöckheim,,Stöckheim,1.3
+W0135,Wald bei Mascherode,,Mascherode,1.4
 W0136,Wald bei Zuckerfabrik / ehem. Bahnhof Salzdahlum,,Zuckerfabrik / ehem. Bahnhof Salzdahlum,1.3
 W1252,Wald bei Hötzum,,Hötzum,0.2
 W1253,Wald bei Sickte,,Sickte,0.8
 W1254,Wald bei Klein Veltheim,,Klein Veltheim,0.5
-W0137,Elm bei Erkerode,Elm,Erkerode,1.2
-W0138,Elm bei Weidehof,Elm,Weidehof,0.6
-W0139,Elm bei Weidehof,Elm,Weidehof,1.7
-W0140,Elm bei Langeleben,Elm,Langeleben,0.4
-W0141,Elm bei Lelm,Elm,Lelm,1.5
+W0137,Wald bei Erkerode,,Erkerode,1.2
+W0138,Wald bei Weidehof,,Weidehof,0.6
+W0139,Wald bei Weidehof,,Weidehof,1.7
+W0140,Wald bei Langeleben,,Langeleben,0.4
+W0141,Wald bei Lelm,,Lelm,1.5
 W1598,Wald bei Lelm,,Lelm,0.2
-W0142,Schieren bei Frellstedt,Schieren,Frellstedt,1.5
+W0142,Wald bei Frellstedt,,Frellstedt,1.5
 W0143,Wald bei Rote Mühle,,Rote Mühle,0.2
 W0144,Wald bei Alte Försterei,,Alte Försterei,1.2
 W0145,Wald bei Helmstedt,,Helmstedt,2.4
@@ -374,15 +374,15 @@ W1267,Wald bei Timmerlah,,Timmerlah,0.9
 W1268,Wald bei Broitzem,,Broitzem,1.1
 W1269,Wald bei Gartenstadt,,Gartenstadt,0.7
 W0151,Wald bei Heidberg,,Heidberg,0.3
-W0152,Rautheimer Holz bei Mascherode,Rautheimer Holz,Mascherode,0.6
+W0152,Wald bei Mascherode,,Mascherode,0.6
 W0153,Wald bei Hötzum,,Hötzum,1.3
 W0154,Wald bei Wilhelmshöhe,,Wilhelmshöhe,0.1
-W0155,Veltheimer Forst bei Klein Veltheim,Veltheimer Forst,Klein Veltheim,1.2
+W0155,Wald bei Klein Veltheim,,Klein Veltheim,1.2
 W1270,Wald bei Schulenrode,,Schulenrode,0.2
 W0156,Wald bei Hemkenrode,,Hemkenrode,1.0
-W0157,Elm bei Weidehof,Elm,Weidehof,2.5
-W0158,Elm bei Weidehof,Elm,Weidehof,3.0
-W0159,Elm bei Sunstedt,Elm,Sunstedt,2.0
+W0157,Wald bei Weidehof,,Weidehof,2.5
+W0158,Wald bei Weidehof,,Weidehof,3.0
+W0159,Wald bei Sunstedt,,Sunstedt,2.0
 W0160,Wald bei Sunstedt,,Sunstedt,0.9
 W1271,Wald bei Hagenhof,,Hagenhof,0.2
 W1272,Wald bei Hagenhof,,Hagenhof,1.8
@@ -390,8 +390,8 @@ W1273,Wald bei Süpplingenburg,,Süpplingenburg,1.2
 W1274,Wald bei Emmerstedt,,Emmerstedt,1.7
 W1275,Wald bei Emmerstedt,,Emmerstedt,0.7
 W0161,Wald bei Helmstedt,,Helmstedt,0.5
-W0162,Lappwald bei Bad Helmstedt,Lappwald,Bad Helmstedt,1.4
-W0163,Lappwald bei Bad Helmstedt,Lappwald,Bad Helmstedt,1.0
+W0162,Wald bei Bad Helmstedt,,Bad Helmstedt,1.4
+W0163,Wald bei Bad Helmstedt,,Bad Helmstedt,1.0
 W0164,Wald bei Morsleben,,Morsleben,1.3
 W1276,Wald bei Groß Bartensleben,,Groß Bartensleben,0.9
 W1277,Wald bei Klein Bartensleben,,Klein Bartensleben,1.0
@@ -400,33 +400,33 @@ W0165,Wald bei Adenstedt,,Adenstedt,0.6
 W0181,Wald bei Groß Bülten,,Groß Bülten,0.5
 W1279,Wald bei Ölsburg,,Ölsburg,0.8
 W0182,Wald bei Oberg,,Oberg,1.1
-W0183,Südholz bei Münstedt,Südholz,Münstedt,1.0
+W0183,Wald bei Münstedt,,Münstedt,1.0
 W0184,Wald bei Bettmar,,Bettmar,1.6
 W1280,Wald bei Bettmar,,Bettmar,0.3
 W1281,Wald bei Vechelde,,Vechelde,1.3
 W1282,Wald bei Vechelde,,Vechelde,0.9
 W1283,Wald bei Denstorf,,Denstorf,0.4
-W0166,Staatsforst Timmerlaher Busch bei Timmerlah,Staatsforst Timmerlaher Busch,Timmerlah,1.0
+W0166,Wald bei Timmerlah,,Timmerlah,1.0
 W1285,Wald bei Weststadt,,Weststadt,1.3
 W0167,Wald bei Westliches Ringgebiet,,Westliches Ringgebiet,1.5
 W1287,Wald bei Braunschweig,,Braunschweig,0.9
 W1288,Wald bei Lindenberg,,Lindenberg,1.4
-W0185,Buchhorst bei Grüner Jäger,Buchhorst,Grüner Jäger,1.1
+W0185,Wald bei Grüner Jäger,,Grüner Jäger,1.1
 W0186,Wald bei Weddel,,Weddel,0.8
-W0187,Weddeler Wohld bei Schandelah,Weddeler Wohld,Schandelah,1.8
+W0187,Wald bei Schandelah,,Schandelah,1.8
 W0170,Wald bei Schulenrode,,Schulenrode,1.4
-W0188,Heiligenholz bei Mühlenberg,Heiligenholz,Mühlenberg,0.6
+W0188,Wald bei Mühlenberg,,Mühlenberg,0.6
 W0171,Wald bei Bornum,,Bornum,1.2
-W0172,Elm bei Lauingen,Elm,Lauingen,2.1
+W0172,Wald bei Lauingen,,Lauingen,2.1
 W0173,Wald bei Königslutter am Elm,,Königslutter am Elm,0.6
 W1293,Wald bei Königslutter am Elm,,Königslutter am Elm,0.9
 W0189,Wald bei Groß Steinum,,Groß Steinum,0.2
-W0190,Dorm bei Groß Steinum,Dorm,Groß Steinum,1.9
+W0190,Wald bei Groß Steinum,,Groß Steinum,1.9
 W1294,Wald bei Süpplingenburg,,Süpplingenburg,0.8
 W0191,Wald bei Barmke,,Barmke,0.9
-W0192,Lappwald bei Mariental,Lappwald,Mariental,1.3
-W0193,Lappwald bei Mariental,Lappwald,Mariental,2.4
-W0194,Lappwald bei Walbeck,Lappwald,Walbeck,2.1
+W0192,Wald bei Mariental,,Mariental,1.3
+W0193,Wald bei Mariental,,Mariental,2.4
+W0194,Wald bei Walbeck,,Walbeck,2.1
 W0195,Wald bei Schwanefeld,,Schwanefeld,1.2
 W0196,Wald bei Schwanefeld,,Schwanefeld,0.8
 W0197,Wald bei Eschenrode,,Eschenrode,2.4
@@ -436,9 +436,9 @@ W1295,Wald bei Klein Solschen,,Klein Solschen,0.7
 W0199,Wald bei Bülten,,Bülten,0.9
 W1296,Wald bei Bülten,,Bülten,0.6
 W0200,Wald bei Klein Ilsede,,Klein Ilsede,1.1
-W1297,Oberger Gutsforst bei Schmedenstedt,Oberger Gutsforst,Schmedenstedt,1.9
+W1297,Wald bei Schmedenstedt,,Schmedenstedt,1.9
 W1298,Wald bei Schmedenstedt,,Schmedenstedt,0.2
-W0201,Sierßer Holz bei Sierße,Sierßer Holz,Sierße,1.3
+W0201,Wald bei Sierße,,Sierße,1.3
 W0202,Wald bei Wahle,,Wahle,1.4
 W0203,Wald bei Bortfeld,,Bortfeld,1.1
 W1299,Wald bei Wedtlenstedt,,Wedtlenstedt,0.4
@@ -448,20 +448,20 @@ W0205,Wald bei Schwarzer Berg,,Schwarzer Berg,0.9
 W0206,Wald bei Nordstadt,,Nordstadt,0.7
 W0207,Wald bei Gliesmarode,,Gliesmarode,0.3
 W0208,Wald bei Schapen,,Schapen,0.5
-W0209,Osterholz bei Weddel,Osterholz,Weddel,1.4
+W0209,Wald bei Weddel,,Weddel,1.4
 W1301,Wald bei Weddel,,Weddel,1.6
 W1302,Wald bei Schandelah,,Schandelah,0.9
 W0210,Wald bei Wohld,,Wohld,1.4
-W1303,Löhnebruch bei Mühlenberg,Löhnebruch,Mühlenberg,1.4
+W1303,Wald bei Mühlenberg,,Mühlenberg,1.4
 W1304,Wald bei Lauingen,,Lauingen,1.7
 W0211,Wald bei Puritzmühle,,Puritzmühle,0.9
 W0212,Wald bei Beienrode,,Beienrode,0.9
-W0213,Dorm bei Uhry,Dorm,Uhry,1.8
-W0214,Dorm bei Rennau,Dorm,Rennau,1.7
+W0213,Wald bei Uhry,,Uhry,1.8
+W0214,Wald bei Rennau,,Rennau,1.7
 W1305,Wald bei Barmke,,Barmke,2.3
 W1306,Wald bei Barmke,,Barmke,0.5
 W1307,Wald bei Mariental,,Mariental,1.0
-W0215,Lappwald bei Mariental-Horst,Lappwald,Mariental-Horst,1.4
+W0215,Wald bei Mariental-Horst,,Mariental-Horst,1.4
 W0216,Wald bei Walbeck,,Walbeck,1.4
 W0217,Wald bei Walbeck,,Walbeck,0.8
 W0218,Wald bei Eschenrode,,Eschenrode,0.7
@@ -469,13 +469,13 @@ W0219,Wald bei Eschenrode,,Eschenrode,1.3
 W1308,Wald bei Eschenrode,,Eschenrode,2.6
 W1309,Wald bei Equord,,Equord,0.2
 W1310,Wald bei Hofschwicheldt,,Hofschwicheldt,0.4
-W1311,Heistern bei Rosenthal,Heistern,Rosenthal,1.0
+W1311,Wald bei Rosenthal,,Rosenthal,1.0
 W1312,Wald bei Handorf,,Handorf,0.6
 W1313,Wald bei Klein Ilsede,,Klein Ilsede,0.8
 W1314,Wald bei Dungelbeck,,Dungelbeck,0.8
 W1315,Wald bei Dungelbeck,,Dungelbeck,1.4
 W1316,Wald bei Fürstenau,,Fürstenau,1.2
-W1317,Wahler Holz bei Fürstenau,Wahler Holz,Fürstenau,1.6
+W1317,Wald bei Fürstenau,,Fürstenau,1.6
 W1318,Wald bei Bortfeld,,Bortfeld,1.5
 W1319,Wald bei Bortfeld,,Bortfeld,0.5
 W1320,Wald bei Kanzlerfeld,,Kanzlerfeld,1.4
@@ -498,7 +498,7 @@ W1336,Wald bei Rennau,,Rennau,0.4
 W1337,Wald bei Rottorf,,Rottorf,0.3
 W1338,Wald bei Mariental-Horst,,Mariental-Horst,1.7
 W1339,Wald bei Mariental-Horst,,Mariental-Horst,0.6
-W1340,Lappwald bei Grasleben,Lappwald,Grasleben,1.9
+W1340,Wald bei Grasleben,,Grasleben,1.9
 W1341,Wald bei Drachenberg,,Drachenberg,0.6
 W1342,Wald bei Hödingen,,Hödingen,1.2
 W1343,Wald bei Eschenrode,,Eschenrode,1.0
@@ -510,10 +510,10 @@ W1347,Wald bei Bauernsiedlung,,Bauernsiedlung,0.8
 W1348,Wald bei Südstadt,,Südstadt,0.4
 W0221,Wald bei Dungelbeck,,Dungelbeck,0.7
 W0222,Wald bei Woltorf,,Woltorf,0.5
-W0223,Fürstenauer Holz bei Fürstenau,Fürstenauer Holz,Fürstenau,0.2
+W0223,Wald bei Fürstenau,,Fürstenau,0.2
 W0224,Wald bei Sophiental,,Sophiental,1.3
 W1349,Wald bei Marina Bortfeld,,Marina Bortfeld,1.3
-W0225,Osterholz bei Völkenrode,Osterholz,Völkenrode,1.2
+W0225,Wald bei Völkenrode,,Völkenrode,1.2
 W1350,Wald bei Völkenrode,,Völkenrode,0.6
 W1351,Wald bei Watenbüttel,,Watenbüttel,0.7
 W1352,Wald bei Veltenhof,,Veltenhof,0.6
@@ -530,8 +530,8 @@ W0232,Wald bei Ochsendorf,,Ochsendorf,0.7
 W0233,Wald bei Beienrode,,Beienrode,1.1
 W0234,Wald bei Uhry,,Uhry,1.1
 W0235,Wald bei Ahmstorf,,Ahmstorf,1.1
-W0236,Lappwald bei Rennau,Lappwald,Rennau,1.2
-W1356,Lappwald bei Rottorf,Lappwald,Rottorf,1.7
+W0236,Wald bei Rennau,,Rennau,1.2
+W1356,Wald bei Rottorf,,Rottorf,1.7
 W0237,Wald bei Mariental-Horst,,Mariental-Horst,1.6
 W0238,Wald bei Grasleben,,Grasleben,0.5
 W0239,Wald bei Drachenberg,,Drachenberg,1.0
@@ -557,17 +557,17 @@ W1369,Wald bei Bienrode,,Bienrode,1.1
 W0246,Wald bei Waggum,,Waggum,1.3
 W0247,Wald bei Hondelage,,Hondelage,0.6
 W0248,Wald bei Wendhausen,,Wendhausen,0.4
-W0249,Essehofer Holz bei Lehre,Essehofer Holz,Lehre,1.0
+W0249,Wald bei Lehre,,Lehre,1.0
 W0250,Wald bei Kampstüh,,Kampstüh,0.6
-W0251,Beienroder Holz bei Kampstüh,Beienroder Holz,Kampstüh,1.4
+W0251,Wald bei Kampstüh,,Kampstüh,1.4
 W0252,Wald bei Rotenkamp,,Rotenkamp,2.1
 W1370,Wald bei Boimstorf,,Boimstorf,2.3
 W1371,Wald bei Glentorf,,Glentorf,0.5
 W0253,Wald bei Klein Steimke,,Klein Steimke,1.3
 W0254,Wald bei Rhode,,Rhode,0.5
 W1372,Wald bei Bisdorf,,Bisdorf,0.7
-W0255,Lappwald bei Ahmstorf,Lappwald,Ahmstorf,2.3
-W0256,Lappwald bei Querenhorst,Lappwald,Querenhorst,1.9
+W0255,Wald bei Ahmstorf,,Ahmstorf,2.3
+W0256,Wald bei Querenhorst,,Querenhorst,1.9
 W0257,Wald bei Heidwinkel,,Heidwinkel,0.4
 W1373,Wald bei Heidwinkel,,Heidwinkel,1.5
 W0258,Wald bei Weferlingen,,Weferlingen,0.9
@@ -575,7 +575,7 @@ W1374,Wald bei Weferlingen,,Weferlingen,1.7
 W1375,Wald bei Ribbensdorf,,Ribbensdorf,0.9
 W1376,Wald bei Ribbensdorf,,Ribbensdorf,1.1
 W1377,Wald bei Belsdorf,,Belsdorf,1.3
-W0260,Hainwald bei Gut Schierke,Hainwald,Gut Schierke,1.3
+W0260,Wald bei Gut Schierke,,Gut Schierke,1.3
 W1378,Wald bei Hämelerwald,,Hämelerwald,2.2
 W1379,Wald bei Eixe,,Eixe,0.8
 W1380,Wald bei Eixe,,Eixe,1.4
@@ -592,16 +592,16 @@ W0264,Wald bei Thune,,Thune,0.3
 W1384,Wald bei Meinholz,,Meinholz,0.6
 W0265,Wald bei Bevenrode,,Bevenrode,0.4
 W0266,Wald bei Bevenrode,,Bevenrode,1.7
-W0267,Hoheholz bei Wendhausen,Hoheholz,Wendhausen,2.4
+W0267,Wald bei Wendhausen,,Wendhausen,2.4
 W0268,Wald bei Lehre,,Lehre,1.2
 W0269,Wald bei Lehre,,Lehre,1.9
-W0270,Beienroder Holz bei Flechtorf,Beienroder Holz,Flechtorf,1.8
+W0270,Wald bei Flechtorf,,Flechtorf,1.8
 W0271,Wald bei Beienrode,,Beienrode,1.7
 W1385,Wald bei Heiligendorf,,Heiligendorf,1.0
 W0293,Wald bei Bahnhof Neindorf,,Bahnhof Neindorf,2.0
 W0294,Wald bei Almke,,Almke,1.8
-W0272,Sarling bei Almke,Sarling,Almke,1.0
-W0273,Sarling bei Bisdorf,Sarling,Bisdorf,1.4
+W0272,Wald bei Almke,,Almke,1.0
+W0273,Wald bei Bisdorf,,Bisdorf,1.4
 W0274,Wald bei Klein Sisbeck,,Klein Sisbeck,2.0
 W0275,Wald bei Querenhorst,,Querenhorst,0.5
 W0276,Wald bei Mühle Ohm,,Mühle Ohm,1.2
@@ -618,10 +618,10 @@ W1388,Wald bei Eixe,,Eixe,2.1
 W1389,Wald bei Wendesse,,Wendesse,0.2
 W1390,Wald bei Wendesse,,Wendesse,1.9
 W0304,Wald bei Blumenhagen,,Blumenhagen,1.0
-W0305,Meerdorfer Holz bei Ahlemissen,Meerdorfer Holz,Ahlemissen,1.7
+W0305,Wald bei Ahlemissen,,Ahlemissen,1.7
 W0306,Wald bei Didderse,,Didderse,1.3
 W0307,Wald bei Ersehof,,Ersehof,0.6
-W0308,Galgenkamp bei Neubrück,Galgenkamp,Neubrück,0.6
+W0308,Wald bei Neubrück,,Neubrück,0.6
 W1391,Wald bei Gut Warxbüttel,,Gut Warxbüttel,0.8
 W1392,Wald bei Rethen,,Rethen,1.6
 W0309,Wald bei Vordorf,,Vordorf,1.1
@@ -634,9 +634,9 @@ W0312,Wald bei Klein Brunsrode,,Klein Brunsrode,1.1
 W0313,Wald bei Heinenkamp I,,Heinenkamp I,0.6
 W0314,Wald bei Heinenkamp II,,Heinenkamp II,0.2
 W0315,Wald bei Heinenkamp II,,Heinenkamp II,2.0
-W0316,Barnstorfer Holz bei Barnstorf,Barnstorfer Holz,Barnstorf,1.0
+W0316,Wald bei Barnstorf,,Barnstorf,1.0
 W0317,Wald bei Hehlingen,,Hehlingen,2.0
-W0318,Steplinger Holz bei Volkmarsdorf,Steplinger Holz,Volkmarsdorf,1.8
+W0318,Wald bei Volkmarsdorf,,Volkmarsdorf,1.8
 W0319,Wald bei Rümmer,,Rümmer,0.7
 W1396,Wald bei Groß Twülpstedt,,Groß Twülpstedt,1.0
 W1397,Wald bei Papenrode,,Papenrode,0.4
@@ -660,7 +660,7 @@ W0328,Wald bei Didderse,,Didderse,1.4
 W1405,Wald bei Am Katzenberg,,Am Katzenberg,0.3
 W0329,Wald bei Adenbüttel,,Adenbüttel,1.3
 W0330,Wald bei Ackern,,Ackern,0.3
-W0331,Kleines Holz bei Meine,Kleines Holz,Meine,1.9
+W0331,Wald bei Meine,,Meine,1.9
 W1406,Wald bei Meine,,Meine,0.7
 W1407,Wald bei Meine,,Meine,1.3
 W0332,Wald bei Brunsbüttel,,Brunsbüttel,0.9
@@ -669,7 +669,7 @@ W0333,Wald bei Wettmershagen,,Wettmershagen,0.9
 W0334,Wald bei Ehmen,,Ehmen,0.9
 W0335,Wald bei Mörse,,Mörse,0.8
 W0336,Wald bei Detmerode,,Detmerode,0.1
-W0337,Hattorfer Holz bei Rabenberg,Hattorfer Holz,Rabenberg,1.3
+W0337,Wald bei Rabenberg,,Rabenberg,1.3
 W0338,Wald bei Barnstorf,,Barnstorf,1.0
 W1409,Wald bei Barnstorf,,Barnstorf,1.2
 W0339,Wald bei Hehlingen,,Hehlingen,1.1
@@ -687,7 +687,7 @@ W1416,Wald bei Schwüblingsen,,Schwüblingsen,1.8
 W1417,Wald bei Schwüblingsen,,Schwüblingsen,1.3
 W1418,Wald bei Dollbergen,,Dollbergen,1.2
 W1419,Wald bei Klein Eddesse,,Klein Eddesse,1.0
-W1420,Berkhöpen bei Berkhöpen,Berkhöpen,Berkhöpen,0.9
+W1420,Wald bei Berkhöpen,,Berkhöpen,0.9
 W1421,Wald bei Berkhöpen,,Berkhöpen,1.3
 W1422,Wald bei Klein Blumenhagen,,Klein Blumenhagen,0.4
 W1423,Wald bei Alvesse,,Alvesse,0.2
@@ -699,17 +699,17 @@ W1428,Wald bei Warmbüttel,,Warmbüttel,0.3
 W1429,Wald bei Ackern,,Ackern,1.4
 W1430,Wald bei Rötgesbüttel,,Rötgesbüttel,1.5
 W1431,Wald bei Ohnhorst,,Ohnhorst,0.5
-W1432,Papenholz bei Gut Martinsbüttel,Papenholz,Gut Martinsbüttel,1.2
+W1432,Wald bei Gut Martinsbüttel,,Gut Martinsbüttel,1.2
 W1433,Wald bei Edesbüttel,,Edesbüttel,0.7
 W1434,Wald bei Wettmershagen,,Wettmershagen,0.6
 W1435,Wald bei Ehmen,,Ehmen,1.6
 W1436,Wald bei Ehmen,,Ehmen,0.5
 W1437,Wald bei Westhagen,,Westhagen,0.5
-W1438,Hattorfer Holz bei Eichelkamp,Hattorfer Holz,Eichelkamp,1.1
-W1439,Hattorfer Holz bei Rabenberg,Hattorfer Holz,Rabenberg,0.8
+W1438,Wald bei Eichelkamp,,Eichelkamp,1.1
+W1439,Wald bei Rabenberg,,Rabenberg,0.8
 W1440,Wald bei Nordsteimke,,Nordsteimke,0.5
 W1441,Wald bei Sonnenkamp,,Sonnenkamp,0.9
-W1442,Hehlinger Holz bei Neuhaus,Hehlinger Holz,Neuhaus,2.0
+W1442,Wald bei Neuhaus,,Neuhaus,2.0
 W1443,Wald bei Velpke,,Velpke,1.8
 W1444,Wald bei Velpke,,Velpke,0.7
 W1445,Wald bei Meinkot,,Meinkot,1.0
@@ -734,7 +734,7 @@ W0353,Wald bei Warmbüttel,,Warmbüttel,1.6
 W0354,Wald bei Klein Vollbüttel,,Klein Vollbüttel,0.8
 W0355,Wald bei Voßheide,,Voßheide,1.1
 W0356,Wald bei Rötgesbüttel,,Rötgesbüttel,1.0
-W1455,Helmsheide bei Gravenhorst,Helmsheide,Gravenhorst,1.2
+W1455,Wald bei Gravenhorst,,Gravenhorst,1.2
 W1456,Wald bei Wasbüttel,,Wasbüttel,0.8
 W1457,Wald bei Calberlah,,Calberlah,0.6
 W1458,Wald bei Allerbüttel,,Allerbüttel,0.6
@@ -744,9 +744,9 @@ W0357,Wald bei Laagberg,,Laagberg,0.4
 W0358,Wald bei Klieversberg,,Klieversberg,0.4
 W0359,Wald bei Steimker Berg,,Steimker Berg,0.6
 W1461,Wald bei Steimker Gärten,,Steimker Gärten,0.7
-W0360,Hehlinger Holz bei Neuhaus,Hehlinger Holz,Neuhaus,0.6
-W0361,Hehlinger Holz bei Danndorf,Hehlinger Holz,Danndorf,2.3
-W0362,Hehlinger Holz bei Velpke,Hehlinger Holz,Velpke,0.9
+W0360,Wald bei Neuhaus,,Neuhaus,0.6
+W0361,Wald bei Danndorf,,Danndorf,2.3
+W0362,Wald bei Velpke,,Velpke,0.9
 W0363,Wald bei Velpke,,Velpke,1.3
 W1462,Wald bei Wahrstedt,,Wahrstedt,0.7
 W1463,Wald bei Siedlung,,Siedlung,0.9
@@ -755,7 +755,7 @@ W1464,Wald bei Bösdorf,,Bösdorf,0.8
 W1465,Wald bei Bösdorf,,Bösdorf,1.5
 W1466,Wald bei Rätzlingen,,Rätzlingen,2.1
 W1467,Wald bei Kolonie Kathendorf,,Kolonie Kathendorf,1.5
-W0366,Burgdorfer Holz bei Schwüblingsen,Burgdorfer Holz,Schwüblingsen,1.9
+W0366,Wald bei Schwüblingsen,,Schwüblingsen,1.9
 W0367,Wald bei Katensen,,Katensen,0.9
 W0368,Wald bei Katensen,,Katensen,1.6
 W0369,Wald bei Dedenhausen,,Dedenhausen,0.8
@@ -781,7 +781,7 @@ W1473,Wald bei Sandkamp,,Sandkamp,1.2
 W1474,Wald bei Alt-Wolfsburg,,Alt-Wolfsburg,0.7
 W1475,Wald bei Vorsfelde,,Vorsfelde,0.9
 W0383,Wald bei Vorsfelde-Süd,,Vorsfelde-Süd,1.3
-W0384,Wolfskuhle bei Danndorf,Wolfskuhle,Danndorf,1.3
+W0384,Wald bei Danndorf,,Danndorf,1.3
 W0385,Wald bei Danndorf,,Danndorf,0.7
 W0386,Wald bei Grafhorst,,Grafhorst,1.9
 W1476,Wald bei Kaltendorf,,Kaltendorf,1.0
@@ -809,12 +809,12 @@ W0430,Wald bei Bornsiek,,Bornsiek,2.6
 W0431,Wald bei Tankumsee,,Tankumsee,2.8
 W0432,Wald bei Clausmoorhof,,Clausmoorhof,0.9
 W0433,Wald bei Clausmoorhof,,Clausmoorhof,1.4
-W0434,Barnbruch bei Osloß,Barnbruch,Osloß,1.4
-W0435,Hagenwald bei Osloß,Hagenwald,Osloß,0.9
-W0408,Barnbruch bei Weyhausen,Barnbruch,Weyhausen,1.8
+W0434,Wald bei Osloß,,Osloß,1.4
+W0435,Wald bei Osloß,,Osloß,0.9
+W0408,Wald bei Weyhausen,,Weyhausen,1.8
 W1481,Wald bei Warmenau,,Warmenau,0.9
 W0436,Wald bei Brackstedt,,Brackstedt,1.4
-W0437,Dachsbau bei Tiergartenbreite,Dachsbau,Tiergartenbreite,1.7
+W0437,Wald bei Tiergartenbreite,,Tiergartenbreite,1.7
 W0438,Wald bei Wendschott,,Wendschott,1.2
 W0439,Wald bei Wippermühle,,Wippermühle,1.1
 W0440,Wald bei Wippermühle,,Wippermühle,1.9
@@ -827,9 +827,9 @@ W1483,Wald bei Bergfriede,,Bergfriede,0.6
 W0444,Wald bei Kolonie Kramer,,Kolonie Kramer,0.6
 W0445,Wald bei Miesterhorst,,Miesterhorst,0.7
 W1484,Wald bei Miesterhorst,,Miesterhorst,0.7
-W0446,Herrschaft bei Krausenburg,Herrschaft,Krausenburg,2.4
+W0446,Wald bei Krausenburg,,Krausenburg,2.4
 W0447,Wald bei Dahrenhorst,,Dahrenhorst,1.9
-W0448,Herrschaft bei Uetze,Herrschaft,Uetze,2.2
+W0448,Wald bei Uetze,,Uetze,2.2
 W1485,Wald bei Uetze,,Uetze,1.0
 W0449,Wald bei Kreuzkrug,,Kreuzkrug,1.3
 W0450,Wald bei Warmse,,Warmse,0.3
@@ -906,7 +906,7 @@ W1534,Wald bei Bröckel,,Bröckel,1.3
 W0473,Wald bei Wiedenrode,,Wiedenrode,1.7
 W0474,Wald bei Wiedenrode,,Wiedenrode,1.5
 W0475,Wald bei Siedersdamm,,Siedersdamm,0.6
-W1535,Forst Harsebruch bei Hünenberg,Forst Harsebruch,Hünenberg,1.1
+W1535,Wald bei Hünenberg,,Hünenberg,1.1
 W1536,Wald bei Müden (Aller),,Müden (Aller),1.9
 W0476,Wald bei Ettenbüttel,,Ettenbüttel,1.1
 W0477,Wald bei Gilde,,Gilde,0.7
@@ -947,7 +947,7 @@ W1547,Wald bei Müden (Aller),,Müden (Aller),0.8
 W0502,Wald bei Gerstenbüttel,,Gerstenbüttel,1.5
 W0503,Wald bei Bokelberge,,Bokelberge,1.3
 W0504,Wald bei Wilsche,,Wilsche,2.1
-W1548,Ringelah bei Wilsche,Ringelah,Wilsche,2.3
+W1548,Wald bei Wilsche,,Wilsche,2.3
 W0505,Wald bei Kästorf,,Kästorf,1.4
 W0506,Wald bei Gamsen,,Gamsen,1.3
 W0507,Wald bei Triangel,,Triangel,1.4
@@ -982,7 +982,7 @@ W0547,Wald bei Nienhof,,Nienhof,1.1
 W1557,Wald bei Flettmar Bahnhof,,Flettmar Bahnhof,1.5
 W0548,Wald bei Hahnenhorn,,Hahnenhorn,0.6
 W0549,Wald bei Hahnenhorn,,Hahnenhorn,1.5
-W0528,Ringelah bei Langenklint,Ringelah,Langenklint,1.6
+W0528,Wald bei Langenklint,,Langenklint,1.6
 W0529,Wald bei Ringelah,,Ringelah,2.4
 W0530,Wald bei Kästorf,,Kästorf,1.5
 W0531,Wald bei Kästorf,,Kästorf,1.4
@@ -995,7 +995,7 @@ W0537,Wald bei Grußendorf,,Grußendorf,1.8
 W0538,Wald bei Barwedel,,Barwedel,2.4
 W0539,Wald bei Barwedel,,Barwedel,1.5
 W0540,Wald bei Tiddische,,Tiddische,2.2
-W0562,Ehraer Holz bei Bergfeld,Ehraer Holz,Bergfeld,1.3
+W0562,Wald bei Bergfeld,,Bergfeld,1.3
 W0563,Wald bei Holzmühle,,Holzmühle,1.2
 W0564,Wald bei Croya,,Croya,0.9
 W0541,Wald bei Croya,,Croya,2.0
@@ -1019,8 +1019,8 @@ W0574,Wald bei Hohne,,Hohne,1.8
 W0575,Wald bei Hohne,,Hohne,2.2
 W0576,Wald bei Ummern,,Ummern,2.1
 W0577,Wald bei Ummern,,Ummern,2.5
-W0578,Brutloh bei Ringelah,Brutloh,Ringelah,2.6
-W0579,Wald bei Ringelah,,Ringelah,2.2
+W0578,Wald bei Hammerstein-Siedlung,,Hammerstein-Siedlung,2.1
+W0579,Wald bei Hammerstein-Siedlung,,Hammerstein-Siedlung,2.1
 W0580,Wald bei Wesendorf,,Wesendorf,2.3
 W0581,Wald bei Westerholz,,Westerholz,3.0
 W0582,Wald bei Charlottenhof,,Charlottenhof,3.6
@@ -1031,7 +1031,7 @@ W0586,Wald bei Zollhaussiedlung,,Zollhaussiedlung,2.0
 W0587,Wald bei Lessien,,Lessien,0.5
 W0588,Wald bei Ehra,,Ehra,0.7
 W0589,Wald bei Ehra,,Ehra,1.4
-W0590,Ehraer Holz bei Holzmühle,Ehraer Holz,Holzmühle,1.7
+W0590,Wald bei Holzmühle,,Holzmühle,1.7
 W0591,Wald bei Tülau,,Tülau,0.7
 W0592,Wald bei Tülau,,Tülau,1.4
 W0593,Wald bei Zicherie,,Zicherie,0.7
@@ -1055,8 +1055,8 @@ W1571,Wald bei Hohne,,Hohne,1.7
 W1572,Wald bei Hohne,,Hohne,0.8
 W1573,Wald bei Ummern,,Ummern,1.9
 W0603,Wald bei Ummern,,Ummern,1.4
-W0604,Brutloh bei Wichelnförth,Brutloh,Wichelnförth,2.0
-W0605,Wald bei Wesendorf,,Wesendorf,1.5
+W0604,Wald bei Hammerstein-Siedlung,,Hammerstein-Siedlung,1.0
+W0605,Wald bei Hammerstein-Siedlung,,Hammerstein-Siedlung,1.0
 W0606,Wald bei Wesendorf,,Wesendorf,0.6
 W0607,Wald bei Westerholz,,Westerholz,1.2
 W1574,Wald bei Westerholz,,Westerholz,2.6
@@ -1078,12 +1078,12 @@ W0619,Wald bei Schwarzendamm,,Schwarzendamm,1.2
 W1745,Wald bei Neuferchau,,Neuferchau,0.7
 W1746,Wald bei Kusey,,Kusey,0.4
 W0620,Wald bei Kusey,,Kusey,2.7
-W1747,Klötzer Forst bei Wenze,Klötzer Forst,Wenze,2.2
+W1747,Wald bei Wenze,,Wenze,2.2
 W1748,Wald bei Altencelle,,Altencelle,0.1
 W1749,Wald bei Osterloh,,Osterloh,0.5
 W1750,Wald bei Osterloh,,Osterloh,2.3
-W1751,Allerheide bei Oppershausen,Allerheide,Oppershausen,1.3
-W1752,Klosterforst Wienhausen bei Oppershausen,Klosterforst Wienhausen,Oppershausen,2.3
+W1751,Wald bei Oppershausen,,Oppershausen,1.3
+W1752,Wald bei Oppershausen,,Oppershausen,2.3
 W1753,Wald bei Ahnsbeck,,Ahnsbeck,2.0
 W1754,Wald bei Ahnsbeck,,Ahnsbeck,1.3
 W1755,Wald bei Helmerkamp,,Helmerkamp,0.9
@@ -1092,7 +1092,7 @@ W1757,Wald bei Spechtshorn,,Spechtshorn,0.2
 W1758,Wald bei Ummern,,Ummern,1.8
 W1759,Wald bei Ummern,,Ummern,1.0
 W1760,Wald bei Pollhöfen,,Pollhöfen,0.9
-W1761,Wald bei Wichelnförth,,Wichelnförth,1.4
+W1761,Wald bei Hammerstein-Siedlung,,Hammerstein-Siedlung,1.1
 W1762,Wald bei Wesendorf,,Wesendorf,0.8
 W1763,Wald bei Westerholz,,Westerholz,0.3
 W1764,Wald bei Wahrenholz,,Wahrenholz,1.7
@@ -1113,12 +1113,12 @@ W1768,Wald bei Rappin,,Rappin,1.4
 W1769,Wald bei Altferchau,,Altferchau,0.4
 W1770,Wald bei Moor,,Moor,1.2
 W1612,Wald bei Kusey,,Kusey,2.0
-W1613,Klötzer Forst bei Kusey,Klötzer Forst,Kusey,2.5
-W1614,Klötzer Forst bei Kusey,Klötzer Forst,Kusey,4.0
-W0621,Finkenherd bei Altencelle,Finkenherd,Altencelle,1.3
+W1613,Wald bei Kusey,,Kusey,2.5
+W1614,Wald bei Kusey,,Kusey,4.0
+W0621,Wald bei Altencelle,,Altencelle,1.3
 W0622,Wald bei Osterloh,,Osterloh,1.9
 W0623,Wald bei Oppershausen,,Oppershausen,2.6
-W0624,Allerheide bei Lachendorf,Allerheide,Lachendorf,2.4
+W0624,Wald bei Lachendorf,,Lachendorf,2.4
 W0625,Wald bei Lachendorf,,Lachendorf,1.5
 W0626,Wald bei Ahnsbeck,,Ahnsbeck,0.6
 W0627,Wald bei Ahnsbeck,,Ahnsbeck,1.4
@@ -1128,8 +1128,8 @@ W0629,Wald bei Spechtshorn,,Spechtshorn,1.4
 W0630,Wald bei Ummern,,Ummern,2.0
 W1616,Wald bei Texas,,Texas,1.9
 W0631,Wald bei Wichelnförth,,Wichelnförth,0.0
-W0632,Wald bei Sandschellenberg,,Sandschellenberg,1.5
-W0633,Wald bei Sandschellenberg,,Sandschellenberg,1.0
+W0632,Wald bei Teichgut (Sandschellenberg),,Teichgut (Sandschellenberg),1.5
+W0633,Wald bei Hasenberg,,Hasenberg,0.4
 W1617,Wald bei Weißenberge,,Weißenberge,0.6
 W0634,Wald bei Wahrenholz,,Wahrenholz,0.4
 W0635,Wald bei Wahrenholz,,Wahrenholz,2.1
@@ -1149,11 +1149,11 @@ W0646,Wald bei Altferchau,,Altferchau,1.1
 W0647,Wald bei Dönitz,,Dönitz,0.4
 W0648,Wald bei Moor,,Moor,1.4
 W0649,Wald bei Immekath,,Immekath,2.6
-W0650,Klötzer Forst bei Kusey,Klötzer Forst,Kusey,3.8
+W0650,Wald bei Kusey,,Kusey,3.8
 W1620,Wald bei Nesenitz,,Nesenitz,3.5
 W0652,Wald bei Lachtehausen,,Lachtehausen,0.4
-W0653,Allerheide bei Lachtehausen,Allerheide,Lachtehausen,2.2
-W0654,Allerheide bei Gockenholz,Allerheide,Gockenholz,2.9
+W0653,Wald bei Lachtehausen,,Lachtehausen,2.2
+W0654,Wald bei Gockenholz,,Gockenholz,2.9
 W0655,Wald bei Gockenholz,,Gockenholz,1.7
 W0656,Wald bei Lachendorf,,Lachendorf,0.5
 W0657,Wald bei Ahnsbeck,,Ahnsbeck,1.9
@@ -1164,8 +1164,8 @@ W0659,Wald bei Schmarloh,,Schmarloh,1.2
 W0660,Wald bei Texas,,Texas,0.5
 W0661,Wald bei Texas,,Texas,2.2
 W0662,Wald bei Wickeloh,,Wickeloh,1.7
-W0663,Wald bei Sandschellenberg,,Sandschellenberg,1.8
-W1623,Wald bei Teichgut,,Teichgut,0.5
+W0663,Wald bei Teichgut,,Teichgut,1.6
+W1623,Wald bei Teichgut (Küsterberg),,Teichgut (Küsterberg),0.5
 W0664,Wald bei Weißenberge,,Weißenberge,0.8
 W0665,Wald bei Betzhorn,,Betzhorn,0.6
 W0666,Wald bei Schönewörde,,Schönewörde,0.6
@@ -1205,7 +1205,7 @@ W0719,Wald bei Langwedel,,Langwedel,1.8
 W0720,Wald bei Oerrel,,Oerrel,2.6
 W0721,Wald bei Oerrel,,Oerrel,3.1
 W0722,Wald bei Vorhop,,Vorhop,2.9
-W0723,Kiekenbruch bei Vorhop,Kiekenbruch,Vorhop,2.2
+W0723,Wald bei Vorhop,,Vorhop,2.2
 W0724,Wald bei Knesebeck,,Knesebeck,2.0
 W0725,Wald bei Knesebeck,,Knesebeck,2.2
 W0726,Wald bei Lütjemühle,,Lütjemühle,2.5
@@ -1234,14 +1234,14 @@ W1631,Wald bei Luttern,,Luttern,1.1
 W0747,Wald bei Metzingen,,Metzingen,0.7
 W0748,Wald bei Steinhorst,,Steinhorst,1.0
 W0749,Wald bei Steinhorst,,Steinhorst,1.7
-W0750,Wald bei Mahrenholz,,Mahrenholz,1.9
-W0751,Wald bei Steinkamp,,Steinkamp,1.7
+W0750,Wald bei Kleinbahnhof Groß Oesingen-Mahrenholz,,Kleinbahnhof Groß Oesingen-Mahrenholz,1.4
+W0751,Wald bei Kleinbahnhof Groß Oesingen-Mahrenholz,,Kleinbahnhof Groß Oesingen-Mahrenholz,1.0
 W0752,Wald bei Lingwedel,,Lingwedel,0.6
 W1632,Wald bei Langwedel,,Langwedel,1.0
 W0753,Wald bei Oerrel,,Oerrel,0.6
 W0754,Wald bei Oerrel,,Oerrel,1.9
-W0755,Emmer Leu bei Junkernholz,Emmer Leu,Junkernholz,1.8
-W0756,Kiekenbruch bei Junkernholz,Kiekenbruch,Junkernholz,0.6
+W0755,Wald bei Junkernholz,,Junkernholz,1.8
+W0756,Wald bei Junkernholz,,Junkernholz,0.6
 W0757,Wald bei Knesebeck,,Knesebeck,0.8
 W0758,Wald bei Krummühle,,Krummühle,0.9
 W0759,Wald bei Lütjemühle,,Lütjemühle,0.6
@@ -1278,7 +1278,7 @@ W0782,Wald bei Oerrel,,Oerrel,1.4
 W0783,Wald bei Emmen,,Emmen,2.2
 W0784,Wald bei Emmen,,Emmen,1.9
 W0785,Wald bei Wunderbüttel,,Wunderbüttel,0.5
-W1641,Wald bei Wunderbüttel,,Wunderbüttel,1.0
+W1641,Wald bei Friedrichsmühle,,Friedrichsmühle,0.8
 W0786,Wald bei Eutzen,,Eutzen,1.0
 W1642,Wald bei Hagen,,Hagen,0.4
 W1643,Wald bei Mahnburg,,Mahnburg,0.5
@@ -1310,7 +1310,7 @@ W1658,Wald bei Lüsche,,Lüsche,2.0
 W1659,Wald bei Großer Kain,,Großer Kain,0.6
 W1660,Wald bei Dedelstorf,,Dedelstorf,0.8
 W1661,Wald bei Repke,,Repke,0.4
-W1662,Nepke bei Repke,Nepke,Repke,1.7
+W1662,Wald bei Repke,,Repke,1.7
 W1663,Wald bei Emmen,,Emmen,2.4
 W1664,Wald bei Emmen,,Emmen,0.8
 W1665,Wald bei Wunderbüttel,,Wunderbüttel,1.8
@@ -1346,9 +1346,9 @@ W0809,Wald bei Lüsche,,Lüsche,1.3
 W0810,Wald bei Großer Kain,,Großer Kain,1.3
 W0811,Wald bei Repke,,Repke,1.6
 W0812,Wald bei Repke,,Repke,1.1
-W0813,Nepke bei Weddersehl,Nepke,Weddersehl,2.5
+W0813,Wald bei Weddersehl,,Weddersehl,2.5
 W0814,Wald bei Emmen,,Emmen,1.3
-W1683,Hagen bei Isenhagen,Hagen,Isenhagen,0.3
+W1683,Wald bei Isenhagen,,Isenhagen,0.3
 W0815,Wald bei Mannhagen,,Mannhagen,1.6
 W0816,Wald bei Hahnenberg,,Hahnenberg,0.8
 W1684,Wald bei Glüsingen,,Glüsingen,0.4
@@ -1417,11 +1417,11 @@ W0897,Wald bei Blickwedel,,Blickwedel,1.1
 W0898,Wald bei Hagen,,Hagen,0.2
 W0899,Wald bei Sprakensehl,,Sprakensehl,0.8
 W0900,Wald bei Sprakensehl,,Sprakensehl,1.4
-W0901,Maseler Wald bei Masel,Maseler Wald,Masel,2.8
+W0901,Wald bei Masel,,Masel,2.8
 W0902,Wald bei Bottendorf,,Bottendorf,1.1
 W0903,Wald bei Schweimke,,Schweimke,0.8
 W0904,Wald bei Wierstorf,,Wierstorf,1.6
-W0905,Lüderbruch bei Gannerwinkel,Lüderbruch,Gannerwinkel,1.9
+W0905,Wald bei Gannerwinkel,,Gannerwinkel,1.9
 W0906,Wald bei Gannerwinkel,,Gannerwinkel,0.5
 W0907,Wald bei Stöcken,,Stöcken,0.7
 W0908,Wald bei Lüben,,Lüben,0.5
@@ -1444,7 +1444,7 @@ W0921,Wald bei Queloh,,Queloh,1.4
 W0922,Wald bei Queloh,,Queloh,0.7
 W0923,Wald bei Queloh,,Queloh,2.6
 W0924,Wald bei Lohe,,Lohe,2.6
-W0925,Lüß bei Lohe,Lüß,Lohe,0.8
+W0925,Wald bei Lohe,,Lohe,0.8
 W0926,Wald bei Dalle,,Dalle,1.0
 W0927,Wald bei Dalle,,Dalle,2.5
 W0928,Wald bei Weyhausen,,Weyhausen,1.4
@@ -1453,8 +1453,8 @@ W0930,Wald bei Weyhausen,,Weyhausen,2.6
 W0931,Wald bei Hagen,,Hagen,2.0
 W0932,Wald bei Behren,,Behren,1.0
 W0933,Wald bei Behren,,Behren,1.0
-W0934,Maseler Wald bei Bokel,Maseler Wald,Bokel,2.3
-W0935,Maseler Wald bei Schweimke,Maseler Wald,Schweimke,2.8
+W0934,Wald bei Bokel,,Bokel,2.3
+W0935,Wald bei Schweimke,,Schweimke,2.8
 W0936,Wald bei Schweimke,,Schweimke,2.5
 W1704,Wald bei Schweimke,,Schweimke,2.2
 W0937,Wald bei Lüder,,Lüder,2.4
@@ -1466,7 +1466,7 @@ W0942,Wald bei Höddelsen,,Höddelsen,1.4
 W0943,Wald bei Dülseberg,,Dülseberg,0.1
 W0944,Wald bei Eickhorst,,Eickhorst,0.3
 W0945,Wald bei Dähre,,Dähre,1.4
-W0946,Horster Holz bei Nipkendey,Horster Holz,Nipkendey,0.9
+W0946,Wald bei Nipkendey,,Nipkendey,0.9
 W0947,Wald bei Hilmsen,,Hilmsen,1.1
 W1705,Wald bei Hilmsen,,Hilmsen,0.9
 W0948,Wald bei Wallstawe,,Wallstawe,0.9
@@ -1491,7 +1491,7 @@ W1782,Wald bei Zittel,,Zittel,1.8
 W1708,Wald bei Behren,,Behren,0.9
 W1709,Wald bei Günne,,Günne,1.3
 W1710,Wald bei Bokel,,Bokel,1.5
-W1711,Wierener Berge bei Bokel,Wierener Berge,Bokel,3.1
+W1711,Wald bei Bokel,,Bokel,3.1
 W1712,Wald bei Röhrsen,,Röhrsen,1.6
 W1713,Wald bei Röhrsen,,Röhrsen,1.7
 W1714,Wald bei Lüder,,Lüder,1.5
@@ -1516,7 +1516,7 @@ W0955,Wald bei Hof Hiester,,Hof Hiester,2.6
 W0956,Wald bei Queloh,,Queloh,2.5
 W0957,Wald bei Lutterloh,,Lutterloh,2.5
 W0958,Wald bei Siedenholz,,Siedenholz,0.8
-W0959,Lüß bei Siedenholz,Lüß,Siedenholz,1.4
+W0959,Wald bei Siedenholz,,Siedenholz,1.4
 W0960,Wald bei Dalle,,Dalle,2.9
 W0961,Wald bei Weyhausen,,Weyhausen,3.7
 W0962,Wald bei Weyhausen,,Weyhausen,2.1
@@ -1526,10 +1526,10 @@ W0965,Wald bei Zittel,,Zittel,2.2
 W0966,Wald bei Zittel,,Zittel,0.5
 W0967,Wald bei Günne,,Günne,0.9
 W0968,Wald bei Bokel,,Bokel,0.3
-W0969,Maseler Wald bei Bokel,Maseler Wald,Bokel,1.8
-W0970,Wierener Berge bei Röhrsen,Wierener Berge,Röhrsen,1.9
-W0971,Wierener Berge bei Röhrsen,Wierener Berge,Röhrsen,0.3
-W0972,Wierener Berge bei Lüder,Wierener Berge,Lüder,0.5
+W0969,Wald bei Bokel,,Bokel,1.8
+W0970,Wald bei Röhrsen,,Röhrsen,1.9
+W0971,Wald bei Röhrsen,,Röhrsen,0.3
+W0972,Wald bei Lüder,,Lüder,0.5
 W0973,Wald bei Neu Lüder,,Neu Lüder,0.8
 W0974,Wald bei Langenbrügge,,Langenbrügge,1.1
 W0975,Wald bei Schmölau,,Schmölau,2.3
@@ -1553,7 +1553,7 @@ W0988,Wald bei Lutterloh,,Lutterloh,1.5
 W0989,Wald bei Lutterloh,,Lutterloh,0.7
 W0990,Wald bei Neu Lutterloh,,Neu Lutterloh,0.5
 W0991,Wald bei Waldhäuser,,Waldhäuser,1.5
-W0992,Lüß bei Unterlüß,Lüß,Unterlüß,1.3
+W0992,Wald bei Unterlüß,,Unterlüß,1.3
 W0993,Wald bei Unterlüß,,Unterlüß,2.8
 W0994,Wald bei Weyhausen,,Weyhausen,3.9
 W0995,Wald bei Weyhausen,,Weyhausen,3.7
@@ -1563,7 +1563,7 @@ W0998,Wald bei Breitenhees,,Breitenhees,1.0
 W0999,Wald bei Günne,,Günne,1.9
 W1000,Wald bei Bokel,,Bokel,1.8
 W1001,Wald bei Bokel,,Bokel,2.5
-W1002,Wierener Berge bei Reinstorf,Wierener Berge,Reinstorf,1.9
+W1002,Wald bei Reinstorf,,Reinstorf,1.9
 W1003,Wald bei Reinstorf,,Reinstorf,0.2
 W1735,Wald bei Reinstorf,,Reinstorf,1.4
 W1736,Wald bei Bad Bodenteich,,Bad Bodenteich,0.3
@@ -1599,9 +1599,9 @@ W1029,Wald bei Breitenhees,,Breitenhees,1.0
 W1030,Wald bei Breitenhees,,Breitenhees,2.1
 W1031,Wald bei Nienwohlde,,Nienwohlde,1.6
 W1032,Wald bei Nienwohlde,,Nienwohlde,0.9
-W1033,Wierener Berge bei Reinstorf,Wierener Berge,Reinstorf,2.6
-W1034,Wierener Berge bei Reinstorf,Wierener Berge,Reinstorf,1.8
-W1035,Wierener Berge bei Häcklingen,Wierener Berge,Häcklingen,0.9
+W1033,Wald bei Reinstorf,,Reinstorf,2.6
+W1034,Wald bei Reinstorf,,Reinstorf,1.8
+W1035,Wald bei Häcklingen,,Häcklingen,0.9
 W1036,Wald bei Schostorf,,Schostorf,1.2
 W1037,Wald bei Schafwedel,,Schafwedel,1.5
 W1038,Wald bei Schmölau,,Schmölau,2.6
@@ -1619,3 +1619,15 @@ W1786,Wald bei Bombeck,,Bombeck,1.5
 W1787,Wald bei Groß Gerstedt,,Groß Gerstedt,1.0
 W1788,Wald bei Böddenstedt,,Böddenstedt,0.8
 W1789,Wald bei Böddenstedt,,Böddenstedt,2.0
+W1790,Wald bei Weißes Moor,,Weißes Moor,3.5
+W1791,Wald bei Wiswedel,,Wiswedel,1.0
+W1792,Wald bei Benitz,,Benitz,0.5
+W1793,Wald bei Nesenitz,,Nesenitz,3.5
+W1794,Wald bei Jarnsen,,Jarnsen,1.0
+W1795,Wald bei Bunkenburg,,Bunkenburg,0.6
+W1796,Wald bei Teichgut (Küsterberg),,Teichgut (Küsterberg),0.5
+W1797,Wald bei Nettgau,,Nettgau,1.7
+W1798,Wald bei Nettgau,,Nettgau,1.0
+W1799,Wald bei Neulingsmühle,,Neulingsmühle,1.1
+W1800,Wald bei Nesenitz,,Nesenitz,2.3
+W1801,Wald bei Gockenholz,,Gockenholz,1.5

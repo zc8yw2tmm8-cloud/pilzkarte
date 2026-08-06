@@ -179,8 +179,12 @@ def main():
 
         zellen.append({
             "id": ort,
-            "lat": round(lat, 5),
-            "lon": round(lon, 5),
+            # NICHT runden. Fuenf Stellen sind zwar auf 1 m genau,
+            # aber ein Punkt dicht an einer Feldgrenze kippt dadurch
+            # ins Nachbarfeld - auf der Karte sieht man dann ein Loch
+            # und daneben zwei Kacheln uebereinander.
+            "lat": lat,
+            "lon": lon,
             "titel": titel,
             "hoehe": None if hoehen.get(ort) is None
                      else round(hoehen[ort]),

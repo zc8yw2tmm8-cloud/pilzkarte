@@ -45,20 +45,35 @@ def gitter():
     return schritt_lat, schritt_lon
 
 
-def hoechste_nummer(punkte):
+def hoechste_nummer(punkte=None):
+    """Hoechste Kennung aus waldpunkte.csv - dorthin wird angehaengt."""
     hoechste = -1
-    for p in punkte:
-        ziffern = "".join(c for c in p["id"] if c.isdigit())
-        if ziffern:
-            hoechste = max(hoechste, int(ziffern))
+    with open(DATEI, "r", encoding="utf-8") as f:
+        for z in csv.DictReader(f):
+            ziffern = "".join(c for c in z["id"] if c.isdigit())
+            if ziffern:
+                hoechste = max(hoechste, int(ziffern))
     return hoechste
 
 
 def main():
     schritt_lat, schritt_lon = gitter()
 
-    with open(DATEI, "r", encoding="utf-8") as f:
-        punkte = [dict(z) for z in csv.DictReader(f)]
+    # Koordinaten aus daten.json nehmen, wenn vorhanden - die Karte
+    # rechnet mit genau diesen Werten. waldpunkte.csv kann minimal
+    # abweichen, und schon das reicht, um ein Feld zu verfehlen.
+    punkte = None
+    if os.path.exists(DATEN):
+        import json
+        with open(DATEN, "r", encoding="utf-8") as f:
+            zellen = json.load(f)["zellen"]
+        punkte = [{"id": z["id"], "lat": z["lat"], "lon": z["lon"]}
+                  for z in zellen]
+        print(f"{len(punkte)} Zellen aus daten.json\n")
+
+    if punkte is None:
+        with open(DATEI, "r", encoding="utf-8") as f:
+            punkte = [dict(z) for z in csv.DictReader(f)]
 
     # Felder so bestimmen, wie es die Karte tut
     belegt = {}
