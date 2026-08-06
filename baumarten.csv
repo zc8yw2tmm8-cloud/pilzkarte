@@ -888,7 +888,7 @@ W1042,52.8428,10.8975,Oak (Quercus spp),0.399,0.043,29893,Oak (Quercus spp):0.39
 W1043,52.8428,10.9271,Alder (Alnus spp),0.527,0.054,35800,Alder (Alnus spp):0.527;Oak (Quercus spp):0.391;Beech (Fagus sylvatica):0.028;Other deciduous – low life expectancy:0.026;Birch (Betula spp):0.023
 W1044,52.8428,10.9566,Pine (Pinus spp),0.345,0.245,35800,Pine (Pinus spp):0.345;Oak (Quercus spp):0.25;Alder (Alnus spp):0.184;Other deciduous – low life expectancy:0.086;Birch (Betula spp):0.079;Beech (Fagus sylvatica):0.028
 W1045,52.8428,10.9861,Pine (Pinus spp),0.386,0.146,35800,Pine (Pinus spp):0.386;Oak (Quercus spp):0.341;Beech (Fagus sylvatica):0.079;Other deciduous – low life expectancy:0.057;Birch (Betula spp):0.052;Larch (Larix spp):0.042
-W1046,52.05901,10.2626,Pine (Pinus spp),0.653,0.147,75800,Pine (Pinus spp):0.653;Oak (Quercus spp):0.13;Other deciduous – low life expectancy:0.081;Birch (Betula spp):0.033;Larch (Larix spp):0.028;Douglas fir (Pseudotsuga menziesii):0.025
+W1046,52.05901,10.2626,Oak (Quercus spp),0.335,0.072,40000,Oak (Quercus spp):0.335;Other deciduous – low life expectancy:0.18;Larch (Larix spp):0.108;Pine (Pinus spp):0.096;Beech (Fagus sylvatica):0.087;Douglas fir (Pseudotsuga menziesii):0.079
 W1047,52.05901,10.29217,Oak (Quercus spp),0.559,0.003,40000,Oak (Quercus spp):0.559;Other deciduous – low life expectancy:0.184;Beech (Fagus sylvatica):0.103;Alder (Alnus spp):0.066;Spruce (Picea spp):0.037
 W1048,52.05901,10.43999,Oak (Quercus spp),0.731,0.041,39800,Oak (Quercus spp):0.731;Beech (Fagus sylvatica):0.225;Other deciduous – low life expectancy:0.031
 W1049,52.05901,10.46955,Oak (Quercus spp),0.69,0.085,40000,Oak (Quercus spp):0.69;Beech (Fagus sylvatica):0.121;Other deciduous – low life expectancy:0.097;Larch (Larix spp):0.025;Douglas fir (Pseudotsuga menziesii):0.024
@@ -1408,30 +1408,30 @@ W1571,52.58153,10.3513,Pine (Pinus spp),0.437,0.209,35200,Pine (Pinus spp):0.437
 W1572,52.58153,10.38086,Oak (Quercus spp),0.887,0.023,40000,Oak (Quercus spp):0.887;Beech (Fagus sylvatica):0.033;Alder (Alnus spp):0.027
 W1573,52.58153,10.41042,Oak (Quercus spp),0.231,0.304,39800,Oak (Quercus spp):0.231;Spruce (Picea spp):0.211;Alder (Alnus spp):0.181;Pine (Pinus spp):0.114;Douglas fir (Pseudotsuga menziesii):0.1;Larch (Larix spp):0.069
 W1574,52.58153,10.58781,Pine (Pinus spp),0.558,0.381,40000,Pine (Pinus spp):0.558;Douglas fir (Pseudotsuga menziesii):0.116;Spruce (Picea spp):0.1;Larch (Larix spp):0.077;Birch (Betula spp):0.06;Oak (Quercus spp):0.051
-W1575,52.07703,10.29217,Pine (Pinus spp),0.356,0.006,65600,Pine (Pinus spp):0.356;Beech (Fagus sylvatica):0.235;Oak (Quercus spp):0.205;Birch (Betula spp):0.111;Other deciduous – low life expectancy:0.037;Larch (Larix spp):0.027
-W1576,52.07703,10.61737,Pine (Pinus spp),0.828,0.013,70400,Pine (Pinus spp):0.828;Birch (Betula spp):0.092;Larch (Larix spp):0.037;Oak (Quercus spp):0.035
-W1577,52.07703,10.79476,Oak (Quercus spp),0.557,0.035,80000,Oak (Quercus spp):0.557;Pine (Pinus spp):0.252;Birch (Betula spp):0.068;Other deciduous – low life expectancy:0.043;Larch (Larix spp):0.034;Alder (Alnus spp):0.029
-W1578,52.09505,10.3513,Beech (Fagus sylvatica),0.499,0.355,75200,Beech (Fagus sylvatica):0.499;Oak (Quercus spp):0.35;Spruce (Picea spp):0.056;Larch (Larix spp):0.033;Douglas fir (Pseudotsuga menziesii):0.027
-W1579,52.09505,10.79476,Oak (Quercus spp),0.605,0.004,79800,Oak (Quercus spp):0.605;Other deciduous – low life expectancy:0.33;Larch (Larix spp):0.029
-W1580,52.09505,10.88345,Pine (Pinus spp),0.895,0.363,46400,Pine (Pinus spp):0.895;Oak (Quercus spp):0.042;Larch (Larix spp):0.037
-W1581,52.09505,10.94258,Pine (Pinus spp),0.52,0.009,79800,Pine (Pinus spp):0.52;Birch (Betula spp):0.239;Oak (Quercus spp):0.139;Beech (Fagus sylvatica):0.055;Other deciduous – low life expectancy:0.039
-W1582,52.11306,10.64694,Pine (Pinus spp),0.807,0.175,80000,Pine (Pinus spp):0.807;Birch (Betula spp):0.077;Oak (Quercus spp):0.073;Larch (Larix spp):0.025
-W1583,52.13108,10.61737,Pine (Pinus spp),0.631,0.075,70400,Pine (Pinus spp):0.631;Birch (Betula spp):0.091;Beech (Fagus sylvatica):0.071;Larch (Larix spp):0.062;Douglas fir (Pseudotsuga menziesii):0.054;Oak (Quercus spp):0.045
-W1584,52.13108,10.76519,Pine (Pinus spp),0.951,0.315,80000,Pine (Pinus spp):0.951
-W1585,52.16712,10.11478,Pine (Pinus spp),0.881,0.254,79800,Pine (Pinus spp):0.881;Birch (Betula spp):0.068
-W1586,52.16712,10.6765,Pine (Pinus spp),0.508,0.076,80000,Pine (Pinus spp):0.508;Alder (Alnus spp):0.23;Oak (Quercus spp):0.126;Birch (Betula spp):0.105
-W1587,52.16712,10.73563,Oak (Quercus spp),0.536,0.03,80000,Oak (Quercus spp):0.536;Birch (Betula spp):0.123;Pine (Pinus spp):0.086;Other deciduous – low life expectancy:0.065;Beech (Fagus sylvatica):0.051;Larch (Larix spp):0.033
-W1588,52.18514,10.17391,Oak (Quercus spp),0.368,0.127,80000,Oak (Quercus spp):0.368;Pine (Pinus spp):0.167;Beech (Fagus sylvatica):0.158;Birch (Betula spp):0.131;Larch (Larix spp):0.06;Douglas fir (Pseudotsuga menziesii):0.045
-W1589,52.18514,10.88345,Oak (Quercus spp),0.341,0.193,60800,Oak (Quercus spp):0.341;Pine (Pinus spp):0.205;Birch (Betula spp):0.142;Larch (Larix spp):0.113;Spruce (Picea spp):0.086;Beech (Fagus sylvatica):0.064
-W1590,52.18514,10.97214,Oak (Quercus spp),0.416,0.208,80000,Oak (Quercus spp):0.416;Beech (Fagus sylvatica):0.376;Pine (Pinus spp):0.075;Birch (Betula spp):0.04;Larch (Larix spp):0.035;Other deciduous - high life expectancy:0.02
-W1591,52.20315,10.20347,Pine (Pinus spp),0.46,0.146,79800,Pine (Pinus spp):0.46;Douglas fir (Pseudotsuga menziesii):0.169;Oak (Quercus spp):0.115;Alder (Alnus spp):0.097;Larch (Larix spp):0.081;Spruce (Picea spp):0.038
-W1592,52.20315,10.73563,Beech (Fagus sylvatica),0.84,0.451,79800,Beech (Fagus sylvatica):0.84;Oak (Quercus spp):0.09;Larch (Larix spp):0.022
-W1593,52.20315,10.79476,Beech (Fagus sylvatica),0.493,0.57,80000,Beech (Fagus sylvatica):0.493;Oak (Quercus spp):0.235;Larch (Larix spp):0.087;Pine (Pinus spp):0.076;Spruce (Picea spp):0.067;Birch (Betula spp):0.021
-W1594,52.20315,10.82432,Beech (Fagus sylvatica),0.356,0.69,80000,Beech (Fagus sylvatica):0.356;Pine (Pinus spp):0.281;Oak (Quercus spp):0.198;Larch (Larix spp):0.067;Spruce (Picea spp):0.048;Birch (Betula spp):0.026
-W1595,52.20315,10.85389,Pine (Pinus spp),0.448,0.128,80000,Pine (Pinus spp):0.448;Beech (Fagus sylvatica):0.217;Oak (Quercus spp):0.13;Birch (Betula spp):0.064;Spruce (Picea spp):0.045;Douglas fir (Pseudotsuga menziesii):0.032
-W1596,52.22117,10.11478,Oak (Quercus spp),0.365,0.051,79800,Oak (Quercus spp):0.365;Pine (Pinus spp):0.303;Birch (Betula spp):0.189;Alder (Alnus spp):0.064;Larch (Larix spp):0.041;Other deciduous – low life expectancy:0.02
-W1597,52.22117,10.17391,Oak (Quercus spp),0.405,0.019,80000,Oak (Quercus spp):0.405;Pine (Pinus spp):0.335;Douglas fir (Pseudotsuga menziesii):0.071;Other deciduous – low life expectancy:0.063;Birch (Betula spp):0.045;Alder (Alnus spp):0.037
-W1598,52.22117,10.85389,Pine (Pinus spp),0.421,0.233,70400,Pine (Pinus spp):0.421;Oak (Quercus spp):0.22;Larch (Larix spp):0.114;Birch (Betula spp):0.113;Douglas fir (Pseudotsuga menziesii):0.06;Alder (Alnus spp):0.044
+W1575,52.07703,10.29217,Beech (Fagus sylvatica),0.543,0.004,40000,Beech (Fagus sylvatica):0.543;Oak (Quercus spp):0.297;Other deciduous – low life expectancy:0.086;Other deciduous - high life expectancy:0.034;Alder (Alnus spp):0.023
+W1576,52.07703,10.61737,kein_wald,0.0,0.0,30400,
+W1577,52.07703,10.79476,kein_wald,0.0,0.0,40000,
+W1578,52.09505,10.3513,Beech (Fagus sylvatica),0.504,0.751,35200,Beech (Fagus sylvatica):0.504;Oak (Quercus spp):0.35;Spruce (Picea spp):0.057;Larch (Larix spp):0.032;Douglas fir (Pseudotsuga menziesii):0.028
+W1579,52.09505,10.79476,kein_wald,0.0,0.0,40000,
+W1580,52.09505,10.88345,kein_wald,0.0,0.0,25600,
+W1581,52.09505,10.94258,kein_wald,0.0,0.0,40000,
+W1582,52.11306,10.64694,kein_wald,0.0,0.0,40000,
+W1583,52.13108,10.61737,Beech (Fagus sylvatica),0.733,0.016,30400,Beech (Fagus sylvatica):0.733;Oak (Quercus spp):0.247
+W1584,52.13108,10.76519,kein_wald,0.0,0.0,40000,
+W1585,52.16712,10.11478,kein_wald,0.0,0.0,39800,
+W1586,52.16712,10.6765,kein_wald,0.0,0.0,40000,
+W1587,52.16712,10.73563,Oak (Quercus spp),0.57,0.01,40000,Oak (Quercus spp):0.57;Other deciduous – low life expectancy:0.115;Other deciduous - high life expectancy:0.089;Douglas fir (Pseudotsuga menziesii):0.073;Beech (Fagus sylvatica):0.057;Alder (Alnus spp):0.036
+W1588,52.18514,10.17391,kein_wald,0.0,0.0,40000,
+W1589,52.18514,10.88345,Oak (Quercus spp),0.431,0.202,25600,Oak (Quercus spp):0.431;Larch (Larix spp):0.211;Spruce (Picea spp):0.177;Pine (Pinus spp):0.133
+W1590,52.18514,10.97214,Beech (Fagus sylvatica),0.452,0.344,40000,Beech (Fagus sylvatica):0.452;Oak (Quercus spp):0.443;Larch (Larix spp):0.038;Other deciduous - high life expectancy:0.024
+W1591,52.20315,10.20347,kein_wald,0.0,0.0,40000,
+W1592,52.20315,10.73563,Beech (Fagus sylvatica),0.898,0.842,40000,Beech (Fagus sylvatica):0.898;Oak (Quercus spp):0.067
+W1593,52.20315,10.79476,Beech (Fagus sylvatica),0.567,0.989,40000,Beech (Fagus sylvatica):0.567;Oak (Quercus spp):0.248;Larch (Larix spp):0.091;Spruce (Picea spp):0.076
+W1594,52.20315,10.82432,Beech (Fagus sylvatica),0.529,0.929,40000,Beech (Fagus sylvatica):0.529;Oak (Quercus spp):0.281;Larch (Larix spp):0.087;Spruce (Picea spp):0.067
+W1595,52.20315,10.85389,Beech (Fagus sylvatica),0.535,0.103,40000,Beech (Fagus sylvatica):0.535;Oak (Quercus spp):0.2;Spruce (Picea spp):0.112;Douglas fir (Pseudotsuga menziesii):0.075;Larch (Larix spp):0.052
+W1596,52.22117,10.11478,Other deciduous – low life expectancy,0.588,0.001,39800,Other deciduous – low life expectancy:0.588;Oak (Quercus spp):0.157;Larch (Larix spp):0.157;Birch (Betula spp):0.039;Pine (Pinus spp):0.039
+W1597,52.22117,10.17391,Oak (Quercus spp),0.534,0.005,40000,Oak (Quercus spp):0.534;Other deciduous – low life expectancy:0.379;Beech (Fagus sylvatica):0.044
+W1598,52.22117,10.85389,Alder (Alnus spp),0.828,0.001,40000,Alder (Alnus spp):0.828;Oak (Quercus spp):0.172
 W1599,52.59955,10.64694,Pine (Pinus spp),0.518,0.814,40000,Pine (Pinus spp):0.518;Birch (Betula spp):0.212;Larch (Larix spp):0.103;Oak (Quercus spp):0.074;Douglas fir (Pseudotsuga menziesii):0.034;Alder (Alnus spp):0.028
 W1600,52.59955,10.6765,Birch (Betula spp),0.687,0.255,40000,Birch (Betula spp):0.687;Pine (Pinus spp):0.151;Larch (Larix spp):0.1;Oak (Quercus spp):0.028
 W1601,52.59955,10.70607,Pine (Pinus spp),0.704,0.696,40000,Pine (Pinus spp):0.704;Birch (Betula spp):0.143;Douglas fir (Pseudotsuga menziesii):0.069;Oak (Quercus spp):0.038;Larch (Larix spp):0.026
@@ -1439,29 +1439,29 @@ W1602,52.59955,10.76519,Pine (Pinus spp),0.982,0.808,40000,Pine (Pinus spp):0.98
 W1603,52.59955,10.79476,Pine (Pinus spp),0.987,0.774,40000,Pine (Pinus spp):0.987
 W1604,52.59955,10.85389,Pine (Pinus spp),0.861,0.719,40000,Pine (Pinus spp):0.861;Birch (Betula spp):0.043;Douglas fir (Pseudotsuga menziesii):0.03;Oak (Quercus spp):0.024
 W1605,52.59955,10.88345,Oak (Quercus spp),0.594,0.016,25600,Oak (Quercus spp):0.594;Pine (Pinus spp):0.272;Birch (Betula spp):0.088;Other deciduous – low life expectancy:0.028
-W1606,52.25721,11.14953,Larch (Larix spp),0.281,0.309,58824,Larch (Larix spp):0.281;Pine (Pinus spp):0.221;Oak (Quercus spp):0.201;Birch (Betula spp):0.092;Spruce (Picea spp):0.09;Beech (Fagus sylvatica):0.06
-W1607,52.36532,11.0904,Oak (Quercus spp),0.411,0.183,79800,Oak (Quercus spp):0.411;Pine (Pinus spp):0.194;Beech (Fagus sylvatica):0.089;Larch (Larix spp):0.089;Alder (Alnus spp):0.089;Douglas fir (Pseudotsuga menziesii):0.061
+W1606,52.25721,11.14953,Larch (Larix spp),0.288,0.932,18824,Larch (Larix spp):0.288;Pine (Pinus spp):0.21;Oak (Quercus spp):0.201;Spruce (Picea spp):0.094;Birch (Betula spp):0.09;Beech (Fagus sylvatica):0.063
+W1607,52.36532,11.0904,Oak (Quercus spp),0.473,0.243,39800,Oak (Quercus spp):0.473;Pine (Pinus spp):0.22;Beech (Fagus sylvatica):0.112;Larch (Larix spp):0.109;Other deciduous – low life expectancy:0.042
 W1608,52.59955,10.97214,Oak (Quercus spp),0.342,0.112,40000,Oak (Quercus spp):0.342;Pine (Pinus spp):0.331;Larch (Larix spp):0.09;Douglas fir (Pseudotsuga menziesii):0.083;Birch (Betula spp):0.056;Other deciduous – low life expectancy:0.047
-W1609,52.45541,11.00171,Pine (Pinus spp),0.915,0.216,72000,Pine (Pinus spp):0.915;Douglas fir (Pseudotsuga menziesii):0.044
-W1610,52.59955,10.73563,Pine (Pinus spp),0.936,0.317,80000,Pine (Pinus spp):0.936;Birch (Betula spp):0.031
-W1611,52.59955,10.82432,Pine (Pinus spp),0.953,0.667,80000,Pine (Pinus spp):0.953;Birch (Betula spp):0.024
+W1609,52.45541,11.00171,kein_wald,0.0,0.0,32000,
+W1610,52.59955,10.73563,Pine (Pinus spp),0.957,0.481,40000,Pine (Pinus spp):0.957;Birch (Betula spp):0.036
+W1611,52.59955,10.82432,Pine (Pinus spp),0.972,0.997,40000,Pine (Pinus spp):0.972
 W1612,52.59955,11.0904,Pine (Pinus spp),0.678,0.16,39800,Pine (Pinus spp):0.678;Birch (Betula spp):0.099;Larch (Larix spp):0.08;Oak (Quercus spp):0.072;Other deciduous – low life expectancy:0.053
 W1613,52.59955,11.11997,Pine (Pinus spp),0.758,0.507,40000,Pine (Pinus spp):0.758;Larch (Larix spp):0.07;Oak (Quercus spp):0.069;Douglas fir (Pseudotsuga menziesii):0.044;Birch (Betula spp):0.037
 W1614,52.59955,11.14953,Pine (Pinus spp),0.836,0.528,20800,Pine (Pinus spp):0.836;Oak (Quercus spp):0.111;Larch (Larix spp):0.024
 W1615,52.61757,10.32173,Pine (Pinus spp),0.461,0.151,40000,Pine (Pinus spp):0.461;Birch (Betula spp):0.307;Oak (Quercus spp):0.153;Larch (Larix spp):0.032
-W1616,52.61757,10.43999,Pine (Pinus spp),0.679,0.759,79800,Pine (Pinus spp):0.679;Birch (Betula spp):0.148;Douglas fir (Pseudotsuga menziesii):0.051;Spruce (Picea spp):0.036;Oak (Quercus spp):0.036;Beech (Fagus sylvatica):0.022
-W1617,52.61757,10.55825,Pine (Pinus spp),0.883,0.524,80000,Pine (Pinus spp):0.883;Spruce (Picea spp):0.046;Birch (Betula spp):0.039
-W1618,52.61757,10.88345,Pine (Pinus spp),0.435,0.717,65600,Pine (Pinus spp):0.435;Douglas fir (Pseudotsuga menziesii):0.199;Oak (Quercus spp):0.134;Spruce (Picea spp):0.091;Birch (Betula spp):0.063;Larch (Larix spp):0.038
-W1619,52.61757,10.91302,Pine (Pinus spp),0.511,0.537,80000,Pine (Pinus spp):0.511;Douglas fir (Pseudotsuga menziesii):0.223;Oak (Quercus spp):0.089;Larch (Larix spp):0.053;Alder (Alnus spp):0.036;Birch (Betula spp):0.034
-W1620,52.61757,11.14953,Pine (Pinus spp),0.783,0.683,60800,Pine (Pinus spp):0.783;Spruce (Picea spp):0.102;Larch (Larix spp):0.05;Birch (Betula spp):0.04
-W1621,52.63559,10.29217,Pine (Pinus spp),0.674,0.47,80000,Pine (Pinus spp):0.674;Spruce (Picea spp):0.121;Birch (Betula spp):0.066;Douglas fir (Pseudotsuga menziesii):0.062;Larch (Larix spp):0.033;Oak (Quercus spp):0.031
-W1622,52.63559,10.32173,Pine (Pinus spp),0.708,0.551,80000,Pine (Pinus spp):0.708;Spruce (Picea spp):0.114;Oak (Quercus spp):0.082;Birch (Betula spp):0.037;Larch (Larix spp):0.022;Douglas fir (Pseudotsuga menziesii):0.021
-W1623,52.63559,10.52868,Pine (Pinus spp),0.429,0.494,75200,Pine (Pinus spp):0.429;Spruce (Picea spp):0.247;Douglas fir (Pseudotsuga menziesii):0.175;Oak (Quercus spp):0.046;Larch (Larix spp):0.04;Birch (Betula spp):0.037
-W1624,52.63559,10.88345,Pine (Pinus spp),0.49,0.566,65600,Pine (Pinus spp):0.49;Spruce (Picea spp):0.188;Douglas fir (Pseudotsuga menziesii):0.089;Oak (Quercus spp):0.08;Alder (Alnus spp):0.052;Birch (Betula spp):0.049
-W1625,52.63559,10.91302,Pine (Pinus spp),0.579,0.538,79800,Pine (Pinus spp):0.579;Douglas fir (Pseudotsuga menziesii):0.124;Oak (Quercus spp):0.089;Spruce (Picea spp):0.087;Alder (Alnus spp):0.044;Larch (Larix spp):0.038
-W1626,52.63559,11.06084,Pine (Pinus spp),0.671,0.548,79800,Pine (Pinus spp):0.671;Spruce (Picea spp):0.093;Oak (Quercus spp):0.088;Douglas fir (Pseudotsuga menziesii):0.046;Alder (Alnus spp):0.046;Larch (Larix spp):0.028
-W1627,52.63559,11.14953,Pine (Pinus spp),0.681,0.648,60800,Pine (Pinus spp):0.681;Spruce (Picea spp):0.228;Douglas fir (Pseudotsuga menziesii):0.046
-W1628,52.6536,10.23304,Pine (Pinus spp),0.893,0.67,68000,Pine (Pinus spp):0.893;Birch (Betula spp):0.041
+W1616,52.61757,10.43999,Pine (Pinus spp),0.643,0.616,39800,Pine (Pinus spp):0.643;Douglas fir (Pseudotsuga menziesii):0.112;Oak (Quercus spp):0.075;Spruce (Picea spp):0.07;Birch (Betula spp):0.039;Alder (Alnus spp):0.032
+W1617,52.61757,10.55825,Pine (Pinus spp),0.563,0.093,40000,Pine (Pinus spp):0.563;Birch (Betula spp):0.226;Oak (Quercus spp):0.13;Beech (Fagus sylvatica):0.028
+W1618,52.61757,10.88345,Pine (Pinus spp),0.683,0.278,25600,Pine (Pinus spp):0.683;Alder (Alnus spp):0.106;Oak (Quercus spp):0.091;Birch (Betula spp):0.058;Larch (Larix spp):0.026
+W1619,52.61757,10.91302,Alder (Alnus spp),0.378,0.099,40000,Alder (Alnus spp):0.378;Oak (Quercus spp):0.332;Douglas fir (Pseudotsuga menziesii):0.063;Birch (Betula spp):0.056;Pine (Pinus spp):0.053;Larch (Larix spp):0.049
+W1620,52.61757,11.14953,Pine (Pinus spp),0.624,0.088,20800,Pine (Pinus spp):0.624;Alder (Alnus spp):0.117;Oak (Quercus spp):0.093;Larch (Larix spp):0.058;Other deciduous – low life expectancy:0.045;Birch (Betula spp):0.033
+W1621,52.63559,10.29217,Oak (Quercus spp),0.368,0.075,40000,Oak (Quercus spp):0.368;Birch (Betula spp):0.264;Alder (Alnus spp):0.104;Pine (Pinus spp):0.084;Larch (Larix spp):0.076;Douglas fir (Pseudotsuga menziesii):0.061
+W1622,52.63559,10.32173,Pine (Pinus spp),0.273,0.118,40000,Pine (Pinus spp):0.273;Oak (Quercus spp):0.26;Birch (Betula spp):0.181;Larch (Larix spp):0.113;Alder (Alnus spp):0.08;Douglas fir (Pseudotsuga menziesii):0.051
+W1623,52.63559,10.52868,Pine (Pinus spp),0.429,0.078,40000,Pine (Pinus spp):0.429;Birch (Betula spp):0.237;Alder (Alnus spp):0.097;Oak (Quercus spp):0.094;Douglas fir (Pseudotsuga menziesii):0.063;Other deciduous – low life expectancy:0.035
+W1624,52.63559,10.88345,Alder (Alnus spp),0.282,0.177,25600,Alder (Alnus spp):0.282;Pine (Pinus spp):0.207;Oak (Quercus spp):0.183;Douglas fir (Pseudotsuga menziesii):0.113;Larch (Larix spp):0.079;Birch (Betula spp):0.07
+W1625,52.63559,10.91302,Pine (Pinus spp),0.508,0.143,40000,Pine (Pinus spp):0.508;Alder (Alnus spp):0.169;Oak (Quercus spp):0.089;Birch (Betula spp):0.073;Douglas fir (Pseudotsuga menziesii):0.069;Larch (Larix spp):0.04
+W1626,52.63559,11.06084,Pine (Pinus spp),0.682,0.104,40000,Pine (Pinus spp):0.682;Oak (Quercus spp):0.155;Alder (Alnus spp):0.058;Larch (Larix spp):0.039;Birch (Betula spp):0.035;Other deciduous – low life expectancy:0.021
+W1627,52.63559,11.14953,Oak (Quercus spp),0.9,0.0,20800,Oak (Quercus spp):0.9;Other deciduous – low life expectancy:0.1
+W1628,52.6536,10.23304,Pine (Pinus spp),0.556,0.319,28000,Pine (Pinus spp):0.556;Birch (Betula spp):0.162;Douglas fir (Pseudotsuga menziesii):0.091;Oak (Quercus spp):0.061;Alder (Alnus spp):0.046;Spruce (Picea spp):0.039
 W1629,52.6536,10.46955,Pine (Pinus spp),0.52,0.105,28000,Pine (Pinus spp):0.52;Oak (Quercus spp):0.269;Birch (Betula spp):0.084;Larch (Larix spp):0.074;Alder (Alnus spp):0.035
 W1630,52.6536,11.14953,Pine (Pinus spp),0.736,0.359,14560,Pine (Pinus spp):0.736;Oak (Quercus spp):0.1;Larch (Larix spp):0.056;Douglas fir (Pseudotsuga menziesii):0.052;Birch (Betula spp):0.035
 W1631,52.67162,10.32173,Pine (Pinus spp),0.249,0.331,40000,Pine (Pinus spp):0.249;Douglas fir (Pseudotsuga menziesii):0.187;Birch (Betula spp):0.14;Oak (Quercus spp):0.137;Larch (Larix spp):0.108;Alder (Alnus spp):0.074
@@ -1570,3 +1570,46 @@ W1737,52.83378,10.82432,Oak (Quercus spp),0.352,0.207,40000,Oak (Quercus spp):0.
 W1738,52.83378,11.00171,Pine (Pinus spp),0.344,0.133,40000,Pine (Pinus spp):0.344;Oak (Quercus spp):0.268;Other deciduous – low life expectancy:0.091;Larch (Larix spp):0.083;Douglas fir (Pseudotsuga menziesii):0.064;Alder (Alnus spp):0.059
 W1739,52.83378,11.06084,Pine (Pinus spp),0.74,0.232,40000,Pine (Pinus spp):0.74;Oak (Quercus spp):0.106;Birch (Betula spp):0.052;Larch (Larix spp):0.039;Other deciduous – low life expectancy:0.032
 W1740,52.83378,11.14953,Oak (Quercus spp),0.681,0.007,20800,Oak (Quercus spp):0.681;Other deciduous – low life expectancy:0.199;Alder (Alnus spp):0.078;Larch (Larix spp):0.043
+W1741,52.8428,11.0747,Pine (Pinus spp),0.846,0.232,35800,Pine (Pinus spp):0.846;Oak (Quercus spp):0.059;Other deciduous – low life expectancy:0.047;Birch (Betula spp):0.034
+W1742,52.58153,10.88345,Pine (Pinus spp),0.626,0.009,25600,Pine (Pinus spp):0.626;Birch (Betula spp):0.191;Oak (Quercus spp):0.135;Larch (Larix spp):0.039
+W1743,52.58153,10.91302,Pine (Pinus spp),0.828,0.023,40000,Pine (Pinus spp):0.828;Birch (Betula spp):0.092;Larch (Larix spp):0.037;Oak (Quercus spp):0.035
+W1744,52.58153,10.97214,Oak (Quercus spp),0.557,0.07,40000,Oak (Quercus spp):0.557;Pine (Pinus spp):0.252;Birch (Betula spp):0.068;Other deciduous – low life expectancy:0.043;Larch (Larix spp):0.034;Alder (Alnus spp):0.029
+W1745,52.58153,11.06084,Pine (Pinus spp),0.363,0.007,40000,Pine (Pinus spp):0.363;Oak (Quercus spp):0.343;Birch (Betula spp):0.153;Other deciduous – low life expectancy:0.073;Larch (Larix spp):0.067
+W1746,52.58153,11.0904,Oak (Quercus spp),0.605,0.008,39800,Oak (Quercus spp):0.605;Other deciduous – low life expectancy:0.33;Larch (Larix spp):0.029
+W1747,52.58153,11.14953,Pine (Pinus spp),0.895,0.81,20800,Pine (Pinus spp):0.895;Oak (Quercus spp):0.042;Larch (Larix spp):0.037
+W1748,52.59955,10.11478,Pine (Pinus spp),0.52,0.018,39800,Pine (Pinus spp):0.52;Birch (Betula spp):0.239;Oak (Quercus spp):0.139;Beech (Fagus sylvatica):0.055;Other deciduous – low life expectancy:0.039
+W1749,52.59955,10.14435,Pine (Pinus spp),0.807,0.35,40000,Pine (Pinus spp):0.807;Birch (Betula spp):0.077;Oak (Quercus spp):0.073;Larch (Larix spp):0.025
+W1750,52.59955,10.17391,Pine (Pinus spp),0.696,0.119,40000,Pine (Pinus spp):0.696;Birch (Betula spp):0.1;Larch (Larix spp):0.068;Douglas fir (Pseudotsuga menziesii):0.059;Oak (Quercus spp):0.024;Alder (Alnus spp):0.024
+W1751,52.59955,10.20347,Pine (Pinus spp),0.951,0.63,40000,Pine (Pinus spp):0.951
+W1752,52.59955,10.23304,Pine (Pinus spp),0.881,0.506,40000,Pine (Pinus spp):0.881;Birch (Betula spp):0.068
+W1753,52.59955,10.2626,Pine (Pinus spp),0.508,0.151,40000,Pine (Pinus spp):0.508;Alder (Alnus spp):0.23;Oak (Quercus spp):0.126;Birch (Betula spp):0.105
+W1754,52.59955,10.29217,Oak (Quercus spp),0.53,0.05,40000,Oak (Quercus spp):0.53;Birch (Betula spp):0.143;Pine (Pinus spp):0.099;Other deciduous – low life expectancy:0.055;Beech (Fagus sylvatica):0.05;Larch (Larix spp):0.036
+W1755,52.59955,10.32173,Oak (Quercus spp),0.368,0.255,40000,Oak (Quercus spp):0.368;Pine (Pinus spp):0.167;Beech (Fagus sylvatica):0.158;Birch (Betula spp):0.131;Larch (Larix spp):0.06;Douglas fir (Pseudotsuga menziesii):0.045
+W1756,52.59955,10.3513,Oak (Quercus spp),0.27,0.186,35200,Oak (Quercus spp):0.27;Pine (Pinus spp):0.262;Birch (Betula spp):0.249;Beech (Fagus sylvatica):0.105;Larch (Larix spp):0.036;Douglas fir (Pseudotsuga menziesii):0.03
+W1757,52.59955,10.38086,Pine (Pinus spp),0.404,0.073,40000,Pine (Pinus spp):0.404;Oak (Quercus spp):0.289;Birch (Betula spp):0.207;Alder (Alnus spp):0.031
+W1758,52.59955,10.41042,Pine (Pinus spp),0.46,0.292,39800,Pine (Pinus spp):0.46;Douglas fir (Pseudotsuga menziesii):0.169;Oak (Quercus spp):0.115;Alder (Alnus spp):0.097;Larch (Larix spp):0.081;Spruce (Picea spp):0.038
+W1759,52.59955,10.43999,Oak (Quercus spp),0.428,0.058,39800,Oak (Quercus spp):0.428;Alder (Alnus spp):0.173;Larch (Larix spp):0.154;Birch (Betula spp):0.1;Pine (Pinus spp):0.094
+W1760,52.59955,10.46955,Pine (Pinus spp),0.573,0.151,40000,Pine (Pinus spp):0.573;Oak (Quercus spp):0.152;Birch (Betula spp):0.133;Larch (Larix spp):0.061;Douglas fir (Pseudotsuga menziesii):0.033
+W1761,52.59955,10.49912,Pine (Pinus spp),0.852,0.45,40000,Pine (Pinus spp):0.852;Birch (Betula spp):0.063;Oak (Quercus spp):0.026;Larch (Larix spp):0.024
+W1762,52.59955,10.52868,Pine (Pinus spp),0.746,0.152,40000,Pine (Pinus spp):0.746;Birch (Betula spp):0.104;Oak (Quercus spp):0.083;Alder (Alnus spp):0.043
+W1763,52.59955,10.55825,Oak (Quercus spp),0.368,0.101,40000,Oak (Quercus spp):0.368;Pine (Pinus spp):0.306;Birch (Betula spp):0.191;Alder (Alnus spp):0.065;Larch (Larix spp):0.04
+W1764,52.59955,10.58781,Oak (Quercus spp),0.385,0.033,40000,Oak (Quercus spp):0.385;Pine (Pinus spp):0.385;Douglas fir (Pseudotsuga menziesii):0.082;Birch (Betula spp):0.05;Alder (Alnus spp):0.041;Larch (Larix spp):0.037
+W1765,52.59955,10.61737,Pine (Pinus spp),0.422,0.539,30400,Pine (Pinus spp):0.422;Oak (Quercus spp):0.22;Larch (Larix spp):0.115;Birch (Betula spp):0.113;Douglas fir (Pseudotsuga menziesii):0.06;Alder (Alnus spp):0.043
+W1766,52.59955,10.91302,Pine (Pinus spp),0.537,0.016,40000,Pine (Pinus spp):0.537;Oak (Quercus spp):0.218;Birch (Betula spp):0.14;Larch (Larix spp):0.087
+W1767,52.59955,10.94258,Oak (Quercus spp),0.292,0.124,40000,Oak (Quercus spp):0.292;Alder (Alnus spp):0.228;Douglas fir (Pseudotsuga menziesii):0.169;Pine (Pinus spp):0.143;Larch (Larix spp):0.052;Beech (Fagus sylvatica):0.045
+W1768,52.59955,11.00171,Pine (Pinus spp),0.915,0.389,40000,Pine (Pinus spp):0.915;Douglas fir (Pseudotsuga menziesii):0.044
+W1769,52.59955,11.03127,Pine (Pinus spp),0.868,0.152,40000,Pine (Pinus spp):0.868;Oak (Quercus spp):0.058;Alder (Alnus spp):0.041
+W1770,52.59955,11.06084,Pine (Pinus spp),0.896,0.337,40000,Pine (Pinus spp):0.896;Birch (Betula spp):0.042;Oak (Quercus spp):0.024
+W1771,52.79775,10.14435,Pine (Pinus spp),0.704,0.9,40000,Pine (Pinus spp):0.704;Birch (Betula spp):0.222;Beech (Fagus sylvatica):0.035
+W1772,52.79775,10.17391,Pine (Pinus spp),0.914,0.956,40000,Pine (Pinus spp):0.914;Spruce (Picea spp):0.051;Birch (Betula spp):0.021
+W1773,52.79775,10.20347,Pine (Pinus spp),0.391,0.998,40000,Pine (Pinus spp):0.391;Douglas fir (Pseudotsuga menziesii):0.234;Oak (Quercus spp):0.142;Spruce (Picea spp):0.108;Birch (Betula spp):0.064;Larch (Larix spp):0.04
+W1774,52.79775,10.23304,Pine (Pinus spp),0.558,0.976,40000,Pine (Pinus spp):0.558;Douglas fir (Pseudotsuga menziesii):0.239;Oak (Quercus spp):0.064;Larch (Larix spp):0.053;Spruce (Picea spp):0.037;Birch (Betula spp):0.032
+W1775,52.79775,10.2626,Pine (Pinus spp),0.79,0.992,40000,Pine (Pinus spp):0.79;Spruce (Picea spp):0.106;Larch (Larix spp):0.049;Birch (Betula spp):0.04
+W1776,52.79775,10.29217,Pine (Pinus spp),0.725,0.864,40000,Pine (Pinus spp):0.725;Spruce (Picea spp):0.13;Douglas fir (Pseudotsuga menziesii):0.062;Birch (Betula spp):0.049;Larch (Larix spp):0.029
+W1777,52.79775,10.32173,Pine (Pinus spp),0.76,0.983,40000,Pine (Pinus spp):0.76;Spruce (Picea spp):0.126;Oak (Quercus spp):0.06;Birch (Betula spp):0.02
+W1778,52.79775,10.3513,Pine (Pinus spp),0.429,0.968,35200,Pine (Pinus spp):0.429;Spruce (Picea spp):0.27;Douglas fir (Pseudotsuga menziesii):0.185;Oak (Quercus spp):0.041;Larch (Larix spp):0.041
+W1779,52.79775,10.38086,Pine (Pinus spp),0.529,0.815,40000,Pine (Pinus spp):0.529;Spruce (Picea spp):0.21;Douglas fir (Pseudotsuga menziesii):0.086;Oak (Quercus spp):0.066;Birch (Betula spp):0.046;Larch (Larix spp):0.039
+W1780,52.79775,10.41042,Pine (Pinus spp),0.59,0.936,39800,Pine (Pinus spp):0.59;Douglas fir (Pseudotsuga menziesii):0.132;Spruce (Picea spp):0.094;Oak (Quercus spp):0.089;Larch (Larix spp):0.037;Alder (Alnus spp):0.025
+W1781,52.79775,10.43999,Pine (Pinus spp),0.67,0.995,39800,Pine (Pinus spp):0.67;Spruce (Picea spp):0.103;Oak (Quercus spp):0.081;Douglas fir (Pseudotsuga menziesii):0.05;Alder (Alnus spp):0.044;Larch (Larix spp):0.026
+W1782,52.79775,10.46955,Pine (Pinus spp),0.681,0.985,40000,Pine (Pinus spp):0.681;Spruce (Picea spp):0.228;Douglas fir (Pseudotsuga menziesii):0.046
+W1783,52.79775,10.79476,Pine (Pinus spp),0.975,0.916,40000,Pine (Pinus spp):0.975

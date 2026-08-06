@@ -73,6 +73,7 @@ MERKMALE = {
     "waldraster_ergaenzen.py": [
         ("ALLE_ZELLEN", "Schalter fuer lueckenloses Gitter"),
         ("frage_block", "gebuendelte Abfrage"),
+        ("hoechste_nummer", "keine doppelten Kennungen"),
     ],
     "waldebenen.py": [
         ("BILDORDNER", "Zielordner einstellbar"),
