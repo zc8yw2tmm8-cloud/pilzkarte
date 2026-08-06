@@ -21,8 +21,24 @@ KOPIE = "waldpunkte_vor_luecken.csv"
 SUED, WEST, NORD, OST = 52.05, 10.10, 52.85, 11.15
 RASTER_KM = 2.0
 
+# Die Karte rechnet mit den Werten aus web/daten.json. Damit hier
+# dieselben Felder herauskommen, werden sie von dort gelesen - sonst
+# fuellt dieses Skript andere Loecher, als man auf der Karte sieht.
+DATEN = os.path.join("web", "daten.json")
+
 
 def gitter():
+    if os.path.exists(DATEN):
+        import json
+        with open(DATEN, "r", encoding="utf-8") as f:
+            g = json.load(f).get("gitter")
+        if g:
+            print("Gitter aus web/daten.json - dieselben Felder wie "
+                  "auf der Karte\n")
+            return g["schritt_lat"], g["schritt_lon"]
+
+    print("web/daten.json fehlt - Gitter selbst gerechnet.\n"
+          "Besser erst daten_export.py laufen lassen.\n")
     schritt_lat = RASTER_KM / 111.0
     mitte = (SUED + NORD) / 2
     schritt_lon = RASTER_KM / (111.0 * math.cos(math.radians(mitte)))
@@ -44,11 +60,27 @@ def main():
     with open(DATEI, "r", encoding="utf-8") as f:
         punkte = [dict(z) for z in csv.DictReader(f)]
 
+    # Felder so bestimmen, wie es die Karte tut
     belegt = {}
     for p in punkte:
         zeile = math.floor((float(p["lat"]) - SUED) / schritt_lat)
         spalte = math.floor((float(p["lon"]) - WEST) / schritt_lon)
         belegt.setdefault((zeile, spalte), []).append(p["id"])
+
+    # Gegenprobe: Welche Punkte stehen ueberhaupt in daten.json? Ein
+    # Punkt ohne Kennwerte wird dort weggelassen und erscheint auf der
+    # Karte als Loch, obwohl er in waldpunkte.csv steht.
+    if os.path.exists(DATEN):
+        import json
+        with open(DATEN, "r", encoding="utf-8") as f:
+            drin = {z["id"] for z in json.load(f)["zellen"]}
+        fehlend = [p["id"] for p in punkte if p["id"] not in drin]
+        if fehlend:
+            print(f"ACHTUNG: {len(fehlend)} Punkte stehen in "
+                  f"{DATEI}, aber nicht in daten.json.")
+            print("Ihnen fehlen Kennwerte - sie erscheinen als Loch.")
+            print(f"Beispiele: {', '.join(fehlend[:6])}")
+            print("Behebung: python nachfuellen.py\n")
 
     zeilen = [f[0] for f in belegt]
     spalten = [f[1] for f in belegt]

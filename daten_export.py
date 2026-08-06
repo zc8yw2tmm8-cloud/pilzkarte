@@ -46,9 +46,13 @@ def gitter_angaben():
     schritt_lat = k.RASTER_KM / 111.0
     mitte = (sued + nord) / 2
     schritt_lon = k.RASTER_KM / (111.0 * math.cos(math.radians(mitte)))
+    # NICHT runden. Der Browser rechnet sonst mit einem minimal
+    # anderen Schritt als die Skripte, und Punkte nahe einer
+    # Feldgrenze landen in verschiedenen Feldern - auf der Karte
+    # sieht man dann Loecher und doppelte Kacheln.
     return {"sued": sued, "west": west,
-            "schritt_lat": round(schritt_lat, 8),
-            "schritt_lon": round(schritt_lon, 8)}
+            "schritt_lat": schritt_lat,
+            "schritt_lon": schritt_lon}
 
 
 def runde(wert, stellen=2):
