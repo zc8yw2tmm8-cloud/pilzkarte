@@ -1,2 +1,8 @@
 * text=auto
 *.yml text eol=lf
+
+# Wetterdaten niemals verschmelzen. Beide Seiten haengen nur Zeilen
+# an; Git kann daraus nichts Sinnvolles bauen und schreibt statt-
+# dessen Konfliktmarkierungen mitten in die CSV.
+wetter_historie/*.csv -merge
+wetter_prognose.csv -merge
