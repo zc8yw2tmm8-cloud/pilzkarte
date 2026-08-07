@@ -221,40 +221,68 @@ diesem Projekt.</p>
   wäre.</p>
   <p class="klein">Genau so wird hier gerechnet: nicht „bei welchen
   Bedingungen wurde gefunden", sondern „<b>wie viel häufiger</b> als
-  an ganz normalen Tagen".</p>
+  sonst".</p>
 </div>
 
-<p>Der Vergleichsmaßstab sind rund <b>47.000 gewöhnliche Tage</b> an
-zufälligen Waldpunkten seit 2019 &ndash; Tage, an denen niemand etwas
-gemeldet hat. Für den Steinpilz sieht das so aus:</p>
+<p>Für das Wetter sind der Maßstab rund <b>47.000 gewöhnliche
+Tage</b> an zufälligen Waldpunkten seit 2019. Für Boden und Bäume
+dagegen die <b>Orte, an denen Menschen überhaupt Pilze melden</b>
+&ndash; und das ist ein wichtiger Unterschied.</p>
+
+<h3>Warum der Maßstab so viel ausmacht</h3>
+
+<p>Vergleicht man Fundorte mit zufälligen Waldpunkten, misst man
+auch, wo Menschen unterwegs sind. Wie stark das wirkt, zeigt der
+Steinpilz beim Säuregrad des Bodens:</p>
 
 <table>
-  <tr><th>Bodenfeuchte</th><th class="z">bei Funden</th>
-      <th class="z">an normalen Tagen</th><th class="z">Verhältnis</th></tr>
-  <tr><td>unter 20 %</td><td class="z">4,9 %</td><td class="z">18,2 %</td>
-      <td class="z schwach">0,27</td></tr>
-  <tr><td>20–25 %</td><td class="z">20,5 %</td><td class="z">21,4 %</td>
-      <td class="z">0,96</td></tr>
-  <tr><td>25–30 %</td><td class="z">27,7 %</td><td class="z">18,9 %</td>
-      <td class="z stark">1,47</td></tr>
-  <tr><td>über 40 %</td><td class="z">6,5 %</td><td class="z">1,7 %</td>
-      <td class="z stark">3,88</td></tr>
+  <tr><th>pH-Wert</th>
+      <th class="z">gegen Waldpunkte</th>
+      <th class="z">gegen Meldeorte</th></tr>
+  <tr><td>niedrig</td><td class="z stark">1,70</td>
+      <td class="z">0,68</td></tr>
+  <tr><td>mittel</td><td class="z stark">1,77</td>
+      <td class="z">1,24</td></tr>
+  <tr><td>hoch</td><td class="z schwach">0,17</td>
+      <td class="z">0,95</td></tr>
 </table>
 
-<p>Die letzte Spalte ist die eine, auf die es ankommt: <b>bei Funden
-geteilt durch normal</b>.</p>
+<p>Links sieht es nach einem starken Zusammenhang aus: Steinpilze
+mögen saure Böden. Rechts, gegen die Meldeorte gerechnet, bleibt fast
+nichts übrig.</p>
 
-<ul>
-  <li><b>1,00</b> &ndash; genau so häufig wie sonst. Kein
-  Zusammenhang.</li>
-  <li><b>0,27</b> &ndash; bei trockenem Boden wird viel seltener
-  gefunden, als es der Zufall ergäbe.</li>
-  <li><b>3,88</b> &ndash; bei sehr nassem Boden fast viermal so oft.</li>
-</ul>
+<p class="klein">Der Grund: Saure Böden liegen in dieser Region im
+Norden, kalkreiche im Süden. Wer wo spazieren geht, hat mit
+Pilzbiologie nichts zu tun.</p>
 
-<p class="klein">Je weiter ein Wert von 1,00 entfernt liegt, desto
-mehr Punkte bringt der Bereich im Score. Das ist der ganze Trick
-&ndash; keine Formel aus einem Buch, sondern ein Abzählen.</p>
+<div class="kasten warn">
+  <h3>Der Boden sagt weniger, als gedacht</h3>
+  <p>Über alle Arten hinweg: An Fundorten liegt der pH-Wert bei 5,4,
+  an Meldeorten bei 5,3. Sandanteil 43,9 gegen 43,3 Prozent.
+  Tonanteil 21,1 gegen 21,0. <b>Praktisch kein Unterschied.</b></p>
+  <p>Bei Parasol und Schwefelporling kehrte sich die Richtung sogar
+  um &ndash; sie bevorzugen <i>höheren</i> pH, nicht niedrigeren.</p>
+  <p class="klein">Die Bodenfaktoren wurden daraufhin stark
+  abgeflacht. Wo zu wenige Fundorte vorliegen, steht jetzt gar kein
+  Faktor mehr statt eines geschätzten.</p>
+</div>
+
+<h3>Und bei den Bäumen dasselbe</h3>
+
+<table>
+  <tr><th>Baumart</th><th class="z">Anteil am Wald</th>
+      <th class="z">Anteil an Meldungen</th></tr>
+  <tr><td>Kiefer</td><td class="z">45,3 %</td>
+      <td class="z schwach">11,7 %</td></tr>
+  <tr><td>Eiche</td><td class="z">21,4 %</td>
+      <td class="z stark">43,6 %</td></tr>
+  <tr><td>Buche</td><td class="z">9,5 %</td>
+      <td class="z stark">26,5 %</td></tr>
+</table>
+
+<p>Spaziergänger bevorzugen Laubwald. Ohne diese Korrektur hätte die
+Karte behauptet, alle Pilze mieden Kiefernwälder &ndash; auch der
+Maronenröhrling, der ein Nadelwaldpilz ist.</p>
 
 <h2>Woher die Daten kommen</h2>
 
@@ -339,7 +367,7 @@ Je mehr Funde dahinterstehen, desto belastbarer.</p>
       <td class="z">2.819 Funde</td></tr>
   <tr><td>Boden<br>
       <span class="klein">Säuregrad und Tongehalt</span></td>
-      <td class="z">468 Fundorte</td></tr>
+      <td class="z">428 Fundorte gegen<br>2.378 Meldeorte</td></tr>
   <tr><td>Baumarten</td>
       <td class="z">8.094 Meldeorte</td></tr>
 </table>

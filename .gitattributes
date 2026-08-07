@@ -6,3 +6,7 @@
 # dessen Konfliktmarkierungen mitten in die CSV.
 wetter_historie/*.csv -merge
 wetter_prognose.csv -merge
+# Notizen für die Zusammenarbeit mit Claude - bleiben lokal
+CLAUDE.md
+ABHAENGIGKEITEN.md
+UEBERGABE.md

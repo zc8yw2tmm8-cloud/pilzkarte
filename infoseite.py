@@ -311,11 +311,14 @@ dabei das staerkste Bodensignal - beim Schwefelporling reicht das
 Auswahlverhaeltnis von 0,04 bei unter 12 % Ton bis 2,89 bei ueber 20 %.
 Ton haelt Wasser, das ist der Mechanismus dahinter.</p>
 
-<div class="hinweis">Vorbehalt: Tonreiche Boeden liegen in dieser
-Region im Sueden, wo auch mehr Menschen melden. Ein Teil des Effekts
-koennte Beobachterdichte sein. Dagegen spricht, dass der Birkenpilz
-genau umgekehrt reagiert - bei reiner Sammlerdichte muessten alle
-Arten in dieselbe Richtung zeigen.</div>
+<div class="hinweis"><b>Nachgemessen, Befund revidiert:</b> Der
+erste Bodenvergleich lief gegen zufaellige Waldpunkte und zeigte
+starke Zusammenhaenge. Gegen die Pilzmeldeorte gerechnet bleibt fast
+nichts uebrig - beim Steinpilz faellt das pH-Verhaeltnis von 1,70 auf
+0,68 bis 1,33. Ueber alle Arten hinweg unterscheidet sich der Boden
+an Fundorten kaum von dem an Meldeorten. Die Bodenfaktoren wurden
+deshalb stark abgeflacht, bei Parasol und Schwefelporling sogar
+umgekehrt.</div>
 
 <p>Noch <b>geschaetzt</b> sind die Baumartenfaktoren, die
 Frostempfindlichkeit je Art sowie die Bodenwerte von Pfifferling und

@@ -139,12 +139,6 @@ ARTEN = {
         "regentage": [(8, None, 15), (6, 8, 11), (5, 6, 7), (3, 5, 4)],
         "temp": [(10, 16, 8), (16, 18, 4), (8, 10, 4)],
         "verzug": (10, 16),   # Tage vom Regenereignis bis zum Schub
-        # Gemessen an 53 Fundorten: Ton ueber 20 % Verhaeltnis 1.81,
-        # pH ueber 6.1 nur 0.23
-        "boden_ph": [(5.0, 6.1, 1.0), (4.6, 5.0, 0.85), (6.1, 6.6, 0.6),
-                     (None, 4.6, 0.7), (6.6, None, 0.5)],
-        "boden_ton": [(19, None, 1.0), (15, 19, 0.9), (12, 15, 0.7),
-                      (None, 12, 0.65)],
         # auch Parkbaeume und Alleen, aber Schwerpunkt Wald
         # Gemessen (n=43, Sammlerdichte herausgerechnet): Fichte 1.67,
         # Buche 1.37, Kiefer 1.16 - bestaetigt die Literatur.
@@ -156,7 +150,16 @@ ARTEN = {
         "waldanteil_wirkung": 0.10,
         # gemessen: leicht 0.71, stark 0.23 (nur Nov)
         "frost_abzug": (15, 40),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.04, 6: 0.04, 7: 0.17, 8: 0.48, 9: 1.0, 10: 0.76, 11: 0.53, 12: 0.08},
+        # Gemessen gegen 2.378 Pilzmeldeorte (n=69): pH-Verhaeltnis
+        # 0.68 bis 1.33, Ton 0.76 bis 1.28. Fast kein Signal.
+        # Der frueher gemessene starke Zusammenhang kam aus dem
+        # Vergleich gegen Waldpunkte und war Beobachterverzerrung.
+        "boden_ph": [(5.1, 5.8, 1.0), (5.8, None, 0.9),
+                     (None, 5.1, 0.85)],
+        "boden_ton": [(15, 22, 1.0), (22, None, 0.9),
+                      (None, 15, 0.95)],
+        "saison": {1: 0.0, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.02, 6: 0.02,
+                   7: 0.21, 8: 0.37, 9: 1.00, 10: 0.70, 11: 0.44, 12: 0.04},
         "waldtyp": {"laub": 1.0, "misch": 1.0, "nadel": 0.95,
                     "bruch": 0.4, "unbekannt": 0.95},
     },
@@ -177,15 +180,17 @@ ARTEN = {
         "regentage": [(8, None, 14), (6, 8, 10), (5, 6, 5), (3, 5, 2)],
         "temp": [(None, 17, 6), (17, 18.5, 4), (18.5, 19.5, 2)],
         "verzug": (8, 14),   # Tage vom Regenereignis bis zum Schub
-        # Nur 10 Fundorte im Vergleichsgebiet - weiter geschaetzt
-        "boden_ph": [(5.5, 7.0, 1.0), (5.0, 5.5, 0.85), (None, 5.0, 0.6),
-                     (7.0, None, 0.85)],
-        "boden_ton": [(18, None, 1.0), (14, 18, 0.85), (None, 14, 0.65)],
         # warme Eichenbestaende, auch offen und licht
         "waldanteil_wirkung": 0.10,
         # geschaetzt - im Juni gibt es keinen Frost
         "frost_abzug": (15, 35),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.08, 6: 1.0, 7: 0.74, 8: 0.21, 9: 0.04, 10: 0.01, 11: 0.01, 12: 0.0},
+        # Zu wenige Fundorte mit Bodenwerten im
+        # Vergleichsgebiet - deshalb neutral. Lieber kein
+        # Faktor als ein erfundener.
+        "boden_ph": [(None, None, 1.0)],
+        "boden_ton": [(None, None, 1.0)],
+        "saison": {1: 0.0, 2: 0.01, 3: 0.02, 4: 0.0, 5: 0.05, 6: 1.00,
+                   7: 0.89, 8: 0.32, 9: 0.06, 10: 0.01, 11: 0.01, 12: 0.0},
         # Kalkbuchenwald und Eiche - der Elm ist klassisches Revier
         # Waermeliebender Laubwaldpilz: Eiche und Buche, keine Nadelhoelzer
         "baumarten": {"eiche": 1.0, "buche": 1.0, "laub_lang": 0.7,
@@ -212,12 +217,6 @@ ARTEN = {
         "temp": [(8.5, 14, 14), (14, 16.5, 10), (16.5, 18, 4),
                  (6, 8.5, 5)],
         "verzug": (10, 16),   # Tage vom Regenereignis bis zum Schub
-        # KORREKTUR: kein Sandpilz. An 45 Fundorten zeigt sich
-        # dieselbe Richtung wie beim Steinpilz - Ton ueber 20 % = 1.96
-        "boden_ph": [(4.9, 5.8, 1.0), (None, 4.9, 0.85), (5.8, 6.4, 0.7),
-                     (6.4, None, 0.55)],
-        "boden_ton": [(19, None, 1.0), (14, 19, 0.85), (12, 14, 0.7),
-                      (None, 12, 0.6)],
         # braucht geschlossenen Nadelbestand
         # Gemessen (n=44): Laerche 1.86, Kiefer 1.27, Laubholz unter 1.
         # Bestaetigt den Nadelwaldpilz. Fichte 0.67 nehme ich nicht
@@ -229,7 +228,13 @@ ARTEN = {
         "waldanteil_wirkung": 0.12,
         # KORREKTUR: nicht frosthart. Leicht 0.00 im Nov
         "frost_abzug": (20, 35),   # (leichter, starker Frost)
-        "saison": {1: 0.03, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.09, 7: 0.15, 8: 0.38, 9: 0.99, 10: 1.0, 11: 0.89, 12: 0.15},
+        # Gemessen gegen Meldeorte (n=45): pH flach (1.05-1.15),
+        # Sand leicht bevorzugt, Ton 16-21 % mit 1.51 am besten.
+        "boden_ph": [(None, 5.7, 1.0), (5.7, None, 0.85)],
+        "boden_ton": [(15, 21, 1.0), (21, 26, 0.85),
+                      (None, 15, 0.9), (26, None, 0.8)],
+        "saison": {1: 0.01, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.06,
+                   7: 0.21, 8: 0.33, 9: 1.00, 10: 0.99, 11: 0.75, 12: 0.08},
         "waldtyp": {"nadel": 1.0, "misch": 0.9, "laub": 0.45,
                     "bruch": 0.3, "unbekannt": 0.85},
     },
@@ -250,14 +255,17 @@ ARTEN = {
         "regentage": [(8, None, 15), (6, 8, 10), (5, 6, 6), (3, 5, 3)],
         "temp": [(17, 19, 10), (13.5, 17, 8), (19, 20, 3)],
         "verzug": (14, 25),   # Tage vom Regenereignis bis zum Schub
-        # Nur 10 Fundorte im Vergleichsgebiet - weiter geschaetzt
-        "boden_ph": [(None, 5.5, 1.0), (5.5, 6.1, 0.85), (6.1, None, 0.6)],
-        "boden_ton": [(13, 20, 1.0), (20, None, 0.9), (None, 13, 0.75)],
         # am staerksten an geschlossenen Wald gebunden
         "waldanteil_wirkung": 0.14,
         # geschaetzt, zu wenige Spaetfunde
         "frost_abzug": (18, 40),   # (leichter, starker Frost)
-        "saison": {1: 0.04, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.46, 7: 1.0, 8: 0.47, 9: 0.43, 10: 0.14, 11: 0.03, 12: 0.15},
+        # Zu wenige Fundorte mit Bodenwerten im
+        # Vergleichsgebiet - deshalb neutral. Lieber kein
+        # Faktor als ein erfundener.
+        "boden_ph": [(None, None, 1.0)],
+        "boden_ton": [(None, None, 1.0)],
+        "saison": {1: 0.02, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.37,
+                   7: 1.00, 8: 0.53, 9: 0.57, 10: 0.20, 11: 0.07, 12: 0.11},
         # Saure, moosige Nadelwaelder, auch Buche auf saurem Grund
         "baumarten": {"fichte": 1.0, "kiefer": 0.9, "tanne": 0.85,
                       "buche": 0.6, "eiche": 0.55, "douglasie": 0.5,
@@ -280,17 +288,17 @@ ARTEN = {
         "regentage": [(6, None, 14), (4, 6, 10), (2, 4, 6)],
         "temp": [(11, 15.5, 14), (15.5, 17, 8), (8, 11, 9)],
         "verzug": (8, 14),   # Tage vom Regenereignis bis zum Schub
-        # 30 Fundorte: Schwerpunkt bei maessigem Ton (12-15 % = 1.87),
-        # und als einzige Art auf sandigem Grund haeufiger
-        "boden_ph": [(4.9, 5.7, 1.0), (None, 4.9, 0.9), (5.7, 6.3, 0.75),
-                     (6.3, None, 0.8)],
-        "boden_ton": [(12, 16, 1.0), (16, 22, 0.8), (None, 12, 0.65),
-                      (22, None, 0.8)],
         # nur die Birke zaehlt - auch in Heide, Park, Garten
         "waldanteil_wirkung": 0.05,
         # KORREKTUR: nicht frosthart, wie die anderen
         "frost_abzug": (18, 40),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, 7: 0.2, 8: 0.28, 9: 1.0, 10: 0.91, 11: 0.29, 12: 0.0},
+        # Zu wenige Fundorte mit Bodenwerten im
+        # Vergleichsgebiet - deshalb neutral. Lieber kein
+        # Faktor als ein erfundener.
+        "boden_ph": [(None, None, 1.0)],
+        "boden_ton": [(None, None, 1.0)],
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0,
+                   7: 0.14, 8: 0.19, 9: 1.00, 10: 0.70, 11: 0.18, 12: 0.0},
         # zwingend an Birke gebunden - Bruchwald ist hier gut
         # Zwingend an Birke gebunden. Der Anteil zaehlt, nicht die
         # Hauptbaumart - Birke steht oft als Beimischung im Kiefernforst.
@@ -318,12 +326,6 @@ ARTEN = {
         "regentage": [(8, None, 15), (6, 8, 11), (5, 6, 6), (3, 5, 3)],
         "temp": [(10, 16, 10), (16, 19, 6), (8, 10, 5)],
         "verzug": (5, 12),   # Tage vom Regenereignis bis zum Schub
-        # 140 Fundorte: klarer Schwerpunkt bei mittlerem Ton
-        # (15-20 % = 2.00), pH 5.1-5.5 = 1.91
-        "boden_ph": [(5.0, 5.7, 1.0), (5.7, 6.2, 0.8), (None, 5.0, 0.7),
-                     (6.2, None, 0.6)],
-        "boden_ton": [(14, 21, 1.0), (21, None, 0.8), (11, 14, 0.75),
-                      (None, 11, 0.55)],
         # Wiesen- und Weidenpilz, Wald fast nebensaechlich
         # Gemessen (n=73): kein starkes Signal ausser Erle 2.55 und
         # Birke 1.68 - passt zu einem Pilz, der Waldraender und
@@ -335,7 +337,16 @@ ARTEN = {
         "waldanteil_wirkung": 0.02,
         # gemessen: leicht 0.64, stark 0.00 (nur Nov)
         "frost_abzug": (20, 45),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.02, 3: 0.0, 4: 0.0, 5: 0.12, 6: 0.51, 7: 0.49, 8: 0.62, 9: 1.0, 10: 0.68, 11: 0.46, 12: 0.0},
+        # KORREKTUR: Gemessen gegen Meldeorte (n=88) genau
+        # umgekehrt zur frueheren Annahme - hoeherer pH ist besser
+        # (ab 5.7 Verhaeltnis 1.49), viel Sand besser (1.60),
+        # wenig Ton besser (unter 21 % um 1.5).
+        "boden_ph": [(5.5, None, 1.0), (5.2, 5.5, 0.85),
+                     (None, 5.2, 0.75)],
+        "boden_ton": [(None, 21, 1.0), (21, 26, 0.8),
+                      (26, None, 0.7)],
+        "saison": {1: 0.0, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.07, 6: 0.31,
+                   7: 0.42, 8: 0.51, 9: 1.00, 10: 0.68, 11: 0.39, 12: 0.0},
         "waldtyp": {"laub": 1.0, "misch": 1.0, "nadel": 0.9,
                     "bruch": 0.7, "unbekannt": 1.0},
     },
@@ -354,13 +365,6 @@ ARTEN = {
         "temp": [(None, 16, 20), (16, 18, 17), (18, None, 15)],
         # Holzbewohner - nicht regengesteuert, kein Schubfenster
         "verzug": None,
-        # 180 Fundorte, das staerkste Bodensignal ueberhaupt:
-        # Ton unter 12 % Verhaeltnis 0.04, ueber 20 % dagegen 2.89.
-        # Passt zu Eiche auf lehmigem Grund.
-        "boden_ph": [(5.1, 6.1, 1.0), (6.1, 6.6, 0.75), (4.8, 5.1, 0.6),
-                     (None, 4.8, 0.5), (6.6, None, 0.65)],
-        "boden_ton": [(20, None, 1.0), (16, 20, 0.8), (13, 16, 0.55),
-                      (None, 13, 0.4)],
         # waechst am einzelnen Baum, nicht am Bestand
         # Gemessen (n=86): Erle 2.55, sonst. Laubholz kurz 1.79,
         # Eiche 1.16, Fichte 0.14. Erle und Weide sind bekannte Wirte -
@@ -372,7 +376,16 @@ ARTEN = {
         "waldanteil_wirkung": 0.04,
         # gemessen: leicht 1.74 - Holzbewohner, unbeeindruckt
         "frost_abzug": (0, 8),   # (leichter, starker Frost)
-        "saison": {1: 0.03, 2: 0.01, 3: 0.03, 4: 0.14, 5: 1.0, 6: 0.38, 7: 0.08, 8: 0.12, 9: 0.13, 10: 0.02, 11: 0.01, 12: 0.02},
+        # KORREKTUR: Gemessen gegen Meldeorte (n=165). pH hoeher
+        # ist besser (ab 5.7 Verhaeltnis 1.78, unter 5.1 nur 0.21) -
+        # umgekehrt zur frueheren Annahme. Beim Ton bleibt die
+        # Richtung, aber schwaecher: 21-26 % mit 1.56.
+        "boden_ph": [(5.4, None, 1.0), (5.1, 5.4, 0.85),
+                     (None, 5.1, 0.6)],
+        "boden_ton": [(21, None, 1.0), (16, 21, 0.85),
+                      (None, 16, 0.7)],
+        "saison": {1: 0.02, 2: 0.01, 3: 0.02, 4: 0.07, 5: 1.00, 6: 0.50,
+                   7: 0.13, 8: 0.19, 9: 0.19, 10: 0.03, 11: 0.02, 12: 0.02},
         "waldtyp": {"laub": 1.0, "bruch": 0.9, "misch": 0.7,
                     "nadel": 0.15, "unbekannt": 0.7},
         "abzug_faktor": 0.2,
@@ -406,10 +419,6 @@ ARTEN = {
         "regentage": [(7, None, 15), (5, 7, 11), (4, 5, 7), (2, 4, 4)],
         "temp": [(11, 19, 8), (19, 22, 4), (8, 11, 4)],
         "verzug": (8, 14),
-        # Saeureliebend, anders als sein netzstieliger Verwandter
-        "boden_ph": [(4.5, 5.8, 1.0), (5.8, 6.4, 0.8),
-                     (None, 4.5, 0.85), (6.4, None, 0.55)],
-        "boden_ton": [(14, None, 1.0), (11, 14, 0.85), (None, 11, 0.7)],
         # Breite Mykorrhiza: Fichte, Buche, Eiche
         "baumarten": {"fichte": 1.0, "buche": 1.0, "eiche": 0.9,
                       "tanne": 0.85, "kiefer": 0.7, "douglasie": 0.5,
@@ -417,7 +426,14 @@ ARTEN = {
                       "laub_kurz": 0.3, "erle": 0.2},
         "waldanteil_wirkung": 0.12,
         "frost_abzug": (18, 40),
-        "saison": {1: 0.1, 2: 0.11, 3: 0.0, 4: 0.0, 5: 0.95, 6: 1.0, 7: 0.89, 8: 0.6, 9: 0.87, 10: 0.72, 11: 0.68, 12: 0.0},
+        # Zu wenige Fundorte mit Bodenwerten im
+        # Vergleichsgebiet - deshalb neutral. Lieber kein
+        # Faktor als ein erfundener.
+        "boden_ph": [(None, None, 1.0)],
+        "boden_ton": [(None, None, 1.0)],
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.03, 6: 0.20,
+                   7: 0.45, 8: 0.75, 9: 1.00, 10: 0.60, 11: 0.15,
+                   12: 0.01},
         "waldtyp": {"laub": 1.0, "misch": 1.0, "nadel": 0.9,
                     "bruch": 0.4, "unbekannt": 0.9},
     },
@@ -437,11 +453,6 @@ ARTEN = {
         "regentage": [(7, None, 14), (5, 7, 11), (4, 5, 7), (2, 4, 4)],
         "temp": [(12, 20, 9), (20, 23, 5), (9, 12, 4)],
         "verzug": (8, 14),
-        # Umgekehrt zu allen anderen: braucht KALK. Ueber pH 6.5
-        # am besten, unter 5.5 kaum zu finden.
-        "boden_ph": [(6.5, None, 1.0), (6.0, 6.5, 0.85),
-                     (5.5, 6.0, 0.55), (None, 5.5, 0.25)],
-        "boden_ton": [(20, None, 1.0), (15, 20, 0.85), (None, 15, 0.6)],
         # Buche und Eiche auf Kalk, kaum Nadelholz
         "baumarten": {"buche": 1.0, "eiche": 0.95, "laub_lang": 0.7,
                       "birke": 0.4, "laub_kurz": 0.35, "fichte": 0.3,
@@ -449,7 +460,14 @@ ARTEN = {
                       "douglasie": 0.2, "erle": 0.2},
         "waldanteil_wirkung": 0.12,
         "frost_abzug": (18, 40),
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.08, 6: 0.71, 7: 1.0, 8: 0.25, 9: 0.06, 10: 0.01, 11: 0.0, 12: 0.0},
+        # Zu wenige Fundorte mit Bodenwerten im
+        # Vergleichsgebiet - deshalb neutral. Lieber kein
+        # Faktor als ein erfundener.
+        "boden_ph": [(None, None, 1.0)],
+        "boden_ton": [(None, None, 1.0)],
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.05, 6: 0.30,
+                   7: 0.55, 8: 0.80, 9: 1.00, 10: 0.55, 11: 0.12,
+                   12: 0.0},
         "waldtyp": {"laub": 1.0, "misch": 0.9, "nadel": 0.35,
                     "bruch": 0.3, "unbekannt": 0.85},
     },
@@ -470,10 +488,6 @@ ARTEN = {
         "regentage": [(7, None, 14), (5, 7, 11), (4, 5, 7), (2, 4, 4)],
         "temp": [(7, 15, 9), (15, 18, 5), (4, 7, 5)],
         "verzug": (10, 16),
-        # Vertraegt Kalk, kommt aber auch auf sauren Sandboeden vor
-        "boden_ph": [(5.5, 7.2, 1.0), (5.0, 5.5, 0.8),
-                     (None, 5.0, 0.6), (7.2, None, 0.9)],
-        "boden_ton": [(12, 22, 1.0), (22, None, 0.85), (None, 12, 0.8)],
         # Fast ausschliesslich Kiefer
         "baumarten": {"kiefer": 1.0, "laerche": 0.35, "fichte": 0.25,
                       "douglasie": 0.2, "tanne": 0.2, "birke": 0.15,
@@ -482,7 +496,14 @@ ARTEN = {
         "waldanteil_wirkung": 0.15,
         # Spaetherbstart, haelt Frost besser aus
         "frost_abzug": (10, 30),
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, 7: 0.0, 8: 0.11, 9: 0.3, 10: 1.0, 11: 0.88, 12: 0.25},
+        # Zu wenige Fundorte mit Bodenwerten im
+        # Vergleichsgebiet - deshalb neutral. Lieber kein
+        # Faktor als ein erfundener.
+        "boden_ph": [(None, None, 1.0)],
+        "boden_ton": [(None, None, 1.0)],
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.02,
+                   7: 0.10, 8: 0.40, 9: 0.90, 10: 1.00, 11: 0.45,
+                   12: 0.05},
         "waldtyp": {"nadel": 1.0, "misch": 0.7, "laub": 0.15,
                     "bruch": 0.2, "unbekannt": 0.8},
     },
@@ -506,9 +527,6 @@ ARTEN = {
         "temp": [(13, 21, 8), (10, 13, 5), (21, 24, 4)],
         # Waechst langsam ueber Wochen, kein scharfer Schub
         "verzug": (14, 28),
-        "boden_ph": [(4.5, 6.2, 1.0), (None, 4.5, 0.85),
-                     (6.2, None, 0.7)],
-        "boden_ton": [(None, 20, 1.0), (20, None, 0.85)],
         # An Kiefer gebunden, selten Laerche oder Douglasie
         "baumarten": {"kiefer": 1.0, "laerche": 0.4, "douglasie": 0.35,
                       "fichte": 0.2, "tanne": 0.2, "eiche": 0.1,
@@ -518,7 +536,14 @@ ARTEN = {
         "waldanteil_wirkung": 0.06,
         # Wie der Schwefelporling geschuetzter als Bodenpilze
         "frost_abzug": (8, 25),
-        "saison": {1: 0.08, 2: 0.04, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, 7: 0.0, 8: 0.06, 9: 1.0, 10: 0.58, 11: 0.44, 12: 0.32},
+        # Zu wenige Fundorte mit Bodenwerten im
+        # Vergleichsgebiet - deshalb neutral. Lieber kein
+        # Faktor als ein erfundener.
+        "boden_ph": [(None, None, 1.0)],
+        "boden_ton": [(None, None, 1.0)],
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.03,
+                   7: 0.20, 8: 0.70, 9: 1.00, 10: 0.65, 11: 0.15,
+                   12: 0.01},
         "waldtyp": {"nadel": 1.0, "misch": 0.7, "laub": 0.15,
                     "bruch": 0.2, "unbekannt": 0.8},
         # Wetter sagt bei Holzbewohnern weniger aus

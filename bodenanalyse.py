@@ -11,6 +11,22 @@ import os
 from collections import defaultdict
 
 BODEN = "bodendaten.csv"
+
+# Der Massstab fuer den Vergleich.
+#
+# bodendaten.csv sind zufaellige Waldpunkte. Vergleicht man Fundorte
+# damit, misst man auch, wo Menschen unterwegs sind - und das ist ein
+# grosser Anteil. Bei den Baumarten hat sich gezeigt: Kiefer macht
+# 45 % der Waldflaeche aus, aber nur 12 % der Meldeorte.
+#
+# bodendaten_aufwand.csv sind die Orte, an denen ueberhaupt Pilze
+# gemeldet werden. Gegen die zu vergleichen laesst nur die
+# Bodenvorliebe uebrig.
+AUFWAND = "bodendaten_aufwand.csv"
+
+# Womit verglichen wurde - fuer die Ausgabe. Liste, damit main()
+# den Wert setzen kann.
+MASSSTAB = ["zufaellige Waldpunkte"]
 BODEN_FUNDE = "bodendaten_funde.csv"
 FUNDE = "funde_arten.csv"
 
@@ -75,11 +91,45 @@ def uebersicht(boden):
         print(f"{lat:<10}{len(g):>6}{m('ph'):>8}{m('sand'):>9}{m('clay'):>8}")
 
 
+def rahmen(boden, rand=0.02):
+    """Umschliessendes Rechteck der Hintergrundpunkte."""
+    lats = [b["lat"] for b in boden.values() if b["lat"] is not None]
+    lons = [b["lon"] for b in boden.values() if b["lon"] is not None]
+    if not lats:
+        return None
+    return (min(lats) - rand, min(lons) - rand,
+            max(lats) + rand, max(lons) + rand)
+
+
+def im_rahmen(eintrag, r):
+    if r is None:
+        return True
+    if eintrag["lat"] is None or eintrag["lon"] is None:
+        return False
+    sued, west, nord, ost = r
+    return sued <= eintrag["lat"] <= nord and west <= eintrag["lon"] <= ost
+
+
 def auswahl(boden, fundboden, funde_je_art):
     """Auswahlverhaeltnis: Bodenwerte an Fundorten gegen die Region."""
-    print("\n" + "=" * 58)
-    print("Bevorzugen die Arten bestimmte Boeden?")
-    print("=" * 58)
+    r = rahmen(boden)
+    if r:
+        drin = {k: v for k, v in fundboden.items() if im_rahmen(v, r)}
+        print("\n" + "=" * 58)
+        print("Bevorzugen die Arten bestimmte Boeden?")
+        print(f"Verglichen gegen: {MASSSTAB[0]}")
+        print("=" * 58)
+        print(f"Vergleichsgebiet: {round(r[0], 2)}-{round(r[2], 2)} Nord, "
+              f"{round(r[1], 2)}-{round(r[3], 2)} Ost")
+        print(f"{len(drin)} von {len(fundboden)} Fundorten liegen darin.")
+        print("Die uebrigen fallen weg - sonst misst der Vergleich")
+        print("Landschaft statt Pilzvorliebe.")
+        fundboden = drin
+    else:
+        print("\n" + "=" * 58)
+        print("Bevorzugen die Arten bestimmte Boeden?")
+        print(f"Verglichen gegen: {MASSSTAB[0]}")
+        print("=" * 58)
 
     for art, ids in sorted(funde_je_art.items()):
         werte = [fundboden[i] for i in ids if i in fundboden]
@@ -127,8 +177,49 @@ def auswahl(boden, fundboden, funde_je_art):
                       f"{ha*100:7.1f}%{v:7.2f}{m}")
 
 
+def vergleich_gesamt(boden, fundboden):
+    """Grobvergleich Hintergrund gegen Fundorte, im selben Gebiet."""
+    r = rahmen(boden)
+    drin = [v for v in fundboden.values() if im_rahmen(v, r)]
+    if len(drin) < 50:
+        return
+
+    print("\n\nHintergrund gegen Fundorte (gleiches Gebiet)")
+    print(f"{'Groesse':<20}{'Hintergrund':>13}{'Fundorte':>11}"
+          f"{'Unterschied':>13}")
+    for feld, name, _, einheit in FELDER[:4]:
+        h = quantile([b[feld] for b in boden.values()], [0.5])
+        f = quantile([b[feld] for b in drin], [0.5])
+        if not h or not f:
+            continue
+        d = f[0] - h[0]
+        print(f"{name:<20}{round(h[0], 2):>13}{round(f[0], 2):>11}"
+              f"{round(d, 2):>+13}")
+    print(f"({len(drin)} Fundorte im Vergleichsgebiet)")
+
+
 def main():
     boden = lade(BODEN)
+
+    # Wenn die Meldeorte vorliegen, sind DIE der Massstab
+    if os.path.exists(AUFWAND):
+        aufwand = lade(AUFWAND)
+        if len(aufwand) > 500:
+            print(f"Massstab: {len(aufwand)} Pilzmeldeorte "
+                  f"(statt {len(boden)} Waldpunkte)\n")
+            print("Damit ist herausgerechnet, wo Menschen unterwegs")
+            print("sind - es bleibt die Bodenvorliebe.\n")
+            boden = aufwand
+            MASSSTAB[0] = "Pilzmeldeorte"
+        else:
+            print(f"{AUFWAND} enthaelt nur {len(aufwand)} Orte - "
+                  f"zu wenig.\n")
+    else:
+        print("ACHTUNG: Verglichen wird gegen zufaellige Waldpunkte.")
+        print("Das misst zum Teil, wo Menschen unterwegs sind, nicht")
+        print("nur die Bodenvorliebe. Fuer eine saubere Messung:")
+        print("  python aufwand_orte.py")
+        print("  python boden_aufwand.py\n")
     if not boden:
         print(f"{BODEN} fehlt. Erst bodendaten.py laufen lassen.")
         return
@@ -148,6 +239,7 @@ def main():
             kennung = f"F{round(float(z['lat']), 3)}_{round(float(z['lon']), 3)}"
             funde_je_art[z["art"]].add(kennung)
 
+    vergleich_gesamt(boden, fundboden)
     auswahl(boden, fundboden, funde_je_art)
 
 
