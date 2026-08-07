@@ -16,6 +16,7 @@ Laeuft im taeglichen Bauvorgang mit, nichts davon wird eingecheckt.
 """
 import os
 import json
+import math
 from datetime import date, timedelta
 
 import weichzeichnen
@@ -48,6 +49,31 @@ def main():
 
     # Der Zeichner legt seine Bilder in einen eigenen Ordner
     weichzeichnen.BILDORDNER = ORDNER
+
+    # Je Gitterfeld nur eine Zelle - sonst zaehlt eine doppelt
+    # abgetastete Stelle zweimal ins gewichtete Mittel und wird
+    # staerker dargestellt, als sie ist.
+    gitter = daten.get("gitter")
+    if gitter:
+        gewaehlt = {}
+        for z in zellen:
+            zeile = math.floor((z["lat"] - gitter["sued"])
+                               / gitter["schritt_lat"])
+            spalte = math.floor((z["lon"] - gitter["west"])
+                                / gitter["schritt_lon"])
+            feld = (zeile, spalte)
+            mitte_lat = gitter["sued"] + (zeile + 0.5) * gitter["schritt_lat"]
+            mitte_lon = gitter["west"] + (spalte + 0.5) * gitter["schritt_lon"]
+            abstand = math.hypot(z["lat"] - mitte_lat,
+                                 z["lon"] - mitte_lon)
+            if feld not in gewaehlt or abstand < gewaehlt[feld][0]:
+                gewaehlt[feld] = (abstand, z)
+
+        vorher = len(zellen)
+        zellen = [v[1] for v in gewaehlt.values()]
+        if vorher != len(zellen):
+            print(f"{vorher - len(zellen)} doppelt belegte Zellen "
+                  f"uebersprungen\n")
 
     eintraege = {}
     grenzen = None

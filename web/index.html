@@ -7,6 +7,12 @@
 <meta name="description" content="Karte der Fundwahrscheinlichkeit für
       Speisepilze in der Region Braunschweig, Wolfsburg und südliche
       Lüneburger Heide.">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#15181c">
 <title>Pilzkarte</title>
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <style>
@@ -424,10 +430,63 @@ function feldgrenzen(z) {
   ];
 }
 
+// Je Gitterfeld genau eine Kachel.
+//
+// In den Daten koennen zwei Zellen im selben Feld liegen - etwa
+// weil das Raster in mehreren Durchgaengen entstanden ist. Zeichnet
+// man beide, liegen zwei halbdurchsichtige Flaechen uebereinander
+// und das Feld erscheint doppelt so kraeftig.
+//
+// Deshalb wird hier zusammengefasst: Pro Feld bleibt die Zelle, die
+// der Feldmitte am naechsten liegt. Die uebrigen werden nicht
+// gezeichnet - anklickbar bleiben sie ueber die naechstgelegene.
+let _felder = null;
+
+function feldIndex(z) {
+  const g = D.gitter;
+  if (!g) return null;
+  return Math.floor((z.lat - g.sued) / g.schritt_lat) + ":" +
+         Math.floor((z.lon - g.west) / g.schritt_lon);
+}
+
+function eineProFeld() {
+  if (_felder) return _felder;
+
+  const gewaehlt = new Map();
+  D.zellen.forEach((z, i) => {
+    const feld = feldIndex(z);
+    if (feld === null) {
+      gewaehlt.set("x" + i, i);
+      return;
+    }
+    const vorher = gewaehlt.get(feld);
+    if (vorher === undefined) {
+      gewaehlt.set(feld, i);
+      return;
+    }
+    // Die Zelle naeher an der Feldmitte gewinnt
+    const abstand = k => {
+      const [s, w, n, o] = feldgrenzen(D.zellen[k]);
+      return Math.hypot(D.zellen[k].lat - (s + n) / 2,
+                        D.zellen[k].lon - (w + o) / 2);
+    };
+    if (abstand(i) < abstand(vorher)) gewaehlt.set(feld, i);
+  });
+
+  _felder = [...gewaehlt.values()];
+  const doppelt = D.zellen.length - _felder.length;
+  if (doppelt > 0) {
+    console.log(`${doppelt} Zellen liegen in einem bereits belegten ` +
+                `Feld und werden nicht gezeichnet.`);
+  }
+  return _felder;
+}
+
 function baueGeoJson() {
   return {
     type: "FeatureCollection",
-    features: D.zellen.map((z, i) => {
+    features: eineProFeld().map(i => {
+      const z = D.zellen[i];
       const [s, w, n, o] = feldgrenzen(z);
       return {
         type: "Feature",
