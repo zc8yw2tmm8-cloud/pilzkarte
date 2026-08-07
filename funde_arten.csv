@@ -1,8 +1,10 @@
 art,gbif_id,datum,lat,lon,unsicherheit_m,ort
 steinpilz,6411160693,2026-06-18,52.98983,10.30229,13.0,LSG Ellerndorfer Wacholderheide
-steinpilz,5282724682,2025-07-31,51.81835,10.22456,4.0,GÖ Bad Grund (Gemeinde)
+steinpilz,6448666906,2026-07-15,53.03928,9.91211,3.0,HK Soltau
+steinpilz,6449043449,2026-07-17,52.25135,9.59629,25.0,H Wennigsen (Deister)
+steinpilz,5282724682,2025-07-31,51.81835,10.22456,4.0,GÖ Bad Grund
 steinpilz,5282837503,2025-07-28,51.77002,10.55702,4.0,Nationalpark Harz - N2000
-steinpilz,5283053064,2025-07-31,51.81851,10.2246,11.0,GÖ Bad Grund (Gemeinde)
+steinpilz,5283053064,2025-07-31,51.81851,10.2246,11.0,GÖ Bad Grund
 steinpilz,5283182646,2025-07-29,52.24958,10.67497,30.0,"LSG Feld- und Waldflur von Weddel, Klein Schöppenstedt, Dest"
 steinpilz,6411761376,2025-07-26,51.85486,10.57394,,GS Bad Harzburg
 steinpilz,5282005941,2025-08-02,51.58422,10.32791,,
@@ -484,6 +486,10 @@ sommersteinpilz,6412758645,2026-06-21,52.98405,9.84103,,HK Soltau
 sommersteinpilz,6412891455,2026-06-14,51.67973,10.04821,,NSG Husumer Tal
 sommersteinpilz,6413530539,2026-06-22,51.90372,10.72036,26132.0,
 sommersteinpilz,6413860846,2026-06-17,52.26275,10.55672,13.0,
+sommersteinpilz,6448678138,2026-07-15,52.12023,10.32438,,SZ Salzgitter Gebhardshagen
+sommersteinpilz,6448684219,2026-07-16,52.99467,9.85741,40.0,HK Soltau
+sommersteinpilz,6449278092,2026-07-14,51.87231,10.56363,,GS Bad Harzburg
+sommersteinpilz,6451594538,2026-07-19,52.04105,10.48481,9.0,
 sommersteinpilz,5206497442,2025-06-22,51.53799,10.0492,1472.0,
 sommersteinpilz,5206576932,2025-06-18,51.51864,10.16155,3.0,
 sommersteinpilz,5206680589,2025-06-21,53.09869,9.84887,75.0,
@@ -494,7 +500,7 @@ sommersteinpilz,6410552390,2025-07-27,51.97861,9.76948,8.0,HI Alfeld (Leine)
 sommersteinpilz,6410591741,2025-07-27,53.21462,10.42739,11.0,LG NSG Ilmenauniederung mit Tiergarten
 sommersteinpilz,6410698342,2025-07-26,51.8853,10.54415,,GS Bad Harzburg
 sommersteinpilz,6411170447,2025-07-28,53.19852,10.85661,,LG Lüneburg (Landkreis)
-sommersteinpilz,6411645229,2025-07-27,51.59277,9.95801,4.0,GÖ Bovenden (Flecken)
+sommersteinpilz,6411645229,2025-07-27,51.59277,9.95801,4.0,GÖ Bovenden
 sommersteinpilz,6411942513,2025-07-29,53.19852,10.85661,,LG Lüneburg (Landkreis)
 sommersteinpilz,6412065035,2025-07-31,53.18374,11.10907,45.0,BSR Niedersächsische Elbtalaue
 sommersteinpilz,6412294687,2025-07-27,51.97854,9.76946,9.0,HI Alfeld (Leine)
@@ -1071,6 +1077,12 @@ pfifferling,6422256081,2026-06-28,51.65226,9.47395,,
 pfifferling,6424680698,2026-06-24,52.9771,9.28754,272.0,FFH Poggenmoor
 pfifferling,6424474671,2026-07-05,53.07861,10.20017,25.0,Gewässersystem der Luhe und unteren Neetze - N2000
 pfifferling,6424568428,2026-07-05,53.07861,10.20017,25.0,Gewässersystem der Luhe und unteren Neetze - N2000
+pfifferling,6447638772,2026-07-23,52.8663,10.22355,5.0,CE Faßberg
+pfifferling,6447657943,2026-07-07,53.13881,9.80074,,LSG Höpener Heide und Höpener Berg
+pfifferling,6447939630,2026-07-23,53.39717,9.81451,6.0,LSG Rosengarten - Kiekeberg - Stuvenwald
+pfifferling,6448407311,2026-07-23,52.86634,10.22358,4.0,CE Faßberg
+pfifferling,6448849785,2026-07-23,52.86646,10.22338,6.0,CE Faßberg
+pfifferling,6467839328,2026-07-08,51.9329,10.23152,10.0,Gläsener Berg
 pfifferling,5230888006,2025-07-10,53.38191,9.3272,25908.0,
 pfifferling,5231829399,2025-07-16,53.1539,9.93743,8.0,
 pfifferling,5282521205,2025-07-29,53.30912,11.52873,,
@@ -1403,7 +1415,7 @@ schwefelporling,6321237807,2026-05-12,53.47208,10.02092,25876.0,
 schwefelporling,6334141557,2026-05-22,53.36105,10.42678,13.0,
 schwefelporling,6334162911,2026-05-22,52.51658,10.61954,1117.0,
 schwefelporling,6334597482,2026-05-20,52.39072,9.77681,12.0,
-schwefelporling,6341679337,2026-05-21,51.72499,10.25054,10.0,GÖ Osterode am Harz (Stadt)
+schwefelporling,6341679337,2026-05-21,51.72499,10.25054,10.0,GÖ Osterode am Harz
 schwefelporling,6341707614,2026-05-27,51.89619,10.39583,18.0,GS Goslar
 schwefelporling,6341734053,2026-05-16,52.27017,10.57463,,BS Braunschweig NSG Riddagshausen
 schwefelporling,6341747368,2026-05-18,52.42173,9.85695,48.0,LSG Altwarmbüchener See
@@ -1425,7 +1437,7 @@ schwefelporling,6342287203,2026-05-29,52.43372,9.3725,8.0,H Wunstorf
 schwefelporling,6342291152,2026-05-22,52.29216,10.46388,,BS Braunschweig Lehndorf-Watenbüttel
 schwefelporling,6342301661,2026-05-31,52.01157,9.65201,23.0,HI Duinger Teiche
 schwefelporling,6342340143,2026-05-03,53.28831,10.78138,,Elbe - Bleckede
-schwefelporling,6342392838,2026-05-14,51.56417,10.15805,3.0,GÖ Seeburg (Gemeinde)
+schwefelporling,6342392838,2026-05-14,51.56417,10.15805,3.0,GÖ Seeburg
 schwefelporling,6342419313,2026-05-03,53.47052,10.04704,28.0,NSG Heuckenlock
 schwefelporling,6342445890,2026-05-23,53.46292,9.93589,7.0,NSG Heimfelder Holz
 schwefelporling,6342548662,2026-05-24,51.85561,10.67494,,HZ Ilsenburg (Harz)
@@ -1468,7 +1480,7 @@ schwefelporling,6343829058,2026-05-01,53.37185,10.53347,52.0,Elbe mit Hohem Elbu
 schwefelporling,6343839369,2026-05-30,52.60748,11.86744,25.0,SDL Stendal (Stadt)
 schwefelporling,6343847705,2026-05-22,52.92096,9.23427,5.0,VER Verden (Aller)
 schwefelporling,6343885244,2026-05-17,52.36286,9.83745,56.0,H Hannover Tiergarten
-schwefelporling,6343948997,2026-05-28,51.50306,10.01421,,GÖ Gleichen (Gemeinde)
+schwefelporling,6343948997,2026-05-28,51.50306,10.01421,,GÖ Gleichen
 schwefelporling,6343959874,2026-05-16,52.05152,10.10043,7.0,HI Bockenem
 schwefelporling,6344014800,2026-05-03,52.32125,9.76626,8.0,H NSG Alte Leine
 schwefelporling,6344063839,2026-05-24,52.18979,9.60798,4.0,H Wisentgehege Springe
@@ -1479,11 +1491,11 @@ schwefelporling,6344180802,2026-05-24,51.71914,10.97394,31.0,Bodetal und Laubwä
 schwefelporling,6344225035,2026-05-20,52.8706,11.96417,55.0,Elbaue Werben und Alte Elbe Kannenberg - N2000
 schwefelporling,6344336616,2026-05-06,52.26901,10.57334,1.0,BS Braunschweig  Wabe-Schunter-Beberbach
 schwefelporling,6344396558,2026-05-23,51.61887,10.44174,,"Sieber, Oder, Rhume - N2000"
-schwefelporling,6344402953,2026-05-17,51.56423,10.15809,,GÖ Seeburg (Gemeinde)
+schwefelporling,6344402953,2026-05-17,51.56423,10.15809,,GÖ Seeburg
 schwefelporling,6344426417,2026-05-28,51.65156,11.11875,30.0,Selketal und Bergwiesen bei Stiege - N2000
 schwefelporling,6344446986,2026-05-04,53.43598,10.15155,4.0,Kirchwerder Wiesen - N2000
 schwefelporling,6344454586,2026-05-31,53.06938,9.69454,5.0,HK Neuenkirchen
-schwefelporling,6344464030,2026-05-16,51.81089,10.22887,3.0,GÖ Bad Grund (Gemeinde)
+schwefelporling,6344464030,2026-05-16,51.81089,10.22887,3.0,GÖ Bad Grund
 schwefelporling,6344474993,2026-05-28,52.25042,10.52631,,BS Braunschweig Mitte
 schwefelporling,6344531682,2026-05-14,52.22925,10.19228,,HI Söhlde
 schwefelporling,6344532116,2026-05-23,52.29252,10.7742,6.0,FFH Rieseberg
@@ -1553,7 +1565,7 @@ schwefelporling,6411316683,2026-06-08,51.6971,9.35522,,NSG Buchenwaelder zwische
 schwefelporling,6411475398,2026-06-18,53.1659,9.92615,5.0,LG VSG Lüneburger Heide
 schwefelporling,6411517842,2026-06-02,51.7148,11.20968,,Burgesroth und Laubwälder bei Ballenstedt - N2000
 schwefelporling,6411534601,2026-06-04,53.16192,11.0271,3.0,DAN Hitzacker (Elbe)
-schwefelporling,6411562967,2026-06-05,51.59139,9.95363,,GÖ Bovenden (Flecken)
+schwefelporling,6411562967,2026-06-05,51.59139,9.95363,,GÖ Bovenden
 schwefelporling,6411617241,2026-06-18,51.58289,10.44414,,Ellersystem - Weilröder Wald - Sülzensee - N2000
 schwefelporling,6411620787,2026-06-09,53.36438,9.9833,5.0,WL Seevetal
 schwefelporling,6411703348,2026-06-07,51.58852,10.5819,,GÖ NSG Priorteich/ Sachsenstein
@@ -1564,7 +1576,7 @@ schwefelporling,6412023145,2026-06-03,51.86851,10.56589,14.0,GS Bad Harzburg
 schwefelporling,6412057352,2026-06-05,52.12653,9.9202,4.0,HI Neuhof
 schwefelporling,6412142184,2026-06-06,52.97961,10.09798,106.0,NSG Tal der Kleinen Örtze
 schwefelporling,6412190891,2026-06-12,52.13437,10.80327,5.0,WF Schöppenstedt
-schwefelporling,6412200108,2026-06-02,51.67677,10.29908,3.0,GÖ Hörden am Harz (Gemeinde)
+schwefelporling,6412200108,2026-06-02,51.67677,10.29908,3.0,GÖ Hörden am Harz
 schwefelporling,6412303602,2026-06-17,51.86311,10.58138,,GS Bad Harzburg
 schwefelporling,6412320801,2026-06-21,52.16419,9.89446,,HI NSG Lange Dreisch und Osterberg
 schwefelporling,6412412428,2026-06-17,52.27091,10.53301,,BS Braunschweig Nordstadt-Schunteraue
@@ -1580,6 +1592,14 @@ schwefelporling,6412733570,2026-06-03,52.36669,9.73423,26.0,H Hannover Maschpark
 schwefelporling,6412743731,2026-06-10,52.13437,10.80332,15.0,WF Schöppenstedt
 schwefelporling,6412874640,2026-06-11,52.31107,10.46142,,BS Braunschweig Lehndorf-Watenbüttel
 schwefelporling,6413749786,2026-06-15,52.27258,10.52305,8.0,
+schwefelporling,6449227001,2026-06-01,52.18371,9.60725,,H Wisentgehege Springe
+schwefelporling,6451793134,2026-06-06,53.29972,10.44723,217.0,
+schwefelporling,6447694997,2026-07-17,53.14471,9.91028,,HK Bispingen
+schwefelporling,6447954966,2026-07-23,52.44316,11.53068,8.0,SAW Gardelegen
+schwefelporling,6448056377,2026-07-17,51.83506,10.64179,,HZ Ilsenburg (Harz)
+schwefelporling,6448172097,2026-07-17,51.853,10.67214,7.0,HZ Ilsenburg (Harz)
+schwefelporling,6448874019,2026-07-24,53.14661,9.90823,8.0,HK Bispingen
+schwefelporling,6449726866,2026-07-05,53.10128,9.80639,,HK Schneverdingen
 schwefelporling,5008665552,2025-01-06,53.16576,9.95216,2.0,LG VSG Lüneburger Heide
 schwefelporling,5051427058,2025-01-16,52.28619,10.50725,7.0,LSG Okertalaue
 schwefelporling,5051468685,2025-01-13,52.18243,10.54041,,LSG Lechlumer Holz und angrenzende Forste
@@ -1730,7 +1750,7 @@ schwefelporling,5760674888,2025-08-28,51.67767,9.49975,8.0,
 schwefelporling,5762230627,2025-08-31,52.22804,10.57995,29.0,NSG Mascheroder und Rautheimer Holz
 schwefelporling,5828817222,2025-08-26,51.97135,11.61382,26132.0,
 schwefelporling,5830435560,2025-08-25,52.44785,10.45533,,
-schwefelporling,5902630411,2025-08-19,51.56373,10.15456,143.0,GÖ Seeburg (Gemeinde)
+schwefelporling,5902630411,2025-08-19,51.56373,10.15456,143.0,GÖ Seeburg
 schwefelporling,5762127050,2025-09-02,51.93543,9.09663,5.0,LIP Lippe (Kreis)
 schwefelporling,5762206825,2025-09-07,52.27266,10.58131,,VSG Riddagshäuser Teiche
 schwefelporling,5762220516,2025-09-02,52.19911,10.18121,,HI Hildesheim (Landkreis)
@@ -2528,6 +2548,7 @@ parasol,6410715463,2026-06-21,52.80138,9.29114,4.0,NI Hassel (Weser)
 parasol,6412450806,2026-06-17,53.28009,10.36966,,LG Lüneburg Ochtmissen
 parasol,6412689173,2026-06-14,52.38151,10.4141,3.0,LSG Okertal
 parasol,6413827872,2026-06-18,52.75086,9.50099,,
+parasol,6449798356,2026-07-15,53.34824,9.91934,12.0,LSG Klecker Wald und Umgebung
 parasol,5180587942,2025-06-05,53.3035,9.72892,,WL Harburg (Landkreis)
 parasol,5206109922,2025-06-14,53.11991,9.03479,3.0,
 parasol,5230099940,2025-07-19,52.29768,10.50556,,
@@ -3094,81 +3115,691 @@ parasol,5017213583,2015-10-01,51.684,9.8459,250.0,Deponie Blankenhagen
 parasol,5023797425,2015-10-03,51.684,9.8459,250.0,Deponie Blankenhagen
 parasol,5026690655,2015-10-23,52.58172,10.18364,250.0,Wienhausen - Kloster
 parasol,6137478699,2015-10-23,53.1867,9.99241,250.0,Undeloh - Heide südöstlich
-steinpilz,inat138120676,2022-10-09,52.21475,10.36749,35,Vechelde
-steinpilz,inat246919735,2024-10-12,52.61807,10.24278,,29331 Lachendorf  Deutschland
-marone,inat95543340,2021-09-20,52.30405,10.55814,,Wabe-Schunter  Braunschweig  Deutschland
-marone,inat138942657,2022-10-15,52.33398,10.71069,190,Lehre  38165 Lehre  Deutschland
-marone,inat177723882,2023-08-10,52.52202,10.39621,,38539 Müden (Aller)  Deutschland
-marone,inat178665820,2023-08-15,52.52019,10.38092,,Dieckhorst  38539 Müden (Aller)  Deutschland
-marone,inat179012187,2023-08-18,52.51952,10.38789,,38539 Müden (Aller)  Deutschland
-marone,inat179024656,2023-08-18,52.51536,10.39127,,38539 Müden (Aller)  Deutschland
-birkenpilz,inat60166355,2020-09-17,52.63957,10.57393,5,29399 Wahrenholz  Deutschland
-birkenpilz,inat93374889,2021-09-02,52.2778,10.45484,91,38116 Braunschweig  Deutschland
-birkenpilz,inat97463066,2021-10-07,52.26511,10.53269,10,38100 Brunswick  Germany
-birkenpilz,inat138518793,2022-10-12,52.26293,10.62846,,38162 Cremlingen  Deutschland
-birkenpilz,inat139023335,2022-10-16,52.23318,10.73832,30,38162 Cremlingen  Germany
-birkenpilz,inat186851434,2023-10-09,52.61731,10.12074,7,29227 Celle  Deutschland
-birkenpilz,inat187108311,2023-10-10,52.3003,10.34514,4,Vechelde  Niedersachsen  DE
-birkenpilz,inat248027968,2024-10-18,52.2235,10.54153,50,Greifswaldstraße  Брауншвейг  Нижняя Саксония  DE
-birkenpilz,inat249227643,2024-10-26,52.71569,10.46275,6,29367 Steinhorst  Germany
-birkenpilz,inat255026687,2024-11-16,52.77342,10.27014,,29348 Eschede  Deutschland
-birkenpilz,inat303732801,2025-08-04,52.2265,10.54551,89,Heidbergstieg  Брауншвейг  Нижняя Саксония  DE
-birkenpilz,inat320598409,2025-10-13,52.18343,10.98606,,38 Büddenstedt  Deutschland
-birkenpilz,inat322377486,2025-10-22,52.17331,10.46739,,38239 Salzgitter  Deutschland
-schwefelporling,inat11494256,2018-04-27,52.29235,10.50112,19,Braunschweig  DE-NI  DE
-schwefelporling,inat11494274,2018-04-27,52.29383,10.50275,14,Braunschweig  DE-NI  DE
-schwefelporling,inat18485031,2017-06-06,52.16152,10.55054,5,38300  Wolfenbüttel  Niedersachsen  DE
-schwefelporling,inat33198425,2019-09-22,52.06329,10.3887,20,38259 Salzgitter  Deutschland
-schwefelporling,inat40701810,2019-08-18,52.14796,10.66687,,Dorfstraße  Dettum  Niedersachsen  DE
-schwefelporling,inat48635465,2020-06-06,52.28924,10.50308,24,Ölpersee  Braunschweig  Niedersachsen  DE
-schwefelporling,inat67463511,2021-01-02,52.22423,10.51466,220,Stöckheim-Leiferde  Braunschweig  Deutschland
-schwefelporling,inat80842513,2021-05-29,52.27131,10.57792,5,Braunschweig Nehrkornweg  38104 Braunschweig  Deutschland
-schwefelporling,inat82037240,2021-06-07,52.26878,10.53219,,38100 Brunswick  Germany
-schwefelporling,inat82511197,2021-06-10,52.23459,10.51829,,Heidberg-Melverode  Braunschweig  Deutschland
-schwefelporling,inat83134474,2021-06-15,52.23448,10.51836,,Heidberg-Melverode  Brunswick  Germany
-schwefelporling,inat91752272,2021-08-19,52.20852,10.51228,4,Stöckheim-Leiferde  Braunschweig  Deutschland
-schwefelporling,inat91752845,2021-08-19,52.20798,10.51233,3,Hahnenkamp  Leiferde  38124 Braunschweig  Deutschland
-schwefelporling,inat162705988,2023-03-24,52.06287,10.38877,5,38259 Salzgitter  Deutschland
-schwefelporling,inat162912948,2023-05-21,52.25037,10.52642,35,Friedrich-Kreiß-Weg  Braunschweig  Niedersachsen  DE
-schwefelporling,inat164416949,2023-05-29,52.24492,10.49826,12,Braunschweig An den Gärtnerhöfen  38120 Braunschweig  Deutsc
-schwefelporling,inat164994818,2023-06-01,52.27977,10.75831,,Königslutter am Elm  38154 Königslutter am Elm  Deutschland
-schwefelporling,inat179988362,2023-08-21,52.22956,10.51275,7,Heidberg-Melverode  Braunschweig  Deutschland
-schwefelporling,inat209284560,2024-04-25,52.2932,10.53246,,Siegfriedviertel  38 Braunschweig-Nordstadt  Deutschland
-schwefelporling,inat213968633,2024-05-06,52.38336,10.53002,,38527 Meine  Deutschland
-schwefelporling,inat219530727,2024-05-31,52.61464,10.24928,,29331 Lachendorf  Deutschland
-schwefelporling,inat245741924,2024-10-05,52.44776,10.45533,,38542 Leiferde  Deutschland
-schwefelporling,inat307693940,2025-08-19,52.16798,10.31625,12,Lebenstedt  Salzgitter  Niedersachsen  DE
-schwefelporling,inat329695348,2025-12-06,52.18239,10.54055,11,38302 Wolfenbüttel-Ahlum  Deutschland
-schwefelporling,inat340036879,2026-02-24,52.07576,10.45381,75,38259 Salzgitter  Deutschland
-schwefelporling,inat345109598,2026-03-25,52.33234,10.59381,,38 Braunschweig-Hondelage  Deutschland
-schwefelporling,inat352924417,2026-04-24,52.25513,10.45792,43,Braunschweig  Raffteichbad  38120 Braunschweig  Deutschland
-schwefelporling,inat356426687,2026-04-16,52.25753,10.53765,11,Willy-Brandt-Platz - Braunschweig  38102 Braunschweig  Deuts
-schwefelporling,inat363673391,2026-05-21,52.28876,10.51057,61,Braunschweig  Weizenbleek  38112 Braunschweig  Deutschland
-schwefelporling,inat365032007,2026-05-25,52.25963,10.56827,3,Viewegsgarten-Bebelhof  Braunschweig  Niedersachsen  DE
-parasol,inat6979962,2017-07-09,52.46533,10.47887,5,Gifhorn  DE-NI  DE
-parasol,inat34591101,2019-10-19,52.16558,10.53953,5,Rosengasse  Wolfenbüttel  Niedersachsen  DE
-parasol,inat52667823,2019-10-02,52.76521,10.16576,489,Naturpark Südheide  Eschede  Niedersachsen  DE
-parasol,inat93735998,2021-09-05,52.3086,10.47793,49,Veltenhof-Rühme  Braunschweig  Deutschland
-parasol,inat94114139,2021-09-08,52.29213,10.33415,22,Vechelde  Niedersachsen  DE
-parasol,inat137144491,2022-10-01,52.39005,10.52653,6,38527 Meine  Deutschland
-parasol,inat137516637,2022-10-04,52.39521,10.5244,8,38531 Rötgesbüttel  Deutschland
-parasol,inat176952481,2023-08-06,52.40394,10.33615,32,Edemissen  31234 Edemissen  Deutschland
-parasol,inat178362738,2023-08-14,52.51224,10.3854,,38539 Müden (Aller)  Deutschland
-parasol,inat179145001,2023-08-19,52.42425,10.80909,4,Drosselweg  Wolfsburg  Niedersachsen  DE
-parasol,inat185566866,2023-09-30,52.41122,10.46608,9,38551 Ribbesbüttel  Deutschland
-parasol,inat187504085,2023-10-14,52.2588,10.58078,9,7H5J+CC  38104 Braunschweig  Germany
-parasol,inat188408682,2023-10-21,52.27037,10.5809,15,Wabe-Schunter-Beberbach  Braunschweig  Germany
-parasol,inat188999044,2023-10-26,52.61614,10.3461,7,Celle  DE-NI  DE
-parasol,inat192375592,2023-11-27,52.30261,10.62291,31,Volkmarode  Braunschweig  Deutschland
-parasol,inat198808156,2021-09-17,52.28094,10.59203,,38 Braunschweig-Volkmarode  Deutschland
-parasol,inat221796840,2024-06-10,52.33814,10.46098,6,38179 Schwülper  Deutschland
-parasol,inat245537747,2024-10-04,52.22226,10.44064,,38120 Braunschweig  Deutschland
-parasol,inat246775284,2024-10-11,52.30264,10.55259,14,38 Braunschweig-Wabe-Schunter-Beberbach  Deutschland
-parasol,inat247125205,2024-10-13,52.38255,10.41241,40,Neubrücker Weg  Didderse  Lower Saxony  DE
-parasol,inat248643097,2024-10-20,52.44731,10.62536,,38550 Isenbüttel  Deutschland
-parasol,inat259535582,2024-10-26,52.81243,10.14489,,Naturpark Südheide  Südheide  Lower Saxony  DE
-parasol,inat303718988,2025-08-04,52.29709,10.6252,28,38 Braunschweig-Volkmarode  Deutschland
-parasol,inat305255788,2025-08-08,52.61629,10.12176,15,Celle  Deutschland
-parasol,inat315048350,2025-09-19,52.30259,10.4828,14,38 Braunschweig-Veltenhof-Rühme  Deutschland
-parasol,inat320703382,2025-10-13,52.30964,10.49964,12,38 Braunschweig-Veltenhof-Rühme  Deutschland
-parasol,inat324509470,2025-11-02,52.1395,10.64924,4,38329 Wittmar  Deutschland
+hexenroehrling,6399838696,2026-05-30,52.38484,10.7158,4.0,
+hexenroehrling,6399071581,2026-06-07,52.0672,11.24185,,
+hexenroehrling,6399503397,2026-06-15,53.16988,9.09139,4.0,
+hexenroehrling,6400614743,2026-06-06,51.82113,10.79153,936.0,
+hexenroehrling,5238220302,2025-07-26,51.72067,10.27803,5.0,
+hexenroehrling,5291979685,2025-08-08,53.2432,10.43459,8.0,
+hexenroehrling,5759409918,2025-08-31,53.46918,11.56832,250.0,Friedrichsmoor und Waldlewitz
+hexenroehrling,5830944653,2025-09-17,53.38639,9.8727,3.0,
+hexenroehrling,5837129083,2025-09-22,52.45988,9.19221,250.0,Mischwald beim Denkhaus in Loccum
+hexenroehrling,5871907404,2025-09-28,52.46332,9.86434,250.0,Lohner Wald
+hexenroehrling,5844781876,2025-10-02,52.13311,9.34665,250.0,Hameln Wehlbach-Wald
+hexenroehrling,5867881372,2025-10-17,53.4509,9.85152,25876.0,
+hexenroehrling,5889005006,2025-10-20,52.92352,9.4572,250.0,TK25 Blatt 3022/4 - Groß Heins / Idsingen / Lehrden
+hexenroehrling,5889429126,2025-10-19,52.13037,9.37355,,
+hexenroehrling,5890098148,2025-10-23,51.50136,11.92691,1.0,
+hexenroehrling,5890098167,2025-10-11,53.22514,9.22076,4.0,
+hexenroehrling,6137478575,2025-10-22,53.18064,9.86856,250.0,Haus Ehrhorn & Umgebung
+hexenroehrling,5893031539,2025-11-04,52.07002,11.28408,,
+hexenroehrling,5897359538,2025-11-12,53.29319,10.25757,15.0,
+hexenroehrling,4855152649,2024-05-05,53.14801,10.78576,4.0,
+hexenroehrling,5013192146,2024-07-20,51.63955,11.14933,250.0,Stadtfriedhof Harzgerode
+hexenroehrling,4987475849,2024-09-24,52.2498,10.49406,4.0,
+hexenroehrling,5017785027,2024-09-01,53.32821,11.48344,250.0,Schlosspark Ludwigslust
+hexenroehrling,4976349322,2024-10-26,52.71872,10.45834,6.0,
+hexenroehrling,4976512611,2024-10-26,52.71675,10.47909,9.0,
+hexenroehrling,4978306994,2024-10-31,52.40428,10.36005,,
+hexenroehrling,4987390890,2024-10-12,51.68933,11.28999,26164.0,
+hexenroehrling,5021924471,2024-10-12,51.83695,10.39942,250.0,Brandkopf mit Schalker Teich
+hexenroehrling,5026444943,2024-10-04,53.42038,11.35265,250.0,Waldgebiet bei Kraak
+hexenroehrling,5153280005,2024-10-17,52.95882,9.7549,25972.0,
+hexenroehrling,5897006768,2024-10-18,53.14728,10.45102,250.0,Naturschutzgebiet Forellenbachtal
+hexenroehrling,6320842359,2024-10-07,51.8125,10.96306,176.0,
+hexenroehrling,5017018050,2024-11-09,52.45988,9.19221,250.0,Mischwald beim Denkhaus in Loccum
+hexenroehrling,5019373951,2024-11-16,53.42038,11.35265,250.0,Waldgebiet bei Kraak
+hexenroehrling,5890404956,2024-11-01,52.73602,10.47519,181.0,
+hexenroehrling,5896996119,2024-11-10,53.2531,10.50224,250.0,Bilmer Strauch
+hexenroehrling,4120928931,2023-05-23,51.52015,10.15304,31.0,
+hexenroehrling,4121161609,2023-05-20,53.21112,10.78781,10.0,
+hexenroehrling,5022661172,2023-06-28,51.90777,9.79086,250.0,Mailerplatz im Hagental
+hexenroehrling,4153915429,2023-07-10,51.51783,10.1514,15.0,
+hexenroehrling,4162074234,2023-07-12,51.77281,10.53326,,
+hexenroehrling,4165443689,2023-07-09,53.16704,9.945,370.0,
+hexenroehrling,4518969957,2023-07-29,51.84858,10.64618,6919.0,
+hexenroehrling,4535872805,2023-07-05,52.34366,9.7285,9.0,
+hexenroehrling,4607519172,2023-07-19,53.15241,9.96084,4.0,
+hexenroehrling,5012713457,2023-07-30,53.19251,10.42561,250.0,Deutsch Evern - Friedhof
+hexenroehrling,5019760374,2023-07-14,51.731,10.025,25.0,TK25 Blatt 4226/3 - Rhume / Northeim / Langenholtensen
+hexenroehrling,4177065248,2023-08-08,52.26898,10.55786,394.0,
+hexenroehrling,4407065821,2023-08-13,52.14823,9.90069,12.0,
+hexenroehrling,4522567844,2023-08-24,53.1558,9.92451,,
+hexenroehrling,4535799847,2023-08-09,52.27637,10.57784,9.0,
+hexenroehrling,4855115341,2023-08-05,53.13472,9.80754,40.0,
+hexenroehrling,5012791865,2023-08-11,53.42345,10.64541,250.0,Kiesgrube südöstlich Zweedorf
+hexenroehrling,5017391107,2023-08-26,51.75411,10.67794,250.0,Elendstal
+hexenroehrling,5020964376,2023-08-28,52.27852,10.7561,25.0,TK25 Blatt 3730/2 - Lauingen / Königslutter am Elm
+hexenroehrling,5027958758,2023-08-08,53.09948,10.33785,250.0,Süsing
+hexenroehrling,5231372483,2023-08-13,51.52529,10.03372,26196.0,
+hexenroehrling,4416722641,2023-09-16,51.72417,10.61765,4.0,
+hexenroehrling,4416742720,2023-09-16,51.72407,10.61762,7.0,
+hexenroehrling,4416956049,2023-09-24,52.32763,10.71416,11.0,
+hexenroehrling,4516444648,2023-09-08,52.48942,11.70041,2307.0,
+hexenroehrling,5016469799,2023-09-10,53.43081,11.34281,250.0,Kraaker Mühlenbach östl. von Moraas
+hexenroehrling,5016469835,2023-09-10,52.44976,9.14762,250.0,Klosterwald Loccum
+hexenroehrling,5022672798,2023-09-09,52.45988,9.19221,250.0,Mischwald beim Denkhaus in Loccum
+hexenroehrling,5027950400,2023-09-24,53.40372,11.40753,250.0,Waldgebiet östl. Jasnitz
+hexenroehrling,4430571823,2023-10-14,51.7465,10.7446,9.0,
+hexenroehrling,4438830142,2023-10-01,53.44585,9.84966,9.0,
+hexenroehrling,4438858261,2023-10-23,53.27014,10.27564,877.0,
+hexenroehrling,4438913223,2023-10-22,52.58782,10.93847,26036.0,
+hexenroehrling,4853012401,2023-10-06,52.61576,10.02065,7.0,
+hexenroehrling,4925837473,2023-10-08,53.20023,9.17833,4.0,
+hexenroehrling,5012672100,2023-10-29,53.42038,11.35265,250.0,Waldgebiet bei Kraak
+hexenroehrling,5012784831,2023-10-08,53.45808,11.24365,250.0,Viezer Heide (TÜP) und umgebender Wald
+hexenroehrling,5016588844,2023-10-21,52.53689,9.70311,250.0,Henjeskamp
+hexenroehrling,5017969226,2023-10-08,53.09902,10.12922,250.0,Rehrhofer Heide
+hexenroehrling,5019997489,2023-10-28,53.15017,9.82332,250.0,Camp Reinsehlen
+hexenroehrling,5022594351,2023-10-07,52.53689,9.70311,250.0,Henjeskamp
+hexenroehrling,5022628998,2023-10-30,53.15653,9.944,250.0,Waldgebiete westl. Wilsede
+hexenroehrling,4438881205,2023-11-04,52.0782,10.08765,,
+hexenroehrling,4516274730,2023-11-04,51.64977,11.3453,26164.0,
+hexenroehrling,5025657630,2023-11-11,53.30104,11.15872,250.0,Nationales Naturerbe Lübtheener Heide
+hexenroehrling,4952434651,2022-02-20,53.20259,9.13616,,
+hexenroehrling,3902127896,2022-05-26,52.26398,10.55664,164.0,
+hexenroehrling,4442436619,2022-05-31,51.98851,9.99477,1432.0,
+hexenroehrling,4525260247,2022-06-15,51.95616,9.86726,1606.0,
+hexenroehrling,3902734506,2022-08-14,53.0909,9.95374,244.0,
+hexenroehrling,5019442156,2022-08-14,53.12999,9.9131,250.0,Tütsberg
+hexenroehrling,5023585069,2022-08-14,53.12999,9.9131,250.0,Tütsberg
+hexenroehrling,5827907694,2022-08-14,53.1111,9.91039,260.0,
+hexenroehrling,3915701389,2022-09-12,52.61736,10.1175,4.0,
+hexenroehrling,4440986844,2022-09-03,52.82496,10.27473,3248.0,
+hexenroehrling,5024160887,2022-09-25,52.54154,9.83,250.0,Sprillgehege
+hexenroehrling,5028516500,2022-09-09,52.83888,10.27422,250.0,Unterlüß / Süll
+hexenroehrling,3925030897,2022-10-05,52.32169,10.42111,21.0,
+hexenroehrling,3925031761,2022-10-04,52.7684,10.22751,26004.0,
+hexenroehrling,3925147254,2022-10-08,52.12568,9.36233,,
+hexenroehrling,3925264468,2022-10-09,52.22221,10.58989,15.0,
+hexenroehrling,3947081661,2022-10-16,52.61581,10.02103,4.0,
+hexenroehrling,3947211384,2022-10-14,52.34827,10.82672,,
+hexenroehrling,3947272934,2022-10-08,52.96902,10.24562,83.0,
+hexenroehrling,3947568979,2022-10-10,52.94283,10.2425,456.0,
+hexenroehrling,3947629669,2022-10-16,51.65991,11.28487,26164.0,
+hexenroehrling,3961214107,2022-10-28,52.2917,10.33305,4.0,
+hexenroehrling,3961440316,2022-10-29,53.14184,10.86963,1735.0,
+hexenroehrling,3986188869,2022-10-16,53.13241,9.80865,25.0,
+hexenroehrling,4127071789,2022-10-21,53.22241,10.70264,330.0,
+hexenroehrling,5013932037,2022-10-11,52.1297,9.84593,250.0,Hildesheimer Wald: Nord
+hexenroehrling,5018070911,2022-10-08,52.53689,9.70311,250.0,Henjeskamp
+hexenroehrling,5018269244,2022-10-08,52.12361,9.37388,250.0,TK25 Blatt 3822/3 - Weser / Hameln
+hexenroehrling,5022721025,2022-10-23,52.25471,9.56703,250.0,Deister Ostseite
+hexenroehrling,5024861012,2022-10-08,52.53689,9.70311,250.0,Henjeskamp
+hexenroehrling,5027715594,2022-10-23,53.1235,10.2904,250.0,TK25 Blatt 2827/4 - Lüneburger Heide / Betzendorf
+hexenroehrling,3963404185,2022-11-01,52.28297,10.47336,97.0,
+hexenroehrling,3963623670,2022-11-01,52.28261,10.47305,29.0,
+hexenroehrling,5013636976,2022-11-06,52.27016,11.05052,250.0,Lappwald bei Walbeck
+hexenroehrling,5016855252,2022-11-04,52.5692,10.1215,250.0,Nienhagen - Felder B 214
+hexenroehrling,5017067427,2021-01-10,52.33543,9.32122,250.0,Waldgebiet bei Beckedorf
+hexenroehrling,5024617103,2021-02-06,51.67549,10.95922,250.0,Krugberg Allrode
+hexenroehrling,3301987224,2021-06-01,51.96312,10.56969,2419.0,
+hexenroehrling,5026712649,2021-07-15,53.36184,11.12677,250.0,Große Heide bei Goldenitz
+hexenroehrling,5014368813,2021-08-27,53.14502,9.89842,250.0,Heideflächen westl. von Nieder-Haverbeck
+hexenroehrling,5020360536,2021-09-04,52.49511,9.38095,250.0,Steinhuder Meer (Ostufer)
+hexenroehrling,5021640015,2021-09-11,52.44976,9.14762,250.0,Klosterwald Loccum
+hexenroehrling,5025044374,2021-09-03,53.16782,9.94567,250.0,Wilseder Berg u. umgebende Heideflächen
+hexenroehrling,5027165761,2021-09-03,52.16693,9.42631,25.0,Süntel: Süd
+hexenroehrling,5015823398,2021-11-06,52.29189,9.46026,250.0,Deister Nordostseite
+hexenroehrling,5020501606,2021-11-19,52.05266,10.17419,25.0,TK25 Blatt 3927/1 - Baddeckenstedt
+hexenroehrling,2814003498,2020-06-28,52.10805,10.38604,263.0,
+hexenroehrling,5020543964,2020-07-02,51.85126,10.54749,250.0,Radau mit Radauwasserfall
+hexenroehrling,5013174868,2020-09-11,52.43345,9.74911,250.0,Langenhagen: Langenforth
+hexenroehrling,5015107254,2020-09-06,51.8581,10.31458,25.0,TK25 Blatt 4127/2 - Harz / Lautenthal
+hexenroehrling,5017817208,2020-10-13,51.67549,10.95922,250.0,Krugberg Allrode
+hexenroehrling,5016846940,2020-11-07,53.04181,10.46561,250.0,Brennholz - Ebstorf - UE
+hexenroehrling,5023582777,2020-11-08,53.28592,10.70172,25.0,TK25 Blatt 2730/1 - Elbe / Bleckede / Breetze
+hexenroehrling,5025064725,2020-11-05,52.98749,10.2512,250.0,Lintzel Blauer Waldpfad
+hexenroehrling,5013389940,2019-10-25,52.25471,9.56703,250.0,Deister Ostseite
+hexenroehrling,5023805594,2019-10-27,51.81221,9.64423,250.0,MTB 4123/4/4 Waldgebiet Solling
+hexenroehrling,5025460817,2019-11-02,52.98749,10.2512,250.0,Lintzel Blauer Waldpfad
+hexenroehrling,5027480596,2017-05-20,51.75121,10.27483,250.0,Waldgebiet westlich Lerbach
+hexenroehrling,4438933304,2017-06-04,51.73788,10.61483,1376.0,
+hexenroehrling,5176918611,2017-08-04,51.68756,10.7842,26164.0,
+hexenroehrling,3017960867,2017-10-16,53.4283,9.84654,,
+hexenroehrling,5020729528,2017-10-08,53.27724,10.43425,250.0,"Adendorf, Kirchwald"
+hexenroehrling,5021053201,2017-10-21,52.82284,11.50738,250.0,"Heiligenfelde, Mühlenberg und Kiesgrube"
+hexenroehrling,5026938015,2017-10-08,53.27726,10.44079,250.0,"Adendorf, zwischen Kirchweg und Bahn"
+hexenroehrling,5014614942,2016-06-11,51.74165,11.07199,250.0,Elzeberg
+hexenroehrling,2988906456,2016-07-10,53.0752,10.28526,,"Wettenbostel, NWR Süsing - 09ÜK_F"
+hexenroehrling,5026607901,2016-10-23,51.82944,9.90375,250.0,Waldgebiet am Aussichtsturm Altendorfer Berg
+hexenroehrling,1143548996,2015-09-20,52.26339,10.55477,88.0,
+hexenroehrling,1831107187,2015-09-19,52.63222,10.56311,26004.0,
+hexenroehrling,2005273561,2015-09-02,52.24809,10.67157,26068.0,
+hexenroehrling,5023174448,2015-09-20,53.2488,10.69177,25.0,TK25 Blatt 2730/1 - Elbe / Bleckede / Breetze
+hexenroehrling,5027119309,2015-09-28,52.9083,10.38201,250.0,Bahnsen Hochspannungstrasse Heideflächen
+hexenroehrling,5016624601,2015-10-04,53.26696,10.59719,250.0,Buckelgräberfeld Boltersen
+netzhexe,6341860108,2026-05-30,52.13077,9.33922,7.0,HM Hameln
+netzhexe,6398714358,2026-06-13,52.33617,9.75874,31.0,
+netzhexe,6400842649,2026-06-03,51.82335,11.70637,4.0,
+netzhexe,6410695739,2026-06-28,52.00259,9.65228,6.0,HI Duinger Teiche
+netzhexe,6410713620,2026-06-02,52.20908,9.47313,4.0,HM Bad Münder am Deister
+netzhexe,6411114650,2026-06-17,52.13323,9.98047,3.0,HI Hildesheim (Kern)
+netzhexe,6411195742,2026-06-27,52.40344,9.91429,6.0,LSG Altwarmbüchener Moor - Ahltener Wald
+netzhexe,6411229117,2026-06-08,52.04924,10.08684,29.0,HI Bockenem
+netzhexe,6411335717,2026-06-21,52.19274,9.29051,6.0,Uhu-Brutplätze im Weserbergland - N2000
+netzhexe,6411594230,2026-06-15,51.58623,10.6396,,Grünes Band Thüringen
+netzhexe,6412146500,2026-06-25,52.18506,9.89508,8.0,HI LSG Giesener Berge und Teiche
+netzhexe,6412580206,2026-06-18,51.82346,11.70678,,Sachsen-Anhalt - FH Anhalt: Campus Bernburg
+netzhexe,6412862706,2026-06-28,52.00252,9.6524,11.0,HI Duinger Teiche
+netzhexe,6424042539,2026-06-28,52.09723,9.32594,4.0,LSG Hamelner Stadtforsten (Südwest)
+netzhexe,6424095619,2026-06-27,51.98745,9.24947,10.0,HM Bad Pyrmont
+netzhexe,6424117381,2026-06-29,52.12505,10.14844,6.0,HI LSG Vorholzer Bergland
+netzhexe,6431752516,2026-06-27,51.9867,9.25054,40.0,
+netzhexe,6423897577,2026-07-04,52.15923,9.52913,,NSG Saupark
+netzhexe,6448988297,2026-07-15,52.05592,10.19512,19.0,HI LSG Hainberg
+netzhexe,6449428596,2026-07-15,52.06962,10.17766,10.0,HI Holle
+netzhexe,6451521011,2026-07-18,52.11194,10.34075,8.0,
+netzhexe,5180659803,2025-06-03,51.79616,11.15583,70.0,HZ Harz (Landkreis)
+netzhexe,5186862471,2025-06-13,51.96075,10.53614,10.0,GS Goslar (Landkreis)
+netzhexe,5198902793,2025-06-11,51.8235,11.70715,4.0,
+netzhexe,5199033855,2025-06-11,52.03685,10.38445,10.0,
+netzhexe,5199250415,2025-06-15,52.11475,9.48348,61.0,
+netzhexe,6130230446,2025-06-09,52.14694,9.90837,5.0,
+netzhexe,5234318735,2025-07-23,51.74238,11.48941,,Aschersleben-Staßfurt (Landkreis)
+netzhexe,5234340196,2025-07-23,51.74238,11.48941,,Aschersleben-Staßfurt (Landkreis)
+netzhexe,5234377073,2025-07-23,51.81024,9.73353,,NOM Northeim (Landkreis)
+netzhexe,5234405629,2025-07-23,52.18876,9.46109,5.0,HM Hameln-Pyrmont (Landkreis)
+netzhexe,5234412753,2025-07-21,52.19639,10.57961,11.0,WF Wolfenbüttel
+netzhexe,5234498854,2025-07-23,51.5408,9.93846,,GÖ Göttingen Zentralcampus
+netzhexe,5234804240,2025-07-25,52.11468,10.32147,12.0,LSG Waldgürtel zwischen Salzgitter-Osterlinde und Salzgitter
+netzhexe,5234912339,2025-07-23,52.25657,10.53549,9.0,BS Braunschweig (Kreisfreie Stadt)
+netzhexe,5235080644,2025-07-22,51.50722,10.27032,9.0,GÖ Duderstadt
+netzhexe,5235103431,2025-07-22,52.25624,10.75015,,HE Helmstedt (Landkreis)
+netzhexe,5235147022,2025-07-23,52.86522,9.56764,,LSG Böhmetal
+netzhexe,5237904302,2025-07-26,51.57583,9.9498,4.0,
+netzhexe,5238285978,2025-07-24,51.56084,9.96582,,
+netzhexe,5282691928,2025-07-29,51.99759,10.4268,12.0,GS Goslar (Landkreis)
+netzhexe,5282732121,2025-07-28,51.88336,10.65071,,"Rohnberg, Westerberg und Köhlerholz bei Ilsenburg - N2000"
+netzhexe,5282754560,2025-07-28,51.88336,10.65071,,"Rohnberg, Westerberg und Köhlerholz bei Ilsenburg - N2000"
+netzhexe,5282801661,2025-07-28,52.41679,10.71951,,WOB Wolfsburg (Kreisfreie Stadt)
+netzhexe,5282859017,2025-07-30,52.27923,10.4688,61.0,BS Braunschweig (Kreisfreie Stadt)
+netzhexe,5282918334,2025-07-29,51.99762,10.4267,18.0,GS Goslar (Landkreis)
+netzhexe,5283179418,2025-07-30,52.10546,9.29682,,HM Hameln
+netzhexe,5283333485,2025-07-28,51.88531,10.54413,,GS Bad Harzburg
+netzhexe,5283447539,2025-07-31,51.58871,9.95999,7.0,GÖ Plesseforst
+netzhexe,5283519539,2025-07-31,52.02007,10.1821,,HI Hildesheim (Landkreis)
+netzhexe,5283552527,2025-07-29,52.18729,9.07784,,SHG Schaumburg (Landkreis)
+netzhexe,5283564653,2025-07-30,52.27979,10.46845,6.0,BS Braunschweig (Kreisfreie Stadt)
+netzhexe,5889811787,2025-07-29,51.64668,9.80172,26164.0,
+netzhexe,6400481710,2025-07-26,52.25877,9.52476,18.0,
+netzhexe,6412010604,2025-07-28,51.59128,9.95442,12.0,GÖ Plesseforst
+netzhexe,6412467859,2025-07-30,52.41566,10.72893,,WOB Wolfsburg (Kreisfreie Stadt)
+netzhexe,6412649661,2025-07-31,53.26201,10.38203,,LG Lüneburg (Landkreis)
+netzhexe,5281669868,2025-08-02,51.74546,9.10901,25.0,"Hinnenburger Forst, südl. Emder Höhe"
+netzhexe,5281768635,2025-08-03,51.52883,10.2269,,
+netzhexe,5281775033,2025-08-02,52.13232,9.3723,,
+netzhexe,5282712987,2025-08-02,52.22835,11.01871,3.0,HE Helmstedt (Landkreis)
+netzhexe,5282815827,2025-08-03,51.56776,9.95307,5.0,GÖ Plesseforst
+netzhexe,5282890257,2025-08-01,52.14527,10.78707,,WF Wolfenbüttel (Landkreis)
+netzhexe,5282913337,2025-08-03,52.0582,10.19676,10.0,"WF LSG Hainberg, Wohldenberg, Braune Heide, Klein Rhüdener H"
+netzhexe,5283216398,2025-08-03,51.68562,9.01634,,HX Höxter (Kreis)
+netzhexe,5283237013,2025-08-01,52.14526,10.78711,,WF Wolfenbüttel (Landkreis)
+netzhexe,5283438386,2025-08-01,52.14024,10.80283,,"LSG Lah, Küblinger Trift und angrenzende Landschaftsteile"
+netzhexe,5291796414,2025-08-09,52.04682,10.37836,5.0,
+netzhexe,5292865539,2025-08-10,51.8239,10.89957,6.0,
+netzhexe,5292880860,2025-08-09,52.14837,9.8991,8.0,
+netzhexe,5760835030,2025-08-02,51.58467,10.32803,,
+netzhexe,5868077050,2025-08-05,52.40955,10.75585,12.0,
+netzhexe,5832280949,2025-09-25,52.44358,9.7969,,Hannover
+netzhexe,4875314526,2024-06-01,52.3712,9.70029,863.0,
+netzhexe,4891783019,2024-06-05,51.93278,10.44254,9159.0,
+netzhexe,4931208948,2024-06-09,52.14744,9.94158,,HI Hildesheim (Kern)
+netzhexe,4933180871,2024-06-28,53.43598,9.99535,16.0,Hamburg
+netzhexe,5021017380,2024-06-20,51.56933,11.4937,250.0,Benndorf Ortslage
+netzhexe,5021168294,2024-06-20,51.58202,11.49138,250.0,Klostermansfeld Friedhof und Umgebung
+netzhexe,5062778648,2024-06-29,52.52817,9.74989,3.0,
+netzhexe,4919280423,2024-07-14,51.69036,10.8552,4.0,
+netzhexe,4919514557,2024-07-26,52.34684,9.71577,59.0,
+netzhexe,4931617214,2024-07-13,52.13411,9.97965,25.0,HI Hildesheim (Kern)
+netzhexe,4931774543,2024-07-13,52.06482,10.00417,7.0,Hildesheimer Wald - N2000
+netzhexe,4931956604,2024-07-23,52.35991,9.74605,,Hannover
+netzhexe,4932370634,2024-07-27,52.44127,10.80905,,WOB Wolfsburg (Kreisfreie Stadt)
+netzhexe,4932791894,2024-07-14,52.35247,9.87116,,Hannover
+netzhexe,4932992187,2024-07-19,52.41791,10.78107,8.0,WOB Wolfsburg (Kreisfreie Stadt)
+netzhexe,4933228975,2024-07-07,52.00745,9.69661,20.0,HI Hildesheim (Landkreis)
+netzhexe,4933487845,2024-07-11,51.64974,9.38423,7.0,HOL Holzminden (Landkreis)
+netzhexe,4935350701,2024-07-27,52.23434,10.48155,,BS Braunschweig (Kreisfreie Stadt)
+netzhexe,5006793608,2024-07-13,52.16702,9.03161,426.0,
+netzhexe,5282921199,2024-07-24,52.38267,9.71098,48.0,H Hannover Georgengarten
+netzhexe,5889668832,2024-07-27,52.44127,10.80905,,
+netzhexe,6424380582,2024-07-14,52.26364,10.56415,5.0,BS Braunschweig (Kreisfreie Stadt)
+netzhexe,4921464930,2024-08-05,52.17518,9.32684,10.0,
+netzhexe,4923729747,2024-08-08,51.71878,11.23632,20.0,
+netzhexe,4924050483,2024-08-07,52.27274,10.57227,14.0,
+netzhexe,4931626159,2024-08-02,52.26937,10.54316,,BS Braunschweig (Kreisfreie Stadt)
+netzhexe,4932448381,2024-08-09,52.05383,10.19941,10.0,"WF LSG Hainberg, Wohldenberg, Braune Heide, Klein Rhüdener H"
+netzhexe,4935382557,2024-08-03,52.36,9.74605,,Hannover
+netzhexe,4935439761,2024-08-04,51.92442,10.401,,GS Goslar (Landkreis)
+netzhexe,4935464246,2024-08-04,52.12568,10.29643,,SZ Salzgitter (Kreisfreie Stadt)
+netzhexe,4956040564,2024-08-28,52.39548,9.70422,,Hannover
+netzhexe,5014814078,2024-08-04,52.13075,9.62505,250.0,Osterwald
+netzhexe,5014940684,2024-08-17,52.13075,9.62505,250.0,Osterwald
+netzhexe,5016810573,2024-08-08,52.12362,10.20709,250.0,TK25 Blatt 3827/3 - Burgdorf (Baddeckenstedt)
+netzhexe,5022077471,2024-08-06,52.31195,9.60071,250.0,Gehrden
+netzhexe,5022981880,2024-08-13,51.57891,10.60747,250.0,Walkenried Karstgebiet
+netzhexe,5028442695,2024-08-04,52.06026,9.64841,250.0,"Thüster Berg,Kansteinhütte"
+netzhexe,5062833326,2024-08-06,52.35269,9.7474,14.0,
+netzhexe,4952808183,2024-09-27,52.19994,9.93777,26100.0,
+netzhexe,5028055411,2024-09-23,51.90824,10.42784,250.0,Goslar Stadtgebiet
+netzhexe,5205884441,2024-09-18,52.08227,10.22959,5.0,
+netzhexe,4954301537,2024-10-01,51.58782,9.87158,,
+netzhexe,5013099449,2024-10-06,52.30326,10.61235,25.0,BS-NO
+netzhexe,5017302135,2024-10-04,52.30459,10.61156,250.0,BS-NO
+netzhexe,5023073954,2024-10-04,52.30459,10.61156,250.0,BS-NO
+netzhexe,5019644429,2024-11-03,51.81932,9.50098,25.0,TK25 Blatt 4123/3 - Solling / Holzminden (West)
+netzhexe,4120851309,2023-05-22,51.5584,9.96475,2.0,
+netzhexe,4121200284,2023-05-18,51.5584,9.9647,4.0,
+netzhexe,4121418531,2023-05-20,52.03794,10.31742,5.0,
+netzhexe,4157670167,2023-05-18,51.5584,9.9647,5.0,GÖ Göttingen (Stadt)
+netzhexe,4157746547,2023-05-18,51.55836,9.96467,5.0,GÖ Göttingen (Stadt)
+netzhexe,4159909815,2023-05-30,51.90431,10.41258,,GS Goslar (Landkreis)
+netzhexe,4160559462,2023-06-28,52.15845,10.54088,66.0,WF Wolfenbüttel
+netzhexe,4160615622,2023-06-30,51.50275,9.9718,4.0,GÖ LSG Leinetal
+netzhexe,4160721565,2023-06-30,51.50275,9.97182,3.0,GÖ LSG Leinetal
+netzhexe,5022498722,2023-06-21,51.80424,9.11126,250.0,Nieheim - Kernstadt
+netzhexe,4145703883,2023-07-02,52.10706,10.38991,9.0,
+netzhexe,4153404948,2023-07-06,51.55865,9.95086,32.0,
+netzhexe,4153442430,2023-07-06,51.55705,9.94837,24.0,
+netzhexe,4153490529,2023-07-06,52.25742,10.45959,16.0,
+netzhexe,4153606058,2023-07-10,52.33609,9.78987,242.0,
+netzhexe,4153666049,2023-07-05,52.32693,9.68681,15.0,
+netzhexe,4153683666,2023-07-07,51.68922,9.91326,9.0,
+netzhexe,4153892084,2023-07-09,51.78123,9.37323,8.0,
+netzhexe,4153961160,2023-07-05,51.55943,9.96016,32.0,
+netzhexe,4153966035,2023-07-09,51.5067,10.00295,17.0,
+netzhexe,4162263692,2023-07-10,52.33683,9.79433,242.0,
+netzhexe,4162461954,2023-07-16,51.72184,11.25311,3.0,
+netzhexe,4408207062,2023-07-06,51.57484,9.46088,19.0,KS Kassel (Landkreis)
+netzhexe,4408539276,2023-07-06,52.15888,10.53989,,LSG Wallanlagen der Stadt Wolfenbüttel
+netzhexe,4408689674,2023-07-06,52.22844,11.01865,15.0,HE Helmstedt (Landkreis)
+netzhexe,4408821699,2023-07-03,51.975,10.71571,283.0,Halberstadt (ehem. Landkreis)
+netzhexe,4409376656,2023-07-13,52.24004,9.61898,,LSG Norddeister
+netzhexe,4409391435,2023-07-11,52.03235,10.20758,30.0,"WF LSG Hainberg, Wohldenberg, Braune Heide, Klein Rhüdener H"
+netzhexe,4512048192,2023-07-14,51.92738,10.06566,1365.0,
+netzhexe,4527957938,2023-07-10,52.3357,9.79431,66.0,
+netzhexe,4935142637,2023-07-02,52.13691,9.92191,7.0,HI Hildesheim (Kern)
+netzhexe,5022815961,2023-07-07,51.87143,11.37495,250.0,NSG Hakel (Kleiner Hakel) + Feld
+netzhexe,5026661778,2023-07-07,51.88652,9.86215,25.0,TK25 Blatt 4125/1 - Brunsen / Stroit / Naensen
+netzhexe,5026891254,2023-07-07,51.87574,11.37598,25.0,NSG Hakel (Kleiner Hakel) + Feld
+netzhexe,4171838091,2023-08-05,51.73651,9.03531,72.0,
+netzhexe,4405129139,2023-08-20,52.32321,10.67398,,
+netzhexe,4405451319,2023-08-20,52.25937,10.54831,44.0,
+netzhexe,4408725945,2023-08-07,52.29087,9.52352,100.0,WL Barsinghausen Egestorf
+netzhexe,4410090986,2023-08-31,52.20204,9.56033,6.0,H Hannover (Region)
+netzhexe,4438777959,2023-08-18,52.37055,9.69213,,
+netzhexe,4506411029,2023-08-02,51.5139,10.18455,7.0,
+netzhexe,4516227884,2023-08-21,52.37996,9.67658,,
+netzhexe,4516318939,2023-08-18,51.50237,11.94519,20.0,
+netzhexe,4535852838,2023-08-19,52.18543,9.89645,12.0,
+netzhexe,5017126885,2023-08-19,52.44352,9.7967,250.0,Garten mit Teich
+netzhexe,5018671802,2023-08-27,52.13775,9.66159,250.0,Wald beim Kloster Wülfinghausen
+netzhexe,5023827508,2023-08-15,53.22099,10.42791,250.0,"Tiergarten, Lüneburg"
+netzhexe,5231617781,2023-08-18,52.10068,9.39893,,
+netzhexe,6412199879,2023-08-01,53.22614,10.80908,166.0,LG Bleckede
+netzhexe,6412685398,2023-08-22,52.38833,9.7061,4.0,Hannover
+netzhexe,4535868893,2023-09-01,52.27089,10.48087,28.0,
+netzhexe,5026362364,2023-10-15,53.14852,10.47684,250.0,"Bienenbüttel, Ilmenau-Vierenbachtal, Hohnstorf"
+netzhexe,3996511842,2022-07-14,52.26632,9.05722,25.0,SHG Schaumburg (Landkreis)
+netzhexe,3905193467,2022-08-02,52.13224,9.34296,9.0,HM Hameln
+netzhexe,4855031996,2022-08-30,52.08612,10.08659,3812.0,
+netzhexe,4006618572,2022-09-16,52.4436,10.80414,,
+netzhexe,5012571632,2021-02-07,51.67367,10.95698,250.0,TK25 Blatt 4331/2 - Harz / Allrode
+netzhexe,3307355629,2021-06-15,52.25005,10.49103,3.0,
+netzhexe,3307363636,2021-06-14,51.72192,11.25262,5.0,
+netzhexe,3320871901,2021-06-26,52.1981,10.76284,17.0,
+netzhexe,3325536101,2021-07-05,52.21252,10.51302,789.0,
+netzhexe,3327672268,2021-07-12,52.27145,10.48037,8.0,
+netzhexe,3330712242,2021-07-20,51.552,9.94916,24.0,
+netzhexe,3330719633,2021-07-16,51.54361,9.94933,16.0,
+netzhexe,3335104011,2021-07-23,52.05092,9.6409,3655.0,
+netzhexe,3335185968,2021-07-23,52.05092,9.6409,3655.0,
+netzhexe,4516657775,2021-07-19,51.78622,10.96247,,
+netzhexe,4855287421,2021-07-14,52.25071,10.49396,11.0,
+netzhexe,5013622240,2021-07-23,52.0627,9.59896,25.0,TK25 Blatt 3923/2 - Salzhemmendorf / Oldendorf
+netzhexe,5013692089,2021-07-10,51.8174,9.89742,25.0,NSG Altendorfer Berg
+netzhexe,5018726730,2021-07-13,51.89183,9.85341,25.0,Stroit
+netzhexe,5019965037,2021-07-13,51.96118,10.05169,250.0,Heber; Klosterforst
+netzhexe,5020246832,2021-07-06,52.29107,9.52448,25.0,Feldmark nordöstlich von Egestorf/Deister mit div. Deisterbä
+netzhexe,5021102431,2021-07-05,52.2878,10.51378,250.0,Braunschweig
+netzhexe,3384952072,2021-09-15,52.44676,10.80819,176.0,
+netzhexe,5013751773,2021-09-08,52.34075,9.65007,25.0,TK25 Blatt 3623/4 - Gehrden / Ronnenberg
+netzhexe,5015168782,2021-09-04,52.49511,9.38095,250.0,Steinhuder Meer (Ostufer)
+netzhexe,5023262125,2021-09-07,51.89184,9.85341,25.0,Stroit
+netzhexe,5086881055,2021-09-12,52.27601,10.57689,14.0,
+netzhexe,2803053926,2020-06-20,51.69523,9.86782,372.0,
+netzhexe,2803160421,2020-06-24,51.9222,10.42283,751.0,
+netzhexe,2984381401,2020-06-24,52.04629,10.37909,8.0,
+netzhexe,3925456369,2020-06-25,52.20876,10.33934,385.0,
+netzhexe,2823253709,2020-07-17,52.31984,9.55417,65.0,
+netzhexe,2984558412,2020-07-16,52.25035,10.49394,5.0,
+netzhexe,4527952408,2020-08-29,52.35186,9.74848,7.0,
+netzhexe,4930485602,2020-08-29,52.02831,9.34049,30.0,HM Hameln-Pyrmont (Landkreis)
+netzhexe,5023309615,2020-08-29,51.58315,10.00169,25.0,TK25 Blatt 4426/1 - Roringen / Waake / Holzerode
+netzhexe,2860041506,2020-09-03,51.81616,10.24188,1414.0,
+netzhexe,5022460079,2020-10-03,51.67367,10.95698,250.0,TK25 Blatt 4331/2 - Harz / Allrode
+netzhexe,5023382129,2020-10-26,51.67367,10.95698,250.0,TK25 Blatt 4331/2 - Harz / Allrode
+netzhexe,3995166001,2019-06-16,51.63239,9.31154,5.0,HX Höxter (Kreis)
+netzhexe,5027859741,2019-06-19,52.33872,9.87714,25.0,TK25 Blatt 3625/3 - Hannover / Wülferode
+netzhexe,5024405551,2017-07-10,51.98649,9.83254,25.0,Antonia -Teich
+netzhexe,5022150413,2017-08-02,51.5222,10.90633,250.0,"Stempeda, NSG Alter Stolberg, Königskopf,"
+netzhexe,5018430489,2016-06-07,51.98656,9.83276,25.0,TK25 Blatt 4025/1 - Leine / Förste / Wispenstein / Hörsum
+netzhexe,3947738304,2015-09-25,52.28011,10.5473,5.0,
+netzhexe,5027236417,2015-09-05,51.74279,11.09817,250.0,Rumberg
+reizker,5837829164,2025-09-28,52.05166,10.98178,1075239.0,
+reizker,5868039023,2025-10-17,52.42257,11.69213,,
+reizker,5871915829,2025-10-14,51.78271,11.96156,250.0,Elsdorfer Sandkiete
+reizker,5889424302,2025-10-31,52.50126,11.44508,,
+reizker,5889995475,2025-10-26,52.73363,10.47742,20.0,
+reizker,5892259985,2025-10-22,52.90248,9.55038,250.0,Grundloses Moor und Grundloser See bei Walsrode
+reizker,6137480398,2025-10-22,53.18064,9.86856,250.0,Haus Ehrhorn & Umgebung
+reizker,6183618346,2025-10-22,53.18173,9.86983,14.0,LG VSG Lüneburger Heide
+reizker,5901329377,2025-11-16,53.14607,9.81594,5.0,HK - Camp Reinsehlen
+reizker,4946709352,2024-09-14,53.03121,9.26844,3.0,
+reizker,4976580566,2024-10-26,52.71988,10.45023,9.0,
+reizker,4980595107,2024-10-26,52.71869,10.4597,9.0,
+reizker,4985395528,2024-10-08,53.27035,10.68387,4.0,LG Bleckede
+reizker,4985664817,2024-10-14,53.26647,10.68467,14.0,LG Bleckede
+reizker,4986546498,2024-10-08,53.27163,10.6843,5.0,LG Bleckede
+reizker,5017561582,2024-10-07,52.93105,9.47159,250.0,"Lehrdetal mit Wald zwischen Wassermühle Stellichte, Gross He"
+reizker,5018092691,2024-10-17,52.4977,9.34668,250.0,Steinhuder Meer Nordufer bei der Alten Moorhütte
+reizker,5024353246,2024-10-23,52.36751,11.27803,250.0,Calvörder Berge (nordost)
+reizker,5087169491,2024-10-30,53.03171,9.26877,15.0,
+reizker,5897006567,2024-10-11,53.19414,10.41096,250.0,"Melbeck, östlich B 4"
+reizker,6398599225,2024-10-22,51.50173,11.89387,8.0,
+reizker,5014171422,2024-11-16,52.4977,9.34668,250.0,Steinhuder Meer Nordufer bei der Alten Moorhütte
+reizker,5023699277,2024-11-16,53.42038,11.35265,250.0,Waldgebiet bei Kraak
+reizker,5037090260,2024-11-16,52.90816,10.3113,25972.0,
+reizker,5896995931,2024-11-17,53.1836,10.51181,250.0,Bienenbüttel - Forst Jungfrau
+reizker,5023222668,2023-08-18,53.15382,10.42026,250.0,"Melbeck, Wald zwischen B4 und L233 bzw. Forellenbachtal"
+reizker,5025202824,2023-08-05,53.2341,10.4328,250.0,"Lüneburg, Waldfriedhof"
+reizker,5025758405,2023-09-12,51.8171,10.97483,250.0,Heers
+reizker,5025818924,2023-09-24,53.40372,11.40753,250.0,Waldgebiet östl. Jasnitz
+reizker,4461193292,2023-10-24,53.27032,10.68336,7.0,LG Bleckede
+reizker,5012637794,2023-10-29,53.19414,10.41096,250.0,"Melbeck, östlich B 4"
+reizker,5014283335,2023-10-28,53.15017,9.82332,250.0,Camp Reinsehlen
+reizker,5016637362,2023-10-29,53.42038,11.35265,250.0,Waldgebiet bei Kraak
+reizker,5017092881,2023-10-29,53.23711,9.87837,250.0,Inzmühlener Moor & Umgebung
+reizker,5017625726,2023-10-24,53.19414,10.41096,250.0,"Melbeck, östlich B 4"
+reizker,5017979653,2023-10-11,53.15783,10.55401,250.0,Solchstorf SW - UE
+reizker,5018231806,2023-10-15,53.15382,10.42026,250.0,"Melbeck, Wald zwischen B4 und L233 bzw. Forellenbachtal"
+reizker,5019816977,2023-10-08,53.45808,11.24365,250.0,Viezer Heide (TÜP) und umgebender Wald
+reizker,5023548526,2023-10-11,53.2341,10.4328,250.0,"Lüneburg, Waldfriedhof"
+reizker,5026143555,2023-10-21,52.53689,9.70311,250.0,Henjeskamp
+reizker,4925933282,2023-11-05,53.21805,9.18929,4.0,
+reizker,4925950717,2023-11-06,53.15774,9.08413,3.0,
+reizker,5021398930,2023-11-11,53.30104,11.15872,250.0,Nationales Naturerbe Lübtheener Heide
+reizker,5027728547,2023-11-01,53.15382,10.42026,250.0,"Melbeck, Wald zwischen B4 und L233 bzw. Forellenbachtal"
+reizker,5027742997,2023-12-25,53.40372,11.40753,250.0,Waldgebiet östl. Jasnitz
+reizker,3995318914,2022-09-11,53.23617,10.70964,25.0,LG Lüneburg (Landkreis)
+reizker,3925183192,2022-10-07,52.50451,11.34293,26036.0,
+reizker,3925365474,2022-10-09,52.55483,10.21619,168.0,
+reizker,3947456896,2022-10-08,52.9704,10.24552,51.0,
+reizker,3947597243,2022-10-13,52.55564,10.21475,150.0,
+reizker,3947748056,2022-10-11,53.29287,10.23172,87.0,
+reizker,3985738902,2022-10-23,53.10908,10.99727,8070.0,
+reizker,3996553003,2022-10-13,53.17777,10.46335,25.0,NSG Dieksbeck
+reizker,5016730973,2022-10-18,53.45808,11.24365,250.0,Viezer Heide (TÜP) und umgebender Wald
+reizker,5022099222,2022-11-06,52.27016,11.05052,250.0,Lappwald bei Walbeck
+reizker,5026259975,2022-11-03,53.18649,10.36843,250.0,Am alten Werk
+reizker,5015715742,2021-09-04,52.49511,9.38095,250.0,Steinhuder Meer (Ostufer)
+reizker,5018671690,2021-09-19,52.52357,9.8738,250.0,TK25 Blatt 3425/3 - Burgwedel / Kleinburgwedel
+reizker,5019217382,2021-10-26,53.1235,11.30407,250.0,NSG Binnendünen bei Klein Schmölen und NSG Löcknitztal-Altla
+reizker,4058058782,2020-10-06,53.27625,10.69774,,LG Lüneburg (Landkreis)
+reizker,4058206104,2020-10-31,53.27606,10.71271,,Elbe - Bleckede
+reizker,4058279836,2020-10-03,53.27089,10.68605,,LG Lüneburg (Landkreis)
+reizker,4058376937,2020-10-06,53.27563,10.70443,,Elbe - Bleckede
+reizker,5015933055,2020-10-31,53.27606,10.71271,25.0,TK25 Blatt 2730/1 - Elbe / Bleckede / Breetze
+reizker,5016863266,2020-10-03,53.27089,10.68605,25.0,TK25 Blatt 2730/1 - Elbe / Bleckede / Breetze
+reizker,5017783943,2020-10-06,52.4977,9.34668,250.0,Steinhuder Meer Nordufer bei der Alten Moorhütte
+reizker,5018075405,2020-10-10,53.45808,11.24365,250.0,Viezer Heide (TÜP) und umgebender Wald
+reizker,5021929948,2020-10-06,53.27625,10.69774,25.0,TK25 Blatt 2730/1 - Elbe / Bleckede / Breetze
+reizker,2988672596,2020-11-21,52.07164,10.3623,174.0,
+reizker,2992874983,2020-11-21,52.07196,10.35871,9.0,
+reizker,4057774267,2020-11-08,53.27621,10.7128,,Elbe - Bleckede
+reizker,5015471566,2020-11-08,53.27621,10.7128,25.0,TK25 Blatt 2730/1 - Elbe / Bleckede / Breetze
+reizker,5022743832,2020-11-03,52.79293,9.66434,250.0,Heide bei Krelingen
+reizker,4058251379,2020-12-25,53.26016,10.68971,,LG Lüneburg (Landkreis)
+reizker,5024187149,2020-12-25,53.26016,10.68971,25.0,TK25 Blatt 2730/1 - Elbe / Bleckede / Breetze
+reizker,5014462691,2019-10-27,53.27459,10.68839,25.0,TK25 Blatt 2730/1 - Elbe / Bleckede / Breetze
+reizker,5015838968,2019-10-17,53.26238,10.71846,25.0,TK25 Blatt 2730/1 - Elbe / Bleckede / Breetze
+reizker,5023084093,2019-10-20,53.27578,10.69454,25.0,TK25 Blatt 2730/1 - Elbe / Bleckede / Breetze
+reizker,5025604883,2019-10-21,51.5237,11.95683,250.0,TK25 Blatt 4437/4 - Halle (Saale)-Nord
+reizker,5016139343,2019-11-23,53.19251,10.50131,250.0,Elbeseitenkanal Wulfsdorf-Wendisch Evern
+reizker,5021964529,2019-11-18,51.5237,11.95683,250.0,TK25 Blatt 4437/4 - Halle (Saale)-Nord
+reizker,1668892189,2017-10-03,51.76951,10.67763,5.0,
+reizker,5013964184,2017-10-18,52.26595,11.78575,250.0,Niegripper See mit angrenzendem Altkanal
+reizker,5024940702,2017-10-21,52.82284,11.50738,250.0,"Heiligenfelde, Mühlenberg und Kiesgrube"
+reizker,5027059815,2017-11-04,53.15017,9.82332,250.0,Camp Reinsehlen
+reizker,1453187132,2016-11-01,51.83644,10.58053,5.0,
+reizker,1305114850,2015-09-19,52.69261,10.46414,25988.0,
+krauseglucke,5087120810,2025-01-11,53.26013,10.48679,2.0,
+krauseglucke,5135464099,2025-01-20,53.45351,9.6829,250.0,Buxtehude - Estetal
+krauseglucke,5902070299,2025-08-25,53.18673,10.4249,,LG NSG Ilmenauniederung mit Tiergarten
+krauseglucke,5796946992,2025-09-10,53.48167,10.24972,,RZ Herzogtum Lauenburg (Landkreis)
+krauseglucke,5797122039,2025-09-10,53.01163,10.74121,800.0,UE Uelzen (Landkreis)
+krauseglucke,5827479572,2025-09-14,51.71594,11.07898,522.0,
+krauseglucke,5827792320,2025-09-10,53.48163,10.24968,25.0,
+krauseglucke,5827881632,2025-09-13,53.01636,9.27358,2.0,
+krauseglucke,5837349186,2025-09-26,52.53689,9.70311,250.0,Henjeskamp
+krauseglucke,5837904563,2025-09-21,53.21634,9.23195,17.0,
+krauseglucke,5838297890,2025-09-21,53.21636,9.23204,3.0,
+krauseglucke,5902390924,2025-09-10,51.87011,10.04592,,NOM Northeim (Landkreis)
+krauseglucke,6147209109,2025-09-23,52.49345,10.73566,139.0,
+krauseglucke,5840796394,2025-10-05,53.3987,9.01226,57.0,ROW Rotenburg (Wümme) (Landkreis)
+krauseglucke,5844267181,2025-10-09,52.82722,10.22433,3.0,
+krauseglucke,5844804829,2025-10-02,52.13311,9.34665,250.0,Hameln Wehlbach-Wald
+krauseglucke,5868198400,2025-10-18,53.49513,10.67727,2.0,
+krauseglucke,5901819782,2025-10-19,52.65001,9.63307,,HK Heidekreis (Landkreis)
+krauseglucke,5902225593,2025-10-08,51.86139,10.58058,35.0,GS Bad Harzburg
+krauseglucke,5902398957,2025-10-29,52.75255,9.96636,4.0,CE Celle (Landkreis)
+krauseglucke,5902400259,2025-10-08,53.42651,9.87063,8.0,LSG Rosengarten - Kiekeberg - Stuvenwald
+krauseglucke,5902555074,2025-10-05,53.22018,10.56197,17.0,LG LSG Lüneburger Heide
+krauseglucke,5903047499,2025-10-07,53.27921,10.94536,14.0,BSR Niedersächsische Elbtalaue
+krauseglucke,5903060087,2025-10-08,53.40271,9.01017,14.0,ROW Rotenburg (Wümme) (Landkreis)
+krauseglucke,6159145540,2025-10-30,52.93352,9.25761,452.0,
+krauseglucke,6171230226,2025-10-10,53.01638,9.2608,3.0,
+krauseglucke,6411216827,2025-10-13,53.03891,10.00709,8.0,HK Heidekreis (Landkreis)
+krauseglucke,5888994600,2025-11-02,52.45988,9.19221,250.0,Mischwald beim Denkhaus in Loccum
+krauseglucke,5892503852,2025-11-04,53.26669,10.39859,29.0,
+krauseglucke,5897211641,2025-11-19,53.21662,9.22813,25.0,
+krauseglucke,5901292674,2025-11-09,53.0427,10.96458,16.0,DAN Zernien
+krauseglucke,5901362798,2025-11-07,53.06082,11.44394,5.0,DAN Höhbeck
+krauseglucke,5901983890,2025-11-09,53.04266,10.96433,5.0,DAN Zernien
+krauseglucke,5902210285,2025-11-09,52.58767,10.49234,,GIF Ummern
+krauseglucke,5902873168,2025-11-26,52.49793,10.02584,9.0,LSG Burgdorfer Holz
+krauseglucke,6159218958,2025-11-02,52.93537,9.25217,95.0,
+krauseglucke,5918308007,2025-12-10,53.16269,10.35739,12.0,LG Embsen
+krauseglucke,4957599138,2024-09-26,53.06756,11.00397,,Drawehn - N2000
+krauseglucke,6195286228,2024-09-19,52.06668,11.2434,490.0,
+krauseglucke,4954754291,2024-10-12,52.98642,11.88672,170.0,
+krauseglucke,4957494871,2024-10-02,52.3244,11.32265,5.0,BK Börde (Landkreis)
+krauseglucke,4976285806,2024-10-26,52.71679,10.47902,8.0,
+krauseglucke,4976671740,2024-10-12,52.98543,11.8802,3299.0,
+krauseglucke,4981931574,2024-10-30,53.02573,9.26293,20.0,
+krauseglucke,4985405560,2024-10-15,52.75866,9.91091,,Übungsplatz Bergen
+krauseglucke,4985881612,2024-10-15,52.44227,10.91408,,GIF Rühen LSG Drömling
+krauseglucke,4986471417,2024-10-03,53.24246,10.70812,5.0,LG Lüneburg (Landkreis)
+krauseglucke,5014673967,2024-10-12,52.53689,9.70311,250.0,Henjeskamp
+krauseglucke,5023290471,2024-10-04,53.40372,11.40753,250.0,Waldgebiet östl. Jasnitz
+krauseglucke,5023379759,2024-10-26,52.44976,9.14762,250.0,Klosterwald Loccum
+krauseglucke,5897009169,2024-10-11,53.19414,10.41096,250.0,"Melbeck, östlich B 4"
+krauseglucke,4985783864,2024-11-21,53.30467,9.75738,12.0,WL Harburg (Landkreis)
+krauseglucke,4986518959,2024-11-18,53.11776,9.81786,,Lüneburger Heide - N2000
+krauseglucke,4994110934,2024-11-29,53.0566,9.3149,106.0,
+krauseglucke,5896995971,2024-11-25,53.19414,10.41096,250.0,"Melbeck, östlich B 4"
+krauseglucke,4989605267,2024-12-07,53.34842,10.06488,5.0,LSG Buchwedel und Umgebung
+krauseglucke,4995577889,2024-12-10,52.49678,10.03443,5.0,LSG Burgdorfer Holz
+krauseglucke,5062899121,2024-12-25,53.11534,9.81448,25.0,
+krauseglucke,5135639335,2024-12-31,53.25207,10.06263,250.0,Toppenstedter Wald
+krauseglucke,4177508810,2023-08-14,52.45097,10.7868,,
+krauseglucke,4405288795,2023-08-22,51.50698,10.15362,519.0,
+krauseglucke,4407530355,2023-09-01,52.13123,9.33217,,
+krauseglucke,4407573618,2023-09-03,53.42513,9.67345,,
+krauseglucke,4413754270,2023-09-08,53.19205,10.96268,2859.0,
+krauseglucke,4413854333,2023-09-03,53.42477,9.67311,,
+krauseglucke,4420713778,2023-09-17,53.29947,9.84843,,
+krauseglucke,4438937080,2023-09-28,53.23478,9.84191,175.0,
+krauseglucke,4459626545,2023-09-29,52.89212,10.0933,11.0,LSG Südheide im Landkreis Celle
+krauseglucke,4459799045,2023-09-04,53.24259,9.89344,7.0,LG VSG Lüneburger Heide
+krauseglucke,4460737919,2023-09-04,51.65842,10.67711,,Bergwiesen und Wolfsbachtal bei Hohegeiß - N2000
+krauseglucke,4926284406,2023-09-23,53.14093,9.36876,4.0,
+krauseglucke,5012583845,2023-09-24,53.40372,11.40753,250.0,Waldgebiet östl. Jasnitz
+krauseglucke,5013893877,2023-09-01,52.12361,9.37388,250.0,TK25 Blatt 3822/3 - Weser / Hameln
+krauseglucke,5023407837,2023-09-24,52.53001,10.23067,250.0,NSG Bohlenbruch
+krauseglucke,5025636609,2023-09-09,52.45988,9.19221,250.0,Mischwald beim Denkhaus in Loccum
+krauseglucke,4430542903,2023-10-03,52.74575,10.35022,809.0,
+krauseglucke,4430586020,2023-10-14,52.27193,11.36439,4.0,
+krauseglucke,4431229840,2023-10-22,53.05564,9.31923,25.0,
+krauseglucke,4436449909,2023-10-22,52.48399,9.6759,7.0,
+krauseglucke,4438818046,2023-10-06,51.51081,10.18221,2000.0,
+krauseglucke,4438995337,2023-10-29,53.28118,10.1545,,
+krauseglucke,4460925545,2023-10-06,53.03348,11.45074,,DAN Elbufer-Drawehn NP
+krauseglucke,4461851106,2023-10-03,53.44397,9.88801,7.0,LSG Rosengarten - Kiekeberg - Stuvenwald
+krauseglucke,4887994739,2023-10-29,53.12838,9.82444,28.0,LG VSG Lüneburger Heide
+krauseglucke,5013374122,2023-10-18,52.45988,9.19221,250.0,Mischwald beim Denkhaus in Loccum
+krauseglucke,5016000526,2023-10-23,53.15382,10.42026,250.0,"Melbeck, Wald zwischen B4 und L233 bzw. Forellenbachtal"
+krauseglucke,5017881072,2023-10-28,53.11587,9.83294,250.0,Heideflächen östlich Schneverdingen
+krauseglucke,5018342119,2023-10-07,52.53689,9.70311,250.0,Henjeskamp
+krauseglucke,5020549649,2023-10-21,52.53689,9.70311,250.0,Henjeskamp
+krauseglucke,5021089207,2023-10-14,53.09948,10.33785,250.0,Süsing
+krauseglucke,5021494933,2023-10-22,52.2258,11.05208,25.0,TK25 Blatt 3732/3 - Helmstedt
+krauseglucke,5024981262,2023-10-29,53.2814,10.15537,25.0,TK25 Blatt 2726/2 - Lüneburger Heide / Toppenstedt
+krauseglucke,5028193821,2023-10-25,52.92466,9.58097,250.0,Ebbingen Wald zwischen Fahlbecke und Ostermoor
+krauseglucke,4440653189,2023-11-11,51.62667,10.62312,24.0,
+krauseglucke,4442379113,2023-11-12,52.63604,9.293,12.0,
+krauseglucke,4442515510,2023-11-18,51.56549,9.97043,6.0,
+krauseglucke,4460217964,2023-11-26,52.46265,9.87609,15.0,H Isernhagen LSG Obere Wietze
+krauseglucke,4926207550,2023-11-01,53.14715,9.08362,12.0,
+krauseglucke,5019688592,2023-11-26,52.46332,9.86434,250.0,Lohner Wald
+krauseglucke,4925965011,2023-12-23,53.19179,9.18195,3.0,
+krauseglucke,3994326491,2022-08-20,51.70821,11.24292,22.0,
+krauseglucke,3912189185,2022-09-13,52.25175,10.46301,155.0,
+krauseglucke,3912353464,2022-09-15,52.24928,10.46421,40.0,
+krauseglucke,3915322995,2022-09-19,52.48325,9.67339,6.0,
+krauseglucke,3923291612,2022-09-16,52.29974,10.37336,4.0,
+krauseglucke,3923453761,2022-09-13,52.61445,10.01583,4.0,
+krauseglucke,3923523833,2022-09-28,52.45021,10.81404,,
+krauseglucke,3966630223,2022-09-11,51.51347,11.93847,1740.0,
+krauseglucke,3995009855,2022-09-17,52.79509,10.86734,13.0,SAW Altmarkkreis Salzwedel (Landkreis)
+krauseglucke,3995227148,2022-09-18,52.10357,9.89852,10.0,HI VSG Hildesheimer Wald
+krauseglucke,3995282896,2022-09-13,52.0478,10.1722,48.0,HI LSG Hainberg
+krauseglucke,3995303772,2022-09-10,53.065,10.83033,16.0,UE Uelzen (Landkreis)
+krauseglucke,3995319067,2022-09-12,53.19749,10.83245,25.0,LG LSG Lüneburger Heide
+krauseglucke,3995360513,2022-09-28,52.79392,10.8655,27.0,SAW Altmarkkreis Salzwedel (Landkreis)
+krauseglucke,3995428252,2022-09-28,52.45021,10.81404,,"LSG Wolfsburger Moor, Butterberg und Lerchenberg"
+krauseglucke,3995451120,2022-09-18,53.25276,11.99007,,PR Prignitz (Landkreis)
+krauseglucke,3995487292,2022-09-10,53.06636,10.82595,74.0,UE Uelzen (Landkreis)
+krauseglucke,3995514500,2022-09-24,53.24342,10.68153,5.0,LG Lüneburg (Landkreis)
+krauseglucke,3995638884,2022-09-24,53.24342,10.68153,5.0,LG Lüneburg (Landkreis)
+krauseglucke,3995883185,2022-09-25,52.2415,9.61469,10.0,LSG Norddeister
+krauseglucke,3996174503,2022-09-10,53.14337,10.86946,5.0,Drawehn - N2000
+krauseglucke,3996466029,2022-09-28,52.28645,9.21925,7.0,LSG Bückeberge
+krauseglucke,3996480436,2022-09-15,53.22875,10.80674,23.0,LG LSG Lüneburger Heide
+krauseglucke,3996696648,2022-09-27,52.4699,9.89026,5.0,H Isernhagen
+krauseglucke,3996798664,2022-09-13,52.04771,10.17254,5.0,HI LSG Hainberg
+krauseglucke,3996912757,2022-09-26,53.11735,9.83566,6.0,LG VSG Lüneburger Heide
+krauseglucke,3997104309,2022-09-22,52.63214,9.65834,10.0,HK Heidekreis (Landkreis)
+krauseglucke,3997142951,2022-09-30,53.21118,10.33526,9.0,LG LSG Lüneburger Heide
+krauseglucke,3997157148,2022-09-18,52.10358,9.8987,20.0,HI VSG Hildesheimer Wald
+krauseglucke,3997261181,2022-09-25,53.1793,10.46354,9.0,NSG Dieksbeck
+krauseglucke,3997391319,2022-09-25,53.07633,9.98855,4.0,HK Heidekreis (Landkreis)
+krauseglucke,3997423606,2022-09-30,51.57182,9.73847,9.0,GÖ Göttingen (Landkreis)
+krauseglucke,3997510973,2022-09-18,52.28664,9.21961,6.0,LSG Bückeberge
+krauseglucke,3997641767,2022-09-22,52.09131,9.32484,,LSG Hamelner Stadtforsten (Südwest)
+krauseglucke,4440805669,2022-09-20,52.84063,10.32045,1589.0,
+krauseglucke,4442407658,2022-09-20,52.76592,10.48916,10286.0,
+krauseglucke,5013204480,2022-09-30,52.37182,10.83049,25.0,TK25 Blatt 3630/2 - Wolfsburg / Detmerode / Barnstorf
+krauseglucke,5017678370,2022-09-25,52.54154,9.83,250.0,Sprillgehege
+krauseglucke,5019023540,2022-09-18,52.53001,10.23067,250.0,NSG Bohlenbruch
+krauseglucke,5021994543,2022-09-23,52.37226,10.82973,25.0,TK25 Blatt 3630/2 - Wolfsburg / Detmerode / Barnstorf
+krauseglucke,5025467341,2022-09-15,53.16673,10.00609,250.0,Döhler Fuhren
+krauseglucke,5027048045,2022-09-24,52.53689,9.70311,250.0,Henjeskamp
+krauseglucke,5027337390,2022-09-17,52.44976,9.14762,250.0,Klosterwald Loccum
+krauseglucke,3925087190,2022-10-07,52.58229,11.26077,231.0,
+krauseglucke,3925161709,2022-10-02,52.45572,10.80829,,
+krauseglucke,3925455075,2022-10-05,51.52154,11.91621,26196.0,
+krauseglucke,3947405227,2022-10-13,52.54435,10.24393,378.0,
+krauseglucke,3947475992,2022-10-10,52.24888,10.46499,37.0,
+krauseglucke,3947710579,2022-10-23,51.69176,11.25302,13.0,
+krauseglucke,3947799507,2022-10-23,53.23571,9.84186,175.0,
+krauseglucke,3961135016,2022-10-28,52.2921,10.33302,4.0,
+krauseglucke,3995107141,2022-10-02,53.19004,10.01769,5.0,WL Egestorf
+krauseglucke,3995280151,2022-10-13,53.10423,9.91324,25.0,LG VSG Lüneburger Heide
+krauseglucke,3995477386,2022-10-02,52.45572,10.80829,,"LSG Wolfsburger Moor, Butterberg und Lerchenberg"
+krauseglucke,3995876258,2022-10-02,53.18414,10.44323,64.0,LG Lüneburg (Landkreis)
+krauseglucke,3996104677,2022-10-08,52.54233,9.56666,,LSG Moorgeest
+krauseglucke,3996158133,2022-10-14,53.14312,10.35427,25.0,LG LSG Lüneburger Heide
+krauseglucke,3996171615,2022-10-03,53.2385,10.81147,28.0,LG LSG Lüneburger Heide
+krauseglucke,3996374818,2022-10-07,53.21109,10.3483,7.0,LG LSG Lüneburger Heide
+krauseglucke,3996466228,2022-10-03,53.23567,10.32435,16.0,LG LSG Lüneburger Heide
+krauseglucke,3996854037,2022-10-03,52.04763,10.1723,16.0,HI LSG Hainberg
+krauseglucke,3997488365,2022-10-07,52.59677,11.29756,,SAW Altmarkkreis Salzwedel (Landkreis)
+krauseglucke,4056395472,2022-10-03,52.81566,9.66782,16.0,HK Heidekreis (Landkreis)
+krauseglucke,4056438914,2022-10-22,53.16566,10.36388,25.0,LG Lüneburg (Landkreis)
+krauseglucke,4056566167,2022-10-31,52.52325,10.67509,4.0,LSG Ostheide
+krauseglucke,4056576839,2022-10-16,53.00256,10.99481,25.0,DAN Lüchow-Dannenberg (Landkreis)
+krauseglucke,4056613205,2022-10-10,53.22826,10.39151,4.0,LG LSG Lüneburger Heide
+krauseglucke,4056687098,2022-10-15,52.7707,10.6253,20.0,GF Gifhorn (Landkreis)
+krauseglucke,4056745655,2022-10-22,53.44566,9.86179,4.0,Hamburg
+krauseglucke,4056766950,2022-10-31,52.65249,10.93297,,SAW Altmarkkreis Salzwedel (Landkreis)
+krauseglucke,4056808589,2022-10-16,52.40524,9.16301,4.0,Schaumburger Wald - N2000
+krauseglucke,4056840663,2022-10-23,52.55696,10.93892,72.0,LSG Lütjes Moor
+krauseglucke,4056847603,2022-10-20,52.08542,9.92298,,Hildesheimer Wald - N2000
+krauseglucke,4056889728,2022-10-19,53.13776,9.80959,32.0,Lüneburger Heide - N2000
+krauseglucke,4057626121,2022-10-16,52.43373,9.51197,,LSG Garbsener Moorgeest
+krauseglucke,4127411495,2022-10-30,53.24651,10.71905,61.0,
+krauseglucke,4158565297,2022-10-15,52.28156,9.17195,34.0,LSG Bückeberge
+krauseglucke,4892235750,2022-10-22,53.28658,9.17365,,
+krauseglucke,5013386264,2022-10-23,53.1235,10.2904,250.0,TK25 Blatt 2827/4 - Lüneburger Heide / Betzendorf
+krauseglucke,5018789193,2022-10-08,52.44262,9.76092,250.0,Stadtwald Langenhagen
+krauseglucke,5022408368,2022-10-19,52.46462,9.93061,250.0,Oldhorster Moor
+krauseglucke,5026858546,2022-10-22,53.1735,10.37372,250.0,TK25 Blatt 2828/1 - Embsen / Melbeck
+krauseglucke,5027954496,2022-10-08,52.53689,9.70311,250.0,Henjeskamp
+krauseglucke,6412334679,2022-10-03,52.44766,10.06348,,LSG Burgdorfer Holz
+krauseglucke,4056491949,2022-11-27,52.57678,9.03984,16.0,LSG Schierholz
+krauseglucke,4056802797,2022-11-14,52.70414,10.45901,4.0,GF Gifhorn (Landkreis)
+krauseglucke,4056874779,2022-11-11,53.22102,9.97833,14.0,LG VSG Lüneburger Heide
+krauseglucke,4067386532,2022-11-03,52.71662,10.45598,151.0,
+krauseglucke,5021270924,2022-11-26,53.22099,10.42791,250.0,"Tiergarten, Lüneburg"
+krauseglucke,5868005148,2022-11-05,52.73782,10.47457,178.0,
+krauseglucke,3988586894,2022-12-02,53.17447,10.68256,184.0,
+krauseglucke,4057101411,2022-12-05,52.53574,10.47485,6.0,GF Gifhorn (Landkreis)
+krauseglucke,6410741412,2022-12-29,53.1734,9.87244,5.0,LG VSG Lüneburger Heide
+krauseglucke,5023731597,2021-02-06,51.7065,11.23644,250.0,Kunstteich Ballenstedt
+krauseglucke,3915368367,2021-09-04,52.71452,10.47265,20.0,
+krauseglucke,5015706921,2021-09-12,52.59007,10.85015,25.0,TK25 Blatt 3431/1 - Tülau / Voitze
+krauseglucke,5018409896,2021-09-19,52.52357,9.8738,250.0,TK25 Blatt 3425/3 - Burgwedel / Kleinburgwedel
+krauseglucke,5026192139,2021-09-26,52.54154,9.83,250.0,Sprillgehege
+krauseglucke,3384777450,2021-10-04,52.79527,10.86738,8.0,
+krauseglucke,3408201953,2021-10-28,53.39265,9.58685,39213.0,
+krauseglucke,3915734479,2021-10-16,52.5139,10.7049,31.0,
+krauseglucke,3995028899,2021-10-03,53.1471,10.70447,5.0,LG Lüneburg (Landkreis)
+krauseglucke,3997059648,2021-10-10,52.54952,10.49044,9.0,GF Gifhorn (Landkreis)
+krauseglucke,3907350816,2021-11-03,53.05741,10.57269,5.0,NSG Der Lohn
+krauseglucke,3947420477,2021-11-04,53.15278,9.46056,,
+krauseglucke,5019814116,2021-11-23,53.32348,9.95711,250.0,TK25 Blatt 2625/4 - Jesteburg / Bendestorf
+krauseglucke,2882974749,2020-09-28,53.19225,10.0174,707.0,
+krauseglucke,5016052855,2020-09-05,51.7065,11.23644,250.0,Kunstteich Ballenstedt
+krauseglucke,5020300767,2020-09-23,53.32348,9.95711,250.0,TK25 Blatt 2625/4 - Jesteburg / Bendestorf
+krauseglucke,5025582678,2020-09-27,52.52357,9.8738,250.0,TK25 Blatt 3425/3 - Burgwedel / Kleinburgwedel
+krauseglucke,2901705026,2020-10-17,51.50029,11.91884,4.0,
+krauseglucke,2980848779,2020-10-31,51.70702,11.23668,1.0,
+krauseglucke,2984519530,2020-10-27,52.2513,10.49349,9.0,
+krauseglucke,2984364033,2020-11-12,51.81007,9.36844,15.0,
+krauseglucke,2988464404,2019-09-01,51.87315,10.55515,9.0,
+krauseglucke,2429351454,2019-10-02,53.11659,9.81341,25.0,
+krauseglucke,2429355125,2019-10-02,53.11656,9.81366,25.0,
+krauseglucke,2429362593,2019-10-03,52.71741,10.48036,18.0,
+krauseglucke,2429364096,2019-10-03,52.72224,10.47144,10.0,
+krauseglucke,4129794740,2019-10-03,53.20314,10.67819,174.0,
+krauseglucke,4606510409,2019-10-12,52.58822,11.69999,263.0,
+krauseglucke,5014526280,2019-10-27,51.81221,9.64423,250.0,MTB 4123/4/4 Waldgebiet Solling
+krauseglucke,5018205180,2019-10-27,52.95954,9.32294,25.0,TK25 Blatt 3021/2 - Walle / Holtum (Geest) / Scharnhorst
+krauseglucke,5016921703,2018-09-11,52.98255,10.49229,250.0,Uelzen Stadtwald West
+krauseglucke,5026207221,2018-09-08,52.44976,9.14762,250.0,Klosterwald Loccum
+krauseglucke,5022731630,2017-09-17,53.46108,9.24431,250.0,Stüh bei Bremervörde
+krauseglucke,2988917822,2017-10-27,53.13417,9.39583,,"Rotenburg (Wümme), NWR Weichel, Luhne - 04ÜK_F"
+krauseglucke,5016516085,2017-10-21,52.82284,11.50738,250.0,"Heiligenfelde, Mühlenberg und Kiesgrube"
+krauseglucke,5023608138,2017-10-20,52.70219,11.45732,250.0,Kalbescher Werder bei Vienau
+krauseglucke,3996302734,2016-11-05,52.12159,9.9355,25.0,HI Hildesheim (Kern)

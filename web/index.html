@@ -582,7 +582,7 @@ function regenzeilen(z) {
   return `<h4>Regen</h4><table>${zeilen}</table>`;
 }
 
-function popupInhalt(z) {
+function popupInhalt(z, klickOrt) {
   const wert = z.scores[art][tag] ?? 0;
   const k = z.kenn;
 
@@ -628,7 +628,8 @@ function popupInhalt(z) {
     <h4>Andere Arten hier</h4>
     <table>${andere}</table>
 
-    ${navigationsknopf(z.lat, z.lon)}
+    ${navigationsknopf(klickOrt ? klickOrt.lat : z.lat,
+                       klickOrt ? klickOrt.lng : z.lon)}
   </div>`;
 }
 
@@ -823,6 +824,8 @@ function baueListe() {
       x.lat === +b.dataset.lat && x.lon === +b.dataset.lon);
     if (z) setTimeout(() => new maplibregl.Popup({ maxWidth: "320px" })
       .setLngLat([z.lon, z.lat]).setHTML(popupInhalt(z)).addTo(karte), 700);
+    // Aus der Liste heraus gibt es keinen Klickort - dann fuehrt die
+    // Navigation zur Zellmitte.
   });
 }
 
@@ -1175,7 +1178,10 @@ fetch("daten.json")
           return;
         }
         const z = D.zellen[e.features[0].properties.i];
-        zeigePopup(e.lngLat, popupInhalt(z));
+        // Die Navigation soll zur angetippten Stelle fuehren, nicht
+        // zur Zellmitte - bei 2 km Kantenlaenge sind das bis zu
+        // 1,4 km Unterschied.
+        zeigePopup(e.lngLat, popupInhalt(z, e.lngLat));
       });
       karte.on("mouseenter", "flaechen",
         () => karte.getCanvas().style.cursor = "pointer");

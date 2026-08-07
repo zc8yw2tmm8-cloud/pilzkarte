@@ -158,11 +158,6 @@ ARTEN = {
         "frost_abzug": (15, 40),   # (leichter, starker Frost)
         "saison": {1: 0.0, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.02, 6: 0.02,
                    7: 0.21, 8: 0.37, 9: 1.00, 10: 0.70, 11: 0.44, 12: 0.04},
-        # Mykorrhiza mit Fichte, Buche, Kiefer, Eiche - breit aufgestellt
-        "baumarten": {"fichte": 1.0, "buche": 1.0, "tanne": 0.9,
-                      "kiefer": 0.85, "eiche": 0.8, "douglasie": 0.5,
-                      "laerche": 0.5, "laub_lang": 0.5, "birke": 0.4,
-                      "laub_kurz": 0.3, "erle": 0.2},
         "waldtyp": {"laub": 1.0, "misch": 1.0, "nadel": 0.95,
                     "bruch": 0.4, "unbekannt": 0.95},
     },
@@ -238,12 +233,6 @@ ARTEN = {
         "frost_abzug": (20, 35),   # (leichter, starker Frost)
         "saison": {1: 0.01, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.06,
                    7: 0.21, 8: 0.33, 9: 1.00, 10: 0.99, 11: 0.75, 12: 0.08},
-        # Nadelwaldpilz. In dieser Region faellt Fichte praktisch aus,
-        # Kiefer traegt sie.
-        "baumarten": {"fichte": 1.0, "kiefer": 0.95, "tanne": 0.9,
-                      "douglasie": 0.7, "laerche": 0.6, "buche": 0.5,
-                      "eiche": 0.35, "birke": 0.3, "laub_lang": 0.25,
-                      "laub_kurz": 0.2, "erle": 0.15},
         "waldtyp": {"nadel": 1.0, "misch": 0.9, "laub": 0.45,
                     "bruch": 0.3, "unbekannt": 0.85},
     },
@@ -353,12 +342,6 @@ ARTEN = {
         "frost_abzug": (20, 45),   # (leichter, starker Frost)
         "saison": {1: 0.0, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.07, 6: 0.31,
                    7: 0.42, 8: 0.51, 9: 1.00, 10: 0.68, 11: 0.39, 12: 0.0},
-        # Waldraender und Lichtungen - Waldtyp fast egal
-        # Zersetzer an Waldraendern und Lichtungen - Baumart fast egal
-        "baumarten": {"eiche": 1.0, "birke": 1.0, "laub_lang": 1.0,
-                      "laub_kurz": 1.0, "buche": 0.95, "laerche": 0.95,
-                      "kiefer": 0.9, "erle": 0.85, "fichte": 0.8,
-                      "douglasie": 0.8, "tanne": 0.8},
         "waldtyp": {"laub": 1.0, "misch": 1.0, "nadel": 0.9,
                     "bruch": 0.7, "unbekannt": 1.0},
     },
@@ -397,16 +380,164 @@ ARTEN = {
         "frost_abzug": (0, 8),   # (leichter, starker Frost)
         "saison": {1: 0.02, 2: 0.01, 3: 0.02, 4: 0.07, 5: 1.00, 6: 0.50,
                    7: 0.13, 8: 0.19, 9: 0.19, 10: 0.03, 11: 0.02, 12: 0.02},
-        # Eiche, Weide, Kirsche, Robinie - reiner Laubholzbewohner
-        # Eiche ist der Hauptwirt, dazu Weide, Kirsche, Robinie.
-        # Auf Nadelholz kaum, und von dort auch nicht zu empfehlen.
-        "baumarten": {"eiche": 1.0, "laub_kurz": 0.85, "laub_lang": 0.8,
-                      "erle": 0.4, "buche": 0.35, "birke": 0.3,
-                      "laerche": 0.15, "kiefer": 0.1, "fichte": 0.08,
-                      "douglasie": 0.08, "tanne": 0.08},
         "waldtyp": {"laub": 1.0, "bruch": 0.9, "misch": 0.7,
                     "nadel": 0.15, "unbekannt": 0.7},
         "abzug_faktor": 0.2,
+    },
+
+    # ------------------------------------------------------------
+    # Die folgenden vier Arten sind NICHT kalibriert.
+    #
+    # Ihre Werte stammen aus der Pilzliteratur und aus dem Vergleich
+    # mit den gemessenen Arten - nicht aus Fundmeldungen. Bei den
+    # ersten sieben Arten hat sich sechsmal gezeigt, dass plausible
+    # Annahmen falsch waren. Nimm diese Zahlen entsprechend
+    # vorsichtig.
+    #
+    # Zum Kalibrieren: funde_arten.py und kalibrieren.py neu laufen
+    # lassen, sobald genug Funde vorliegen.
+    # ------------------------------------------------------------
+
+    "hexenroehrling": {
+        "name": "Flockenstieliger Hexenr\u00f6hrling",
+        "gbif": "Neoboletus erythropus",
+        # GESCHAETZT. Frueher und waermetoleranter als der Steinpilz,
+        # sonst aehnliche Ansprueche.
+        "bilanz_14": [(12, None, 22), (-2, 12, 17), (-15, -2, 10),
+                      (-32, -15, 4)],
+        "bt07": [(10, 16, 22), (16, 19, 16), (8, 10, 11), (19, 22, 6)],
+        "bf07": [(0.30, None, 18), (0.22, 0.30, 15), (0.18, 0.22, 8),
+                 (0.15, 0.18, 3)],
+        "regen_reife": [(30, None, 15), (20, 30, 12), (12, 20, 7),
+                        (6, 12, 3)],
+        "regentage": [(7, None, 15), (5, 7, 11), (4, 5, 7), (2, 4, 4)],
+        "temp": [(11, 19, 8), (19, 22, 4), (8, 11, 4)],
+        "verzug": (8, 14),
+        # Saeureliebend, anders als sein netzstieliger Verwandter
+        "boden_ph": [(4.5, 5.8, 1.0), (5.8, 6.4, 0.8),
+                     (None, 4.5, 0.85), (6.4, None, 0.55)],
+        "boden_ton": [(14, None, 1.0), (11, 14, 0.85), (None, 11, 0.7)],
+        # Breite Mykorrhiza: Fichte, Buche, Eiche
+        "baumarten": {"fichte": 1.0, "buche": 1.0, "eiche": 0.9,
+                      "tanne": 0.85, "kiefer": 0.7, "douglasie": 0.5,
+                      "laerche": 0.5, "laub_lang": 0.5, "birke": 0.35,
+                      "laub_kurz": 0.3, "erle": 0.2},
+        "waldanteil_wirkung": 0.12,
+        "frost_abzug": (18, 40),
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.03, 6: 0.20,
+                   7: 0.45, 8: 0.75, 9: 1.00, 10: 0.60, 11: 0.15,
+                   12: 0.01},
+        "waldtyp": {"laub": 1.0, "misch": 1.0, "nadel": 0.9,
+                    "bruch": 0.4, "unbekannt": 0.9},
+    },
+
+    "netzhexe": {
+        "name": "Netzstieliger Hexenr\u00f6hrling",
+        "gbif": "Suillellus luridus",
+        # GESCHAETZT. Der Kalkzeiger unter den Roehrlingen - im Elm
+        # deutlich haeufiger als in der Heide.
+        "bilanz_14": [(12, None, 22), (-2, 12, 17), (-15, -2, 10),
+                      (-32, -15, 4)],
+        "bt07": [(11, 17, 22), (17, 20, 15), (9, 11, 10), (20, 23, 5)],
+        "bf07": [(0.30, None, 17), (0.22, 0.30, 14), (0.18, 0.22, 8),
+                 (0.15, 0.18, 3)],
+        "regen_reife": [(30, None, 15), (20, 30, 12), (12, 20, 7),
+                        (6, 12, 3)],
+        "regentage": [(7, None, 14), (5, 7, 11), (4, 5, 7), (2, 4, 4)],
+        "temp": [(12, 20, 9), (20, 23, 5), (9, 12, 4)],
+        "verzug": (8, 14),
+        # Umgekehrt zu allen anderen: braucht KALK. Ueber pH 6.5
+        # am besten, unter 5.5 kaum zu finden.
+        "boden_ph": [(6.5, None, 1.0), (6.0, 6.5, 0.85),
+                     (5.5, 6.0, 0.55), (None, 5.5, 0.25)],
+        "boden_ton": [(20, None, 1.0), (15, 20, 0.85), (None, 15, 0.6)],
+        # Buche und Eiche auf Kalk, kaum Nadelholz
+        "baumarten": {"buche": 1.0, "eiche": 0.95, "laub_lang": 0.7,
+                      "birke": 0.4, "laub_kurz": 0.35, "fichte": 0.3,
+                      "tanne": 0.3, "kiefer": 0.25, "laerche": 0.25,
+                      "douglasie": 0.2, "erle": 0.2},
+        "waldanteil_wirkung": 0.12,
+        "frost_abzug": (18, 40),
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.05, 6: 0.30,
+                   7: 0.55, 8: 0.80, 9: 1.00, 10: 0.55, 11: 0.12,
+                   12: 0.0},
+        "waldtyp": {"laub": 1.0, "misch": 0.9, "nadel": 0.35,
+                    "bruch": 0.3, "unbekannt": 0.85},
+    },
+
+    "reizker": {
+        "name": "Edelreizker",
+        "gbif": "Lactarius deliciosus",
+        # GESCHAETZT. An Kiefer gebunden - in dieser Region mit 45 %
+        # Kiefernanteil eine der aussichtsreicheren Arten.
+        # Spaete Art, vertraegt Kaelte besser als die Roehrlinge.
+        "bilanz_14": [(10, None, 20), (-5, 10, 16), (-20, -5, 10),
+                      (-35, -20, 4)],
+        "bt07": [(7, 12, 22), (12, 15, 16), (4, 7, 12), (15, 18, 6)],
+        "bf07": [(0.30, None, 18), (0.23, 0.30, 15), (0.19, 0.23, 9),
+                 (0.16, 0.19, 4)],
+        "regen_reife": [(30, None, 15), (20, 30, 12), (12, 20, 7),
+                        (6, 12, 3)],
+        "regentage": [(7, None, 14), (5, 7, 11), (4, 5, 7), (2, 4, 4)],
+        "temp": [(7, 15, 9), (15, 18, 5), (4, 7, 5)],
+        "verzug": (10, 16),
+        # Vertraegt Kalk, kommt aber auch auf sauren Sandboeden vor
+        "boden_ph": [(5.5, 7.2, 1.0), (5.0, 5.5, 0.8),
+                     (None, 5.0, 0.6), (7.2, None, 0.9)],
+        "boden_ton": [(12, 22, 1.0), (22, None, 0.85), (None, 12, 0.8)],
+        # Fast ausschliesslich Kiefer
+        "baumarten": {"kiefer": 1.0, "laerche": 0.35, "fichte": 0.25,
+                      "douglasie": 0.2, "tanne": 0.2, "birke": 0.15,
+                      "eiche": 0.1, "buche": 0.1, "laub_lang": 0.1,
+                      "laub_kurz": 0.1, "erle": 0.1},
+        "waldanteil_wirkung": 0.15,
+        # Spaetherbstart, haelt Frost besser aus
+        "frost_abzug": (10, 30),
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.02,
+                   7: 0.10, 8: 0.40, 9: 0.90, 10: 1.00, 11: 0.45,
+                   12: 0.05},
+        "waldtyp": {"nadel": 1.0, "misch": 0.7, "laub": 0.15,
+                    "bruch": 0.2, "unbekannt": 0.8},
+    },
+
+    "krauseglucke": {
+        "name": "Krause Glucke",
+        "gbif": "Sparassis crispa",
+        # GESCHAETZT. Waechst an Wurzeln und Stuempfen alter Kiefern,
+        # also nicht im Boden. Deshalb wirkt das Wetter schwaecher
+        # als bei Mykorrhizapilzen - aehnlich wie beim
+        # Schwefelporling.
+        #
+        # Besonderheit fuer Sammler: Sie kommt jahrelang an derselben
+        # Wurzel wieder. Die Fundebene ist bei ihr wertvoller als
+        # jede Wetterrechnung.
+        "bilanz_14": [(5, None, 14), (-15, 5, 11), (-35, -15, 7)],
+        "bt07": [(12, 19, 16), (9, 12, 12), (19, 22, 9), (6, 9, 6)],
+        "bf07": [(0.26, None, 14), (0.20, 0.26, 11), (0.16, 0.20, 7)],
+        "regen_reife": [(25, None, 12), (15, 25, 9), (8, 15, 5)],
+        "regentage": [(6, None, 10), (4, 6, 7), (2, 4, 4)],
+        "temp": [(13, 21, 8), (10, 13, 5), (21, 24, 4)],
+        # Waechst langsam ueber Wochen, kein scharfer Schub
+        "verzug": (14, 28),
+        "boden_ph": [(4.5, 6.2, 1.0), (None, 4.5, 0.85),
+                     (6.2, None, 0.7)],
+        "boden_ton": [(None, 20, 1.0), (20, None, 0.85)],
+        # An Kiefer gebunden, selten Laerche oder Douglasie
+        "baumarten": {"kiefer": 1.0, "laerche": 0.4, "douglasie": 0.35,
+                      "fichte": 0.2, "tanne": 0.2, "eiche": 0.1,
+                      "buche": 0.1, "birke": 0.08, "laub_lang": 0.08,
+                      "laub_kurz": 0.08, "erle": 0.05},
+        # Waechst am einzelnen Baum, nicht am Bestand
+        "waldanteil_wirkung": 0.06,
+        # Wie der Schwefelporling geschuetzter als Bodenpilze
+        "frost_abzug": (8, 25),
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.03,
+                   7: 0.20, 8: 0.70, 9: 1.00, 10: 0.65, 11: 0.15,
+                   12: 0.01},
+        "waldtyp": {"nadel": 1.0, "misch": 0.7, "laub": 0.15,
+                    "bruch": 0.2, "unbekannt": 0.8},
+        # Wetter sagt bei Holzbewohnern weniger aus
+        "abzug_faktor": 0.5,
     },
 }
 

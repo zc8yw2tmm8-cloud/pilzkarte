@@ -28,6 +28,10 @@ ARTEN = {
     "birkenpilz": "Leccinum scabrum",
     "schwefelporling": "Laetiporus sulphureus",
     "parasol": "Macrolepiota procera",
+    "hexenroehrling": "Neoboletus erythropus",
+    "netzhexe": "Suillellus luridus",
+    "reizker": "Lactarius deliciosus",
+    "krauseglucke": "Sparassis crispa",
 }
 
 AUFWAND_GRUPPE = "Agaricomycetes"

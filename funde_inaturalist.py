@@ -23,6 +23,10 @@ ARTEN = {
     "birkenpilz": "Leccinum scabrum",
     "schwefelporling": "Laetiporus sulphureus",
     "parasol": "Macrolepiota procera",
+    "hexenroehrling": "Neoboletus erythropus",
+    "netzhexe": "Suillellus luridus",
+    "reizker": "Lactarius deliciosus",
+    "krauseglucke": "Sparassis crispa",
 }
 
 SUED, WEST, NORD, OST = 52.05, 10.10, 52.85, 11.15
