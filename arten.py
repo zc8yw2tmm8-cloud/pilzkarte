@@ -156,8 +156,7 @@ ARTEN = {
         "waldanteil_wirkung": 0.10,
         # gemessen: leicht 0.71, stark 0.23 (nur Nov)
         "frost_abzug": (15, 40),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.02, 6: 0.02,
-                   7: 0.21, 8: 0.37, 9: 1.00, 10: 0.70, 11: 0.44, 12: 0.04},
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.04, 6: 0.04, 7: 0.17, 8: 0.48, 9: 1.0, 10: 0.76, 11: 0.53, 12: 0.08},
         "waldtyp": {"laub": 1.0, "misch": 1.0, "nadel": 0.95,
                     "bruch": 0.4, "unbekannt": 0.95},
     },
@@ -186,8 +185,7 @@ ARTEN = {
         "waldanteil_wirkung": 0.10,
         # geschaetzt - im Juni gibt es keinen Frost
         "frost_abzug": (15, 35),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.01, 3: 0.02, 4: 0.0, 5: 0.05, 6: 1.00,
-                   7: 0.89, 8: 0.32, 9: 0.06, 10: 0.01, 11: 0.01, 12: 0.0},
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.08, 6: 1.0, 7: 0.74, 8: 0.21, 9: 0.04, 10: 0.01, 11: 0.01, 12: 0.0},
         # Kalkbuchenwald und Eiche - der Elm ist klassisches Revier
         # Waermeliebender Laubwaldpilz: Eiche und Buche, keine Nadelhoelzer
         "baumarten": {"eiche": 1.0, "buche": 1.0, "laub_lang": 0.7,
@@ -231,8 +229,7 @@ ARTEN = {
         "waldanteil_wirkung": 0.12,
         # KORREKTUR: nicht frosthart. Leicht 0.00 im Nov
         "frost_abzug": (20, 35),   # (leichter, starker Frost)
-        "saison": {1: 0.01, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.06,
-                   7: 0.21, 8: 0.33, 9: 1.00, 10: 0.99, 11: 0.75, 12: 0.08},
+        "saison": {1: 0.03, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.09, 7: 0.15, 8: 0.38, 9: 0.99, 10: 1.0, 11: 0.89, 12: 0.15},
         "waldtyp": {"nadel": 1.0, "misch": 0.9, "laub": 0.45,
                     "bruch": 0.3, "unbekannt": 0.85},
     },
@@ -260,8 +257,7 @@ ARTEN = {
         "waldanteil_wirkung": 0.14,
         # geschaetzt, zu wenige Spaetfunde
         "frost_abzug": (18, 40),   # (leichter, starker Frost)
-        "saison": {1: 0.02, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.37,
-                   7: 1.00, 8: 0.53, 9: 0.57, 10: 0.20, 11: 0.07, 12: 0.11},
+        "saison": {1: 0.04, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.46, 7: 1.0, 8: 0.47, 9: 0.43, 10: 0.14, 11: 0.03, 12: 0.15},
         # Saure, moosige Nadelwaelder, auch Buche auf saurem Grund
         "baumarten": {"fichte": 1.0, "kiefer": 0.9, "tanne": 0.85,
                       "buche": 0.6, "eiche": 0.55, "douglasie": 0.5,
@@ -294,8 +290,7 @@ ARTEN = {
         "waldanteil_wirkung": 0.05,
         # KORREKTUR: nicht frosthart, wie die anderen
         "frost_abzug": (18, 40),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0,
-                   7: 0.14, 8: 0.19, 9: 1.00, 10: 0.70, 11: 0.18, 12: 0.0},
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, 7: 0.2, 8: 0.28, 9: 1.0, 10: 0.91, 11: 0.29, 12: 0.0},
         # zwingend an Birke gebunden - Bruchwald ist hier gut
         # Zwingend an Birke gebunden. Der Anteil zaehlt, nicht die
         # Hauptbaumart - Birke steht oft als Beimischung im Kiefernforst.
@@ -340,8 +335,7 @@ ARTEN = {
         "waldanteil_wirkung": 0.02,
         # gemessen: leicht 0.64, stark 0.00 (nur Nov)
         "frost_abzug": (20, 45),   # (leichter, starker Frost)
-        "saison": {1: 0.0, 2: 0.01, 3: 0.0, 4: 0.0, 5: 0.07, 6: 0.31,
-                   7: 0.42, 8: 0.51, 9: 1.00, 10: 0.68, 11: 0.39, 12: 0.0},
+        "saison": {1: 0.0, 2: 0.02, 3: 0.0, 4: 0.0, 5: 0.12, 6: 0.51, 7: 0.49, 8: 0.62, 9: 1.0, 10: 0.68, 11: 0.46, 12: 0.0},
         "waldtyp": {"laub": 1.0, "misch": 1.0, "nadel": 0.9,
                     "bruch": 0.7, "unbekannt": 1.0},
     },
@@ -378,8 +372,7 @@ ARTEN = {
         "waldanteil_wirkung": 0.04,
         # gemessen: leicht 1.74 - Holzbewohner, unbeeindruckt
         "frost_abzug": (0, 8),   # (leichter, starker Frost)
-        "saison": {1: 0.02, 2: 0.01, 3: 0.02, 4: 0.07, 5: 1.00, 6: 0.50,
-                   7: 0.13, 8: 0.19, 9: 0.19, 10: 0.03, 11: 0.02, 12: 0.02},
+        "saison": {1: 0.03, 2: 0.01, 3: 0.03, 4: 0.14, 5: 1.0, 6: 0.38, 7: 0.08, 8: 0.12, 9: 0.13, 10: 0.02, 11: 0.01, 12: 0.02},
         "waldtyp": {"laub": 1.0, "bruch": 0.9, "misch": 0.7,
                     "nadel": 0.15, "unbekannt": 0.7},
         "abzug_faktor": 0.2,
@@ -424,9 +417,7 @@ ARTEN = {
                       "laub_kurz": 0.3, "erle": 0.2},
         "waldanteil_wirkung": 0.12,
         "frost_abzug": (18, 40),
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.03, 6: 0.20,
-                   7: 0.45, 8: 0.75, 9: 1.00, 10: 0.60, 11: 0.15,
-                   12: 0.01},
+        "saison": {1: 0.1, 2: 0.11, 3: 0.0, 4: 0.0, 5: 0.95, 6: 1.0, 7: 0.89, 8: 0.6, 9: 0.87, 10: 0.72, 11: 0.68, 12: 0.0},
         "waldtyp": {"laub": 1.0, "misch": 1.0, "nadel": 0.9,
                     "bruch": 0.4, "unbekannt": 0.9},
     },
@@ -458,9 +449,7 @@ ARTEN = {
                       "douglasie": 0.2, "erle": 0.2},
         "waldanteil_wirkung": 0.12,
         "frost_abzug": (18, 40),
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.05, 6: 0.30,
-                   7: 0.55, 8: 0.80, 9: 1.00, 10: 0.55, 11: 0.12,
-                   12: 0.0},
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.08, 6: 0.71, 7: 1.0, 8: 0.25, 9: 0.06, 10: 0.01, 11: 0.0, 12: 0.0},
         "waldtyp": {"laub": 1.0, "misch": 0.9, "nadel": 0.35,
                     "bruch": 0.3, "unbekannt": 0.85},
     },
@@ -493,9 +482,7 @@ ARTEN = {
         "waldanteil_wirkung": 0.15,
         # Spaetherbstart, haelt Frost besser aus
         "frost_abzug": (10, 30),
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.02,
-                   7: 0.10, 8: 0.40, 9: 0.90, 10: 1.00, 11: 0.45,
-                   12: 0.05},
+        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, 7: 0.0, 8: 0.11, 9: 0.3, 10: 1.0, 11: 0.88, 12: 0.25},
         "waldtyp": {"nadel": 1.0, "misch": 0.7, "laub": 0.15,
                     "bruch": 0.2, "unbekannt": 0.8},
     },
@@ -531,9 +518,7 @@ ARTEN = {
         "waldanteil_wirkung": 0.06,
         # Wie der Schwefelporling geschuetzter als Bodenpilze
         "frost_abzug": (8, 25),
-        "saison": {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.03,
-                   7: 0.20, 8: 0.70, 9: 1.00, 10: 0.65, 11: 0.15,
-                   12: 0.01},
+        "saison": {1: 0.08, 2: 0.04, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, 7: 0.0, 8: 0.06, 9: 1.0, 10: 0.58, 11: 0.44, 12: 0.32},
         "waldtyp": {"nadel": 1.0, "misch": 0.7, "laub": 0.15,
                     "bruch": 0.2, "unbekannt": 0.8},
         # Wetter sagt bei Holzbewohnern weniger aus
