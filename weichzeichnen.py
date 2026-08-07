@@ -29,10 +29,10 @@ BILD_KM = 0.25
 # Muss zum Punktabstand passen. Bei 2 km Raster reichen 0,9 km nicht
 # von Reihe zu Reihe - dazwischen bleiben dunkle Streifen. Etwa
 # zwei Drittel des Abstands ist die Untergrenze, mehr schadet nicht.
-STREUUNG_KM = 1.6
+STREUUNG_KM = 1.7
  
 # Ab welcher Entfernung zur naechsten Zelle das Bild durchsichtig wird
-VOLL_KM = 1.8
+VOLL_KM = 1.85
 AUS_KM = 3.3
  
 ORDNER = "bilder"
