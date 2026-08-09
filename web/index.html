@@ -19,6 +19,7 @@
   :root {
     --grund: #15181c; --flaeche: #1e2228; --text: #e6e6e6;
     --leise: #9aa0a6; --linie: #2f353d; --akzent: #5fb763;
+    --warn: #e8a33d;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; margin: 0; }
@@ -73,8 +74,21 @@
   #liste details[open] summary::before { content: "▾ "; }
 
   .leiste { display: flex; gap: 6px; overflow-x: auto;
-            scrollbar-width: none; padding-bottom: 2px; }
-  .leiste::-webkit-scrollbar { display: none; }
+            scrollbar-width: thin;
+            scrollbar-color: var(--linie) transparent;
+            padding-bottom: 3px; }
+  @media (max-width: 700px) { .leiste { scrollbar-width: none; } }
+  /* Am Rechner eine schmale Bildlaufleiste zeigen - sonst sieht
+     man nicht, dass es weitergeht, und das Mausrad scrollt
+     senkrecht statt waagerecht. Auf dem Telefon wischt man
+     ohnehin. */
+  .leiste::-webkit-scrollbar { height: 6px; }
+  .leiste::-webkit-scrollbar-thumb { background: var(--linie);
+                                     border-radius: 3px; }
+  .leiste::-webkit-scrollbar-track { background: transparent; }
+  @media (max-width: 700px) {
+    .leiste::-webkit-scrollbar { display: none; }
+  }
   .art { flex: 0 0 auto; border: 1px solid var(--linie);
          background: var(--grund); color: var(--text);
          padding: 7px 12px; border-radius: 20px; cursor: pointer;
@@ -521,6 +535,8 @@ function aktualisiere() {
   });
   bewertet.sort((x, y) => y.schnitt - x.schnitt)
     .forEach(({ b }) => leiste.appendChild(b));
+
+  if (window._zeigeGewaehlte) setTimeout(window._zeigeGewaehlte, 30);
   const tn = document.getElementById("tagname");
   if (tn) tn.textContent = tagname(tag);
   const zurueck = document.getElementById("tagzurueck");
@@ -582,6 +598,16 @@ function regenzeilen(z) {
   return `<h4>Regen</h4><table>${zeilen}</table>`;
 }
 
+function bremszeile(z) {
+  // Warum ist der Wert so niedrig? Ohne diese Angabe lässt sich
+  // eine 3 nicht deuten - sie kann an der Jahreszeit liegen, am
+  // Wald oder schlicht am Wetter.
+  const t = (z.teile || {})[art];
+  if (!t || !t.bremse) return "";
+  return `<div class="bremse">Gebremst durch
+    <b>${t.bremse.was}</b> &middot; ${t.bremse.warum}</div>`;
+}
+
 function popupInhalt(z, klickOrt) {
   const wert = z.scores[art][tag] ?? 0;
   const k = z.kenn;
@@ -627,6 +653,10 @@ function popupInhalt(z, klickOrt) {
 
     <h4>Andere Arten hier</h4>
     <table>${andere}</table>
+    <div class="klein" style="margin-top:4px">Die Zahlen gelten je
+      Art. Ein Wert sagt, wie nah diese Art an ihren besten
+      Bedingungen ist &ndash; nicht, wie viele Pilze dort
+      stehen.</div>
 
     ${navigationsknopf(klickOrt ? klickOrt.lat : z.lat,
                        klickOrt ? klickOrt.lng : z.lon)}
@@ -923,6 +953,29 @@ fetch("daten.json")
 
     document.querySelectorAll(".art").forEach(b =>
       b.onclick = () => { art = b.dataset.art; aktualisiere(); });
+
+    // Mausrad waagerecht umsetzen - sonst laesst sich die Leiste am
+    // Rechner nicht durchblaettern.
+    ["arten", "baumleiste", "ebenen", "darstellung"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("wheel", e => {
+        if (el.scrollWidth <= el.clientWidth) return;
+        if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }, { passive: false });
+    });
+
+    // Die gewaehlte Art ins Bild ruecken, wenn sie ausserhalb liegt
+    const zeigeGewaehlte = () => {
+      const b = document.querySelector(".art.aktiv");
+      if (b && b.scrollIntoView) {
+        b.scrollIntoView({ block: "nearest", inline: "nearest",
+                           behavior: "smooth" });
+      }
+    };
+    window._zeigeGewaehlte = zeigeGewaehlte;
 
     document.querySelectorAll(".um").forEach(b =>
       b.onclick = () => zeigeAnsicht(b.dataset.ansicht));

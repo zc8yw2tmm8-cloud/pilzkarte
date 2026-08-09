@@ -96,6 +96,11 @@ KARTE_ZOOM = 9
 
 PROGNOSE = "wetter_prognose.csv"
 PUNKTE_DATEI = "waldpunkte.csv"
+
+# Bei veralteten oertlichen Daten selbst von GitHub holen. Der
+# Cloud-Lauf sammelt viermal taeglich - meist liegt dort Neueres.
+AUTOMATISCH_HOLEN = True
+TAGE_BIS_HOLEN = 2
 TYPEN_DATEI = "waldtypen.csv"
 HOEHEN_DATEI = "hoehen.csv"
 NAMEN_DATEI = "ortsnamen.csv"
@@ -176,6 +181,63 @@ def gueltige_punkte():
         return None
     with open(PUNKTE_DATEI, "r", encoding="utf-8") as f:
         return {z["id"] for z in csv.DictReader(f)}
+
+
+def alter_der_daten():
+    """Wie viele Tage liegt der juengste gemessene Wert zurueck?"""
+    juengster = None
+    grenze = (date.today() - timedelta(days=30)).isoformat()
+    for z in historie.lese(grenze):
+        d = z.get("datum")
+        if d and (juengster is None or d > juengster):
+            juengster = d
+    if juengster is None:
+        return None
+    return (date.today() - date.fromisoformat(juengster)).days
+
+
+def hole_neue_daten(tage_alt):
+    """
+    Holt die Wetterdaten von GitHub, wenn die oertlichen veraltet
+    sind.
+
+    Der Cloud-Lauf sammelt viermal taeglich. Wer oertlich rechnet,
+    ohne vorher zu holen, arbeitet mit dem Stand vom letzten Mal -
+    und merkt es nur an der Warnung am Ende.
+    """
+    import subprocess
+
+    print(f"Die oertlichen Wetterdaten sind {tage_alt} Tage alt.")
+    print("Hole den Stand von GitHub ...", flush=True)
+
+    try:
+        ergebnis = subprocess.run(
+            ["git", "pull", "--rebase", "--autostash"],
+            capture_output=True, text=True, timeout=120)
+    except FileNotFoundError:
+        print("  Git nicht gefunden - bitte von Hand holen.\n")
+        return False
+    except subprocess.TimeoutExpired:
+        print("  Zeitueberschreitung - bitte von Hand holen.\n")
+        return False
+
+    ausgabe = (ergebnis.stdout + ergebnis.stderr).strip()
+
+    if ergebnis.returncode != 0:
+        print("  Fehlgeschlagen:")
+        for zeile in ausgabe.split("\n")[:4]:
+            print(f"    {zeile}")
+        print("  Bitte von Hand: git pull --rebase\n")
+        return False
+
+    if "Already up to date" in ausgabe or "Bereits aktuell" in ausgabe:
+        print("  Auf GitHub liegt auch nichts Neueres.")
+        print("  Pruefen, ob der taegliche Lauf noch geht:")
+        print("  github.com/zc8yw2tmm8-cloud/pilzkarte/actions\n")
+        return False
+
+    print("  Neue Daten geholt.\n")
+    return True
 
 
 def lade_reihen():
@@ -1476,6 +1538,13 @@ def main():
         print("Unbekannte Art:", ", ".join(unbekannt))
         return
 
+    # Erst schauen, wie alt die oertlichen Daten sind - und den
+    # Stand von GitHub holen, bevor gerechnet wird
+    if AUTOMATISCH_HOLEN:
+        alter = alter_der_daten()
+        if alter is not None and alter >= TAGE_BIS_HOLEN:
+            hole_neue_daten(alter)
+
     punkte, reihen, ergaenzt = lade_reihen()
     if not reihen:
         print("Keine Wetterdaten. Erst nachfuellen.py laufen lassen.")
@@ -1597,8 +1666,10 @@ def main():
 
     print(f"\nFertig. {INDEX} im Browser oeffnen.")
     if eintraege:
-        print(f"Beste Art heute: {eintraege[0][0]} "
+        print(f"Beste Aussichten heute: {eintraege[0][0]} "
               f"(Schnitt {round(eintraege[0][2])})")
+        print("Die Werte gelten je Art und sind zwischen den Arten")
+        print("nur grob vergleichbar.")
 
 
 # Nur ausfuehren, wenn direkt gestartet - dieses Modul

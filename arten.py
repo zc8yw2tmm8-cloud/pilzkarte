@@ -714,6 +714,67 @@ def saison_rohwert(einstellung, tag):
     return a + (b - a) * min(1.0, max(0.0, anteil))
 
 
+# ------------------------------------------------------------
+# Monatsnormale der Wetterpunkte
+#
+# Problem: Die Wetterpunkte sind im Herbst systematisch hoeher, weil
+# der Boden dann feuchter und kuehler ist. Der Saisonfaktor sagt das
+# aber schon - er wurde aus Fundmeldungen je Aufwand und Monat
+# gerechnet und enthaelt den Wettereffekt des Monats bereits.
+#
+# Multipliziert man beides, zaehlt der Herbst zweimal. Gemessen an
+# 31.535 Vergleichstagen verschiebt das bei vier Arten den
+# Hoehepunkt um einen Monat nach hinten: Steinpilz, Marone,
+# Birkenpilz und Parasol landeten im Oktober statt im September.
+#
+# Diese Tabelle sagt, wie hoch die Wetterpunkte in einem Monat
+# NORMALERWEISE liegen - bezogen auf das Jahresmittel. Die
+# Wetterpunkte werden daran geteilt. Damit drueckt das Wetter nur
+# noch aus, ob dieser Tag besser oder schlechter ist als ein
+# gewoehnlicher Tag desselben Monats.
+#
+# Erzeugt aus dem Hintergrund mit monatsnormale.py.
+MONATSNORMALE = {
+    "birkenpilz": {1: 0.936, 2: 0.974, 3: 1.051, 4: 1.071, 5: 1.056, 6: 0.779, 7: 0.679, 8: 0.653, 9: 0.986, 10: 1.521, 11: 1.272, 12: 1.022},
+    "hexenroehrling": {1: 0.705, 2: 0.765, 3: 0.797, 4: 0.923, 5: 1.113, 6: 1.026, 7: 1.002, 8: 0.929, 9: 1.209, 10: 1.625, 11: 1.111, 12: 0.794},
+    "krauseglucke": {1: 0.84, 2: 0.866, 3: 0.82, 4: 0.865, 5: 1.023, 6: 1.076, 7: 1.084, 8: 1.007, 9: 1.211, 10: 1.359, 11: 1.007, 12: 0.842},
+    "marone": {1: 0.707, 2: 0.797, 3: 0.939, 4: 1.156, 5: 1.196, 6: 0.851, 7: 0.757, 8: 0.733, 9: 1.082, 10: 1.72, 11: 1.266, 12: 0.796},
+    "netzhexe": {1: 0.683, 2: 0.746, 3: 0.764, 4: 0.845, 5: 1.089, 6: 1.108, 7: 1.091, 8: 1.003, 9: 1.271, 10: 1.558, 11: 1.059, 12: 0.783},
+    "parasol": {1: 0.644, 2: 0.78, 3: 0.838, 4: 1.006, 5: 1.168, 6: 0.934, 7: 0.86, 8: 0.805, 9: 1.132, 10: 1.844, 11: 1.215, 12: 0.773},
+    "pfifferling": {1: 0.893, 2: 0.962, 3: 1.058, 4: 0.948, 5: 0.862, 6: 0.888, 7: 0.864, 8: 0.813, 9: 1.042, 10: 1.387, 11: 1.257, 12: 1.027},
+    "reizker": {1: 0.858, 2: 0.983, 3: 1.081, 4: 1.129, 5: 1.006, 6: 0.755, 7: 0.704, 8: 0.681, 9: 0.926, 10: 1.556, 11: 1.347, 12: 0.973},
+    "schwefelporling": {1: 1.064, 2: 1.064, 3: 1.066, 4: 1.044, 5: 0.989, 6: 0.9, 7: 0.871, 8: 0.872, 9: 0.939, 10: 1.051, 11: 1.072, 12: 1.066},
+    "sommersteinpilz": {1: 1.044, 2: 1.098, 3: 1.111, 4: 0.997, 5: 0.913, 6: 0.781, 7: 0.729, 8: 0.685, 9: 0.963, 10: 1.347, 11: 1.239, 12: 1.094},
+    "steinpilz": {1: 0.759, 2: 0.859, 3: 0.879, 4: 1.004, 5: 1.106, 6: 0.871, 7: 0.793, 8: 0.761, 9: 1.057, 10: 1.799, 11: 1.256, 12: 0.856},
+}
+
+# Abschalten, falls sich der Umbau als falsch erweist
+MONATSAUSGLEICH = True
+
+def bremse(wetter, saison, bestand, boden):
+    """
+    Welcher Faktor drueckt den Score am staerksten?
+
+    Eine 3 kann heissen: falsche Jahreszeit, falscher Wald, oder
+    schlicht zu trocken. Das steht sonst nirgends, und ohne diese
+    Angabe ist eine niedrige Zahl nicht zu deuten.
+
+    Rueckgabe: (Kurzwort, Erklaerung, Wert) oder None, wenn nichts
+    besonders bremst.
+    """
+    teile = [
+        # Wetter auf dieselbe Skala wie die Faktoren bringen
+        (wetter / 100.0, "Wetter", "zu trocken oder falsche Temperatur"),
+        (saison, "Jahreszeit", "nicht die Zeit dieser Art"),
+        (bestand, "Bestand", "die passenden Baeume fehlen"),
+        (boden, "Boden", "Saeuregrad oder Tongehalt passen nicht"),
+    ]
+    schwaechster = min(teile, key=lambda x: x[0])
+    if schwaechster[0] >= 0.7:
+        return None
+    return schwaechster[1], schwaechster[2], round(schwaechster[0], 2)
+
+
 def score(kennwerte, art, tag, waldtyp="unbekannt", boden=None,
           bestand=None):
     """
@@ -770,6 +831,15 @@ def score(kennwerte, art, tag, waldtyp="unbekannt", boden=None,
         if ab:
             wetter -= ab
             einzeln["frost"] = -ab
+
+    # Monatsausgleich: Die Wetterpunkte durch den Monatsnormalwert
+    # teilen, damit sie nur die Abweichung vom gewoehnlichen Tag
+    # dieses Monats ausdruecken. Sonst zaehlt der Herbst zweimal -
+    # einmal ueber das Wetter, einmal ueber die Saison.
+    if MONATSAUSGLEICH:
+        normal = MONATSNORMALE.get(art, {}).get(tag.month)
+        if normal and normal > 0.2:
+            wetter = wetter / normal
 
     wetter = max(0, min(100, wetter))
 

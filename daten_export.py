@@ -145,10 +145,18 @@ def main():
                     artenmodul.score(kenn, art, tag, wt["typ"], bd, bst)
                 werte.append(end)
                 if i == 0:
+                    gebremst = artenmodul.bremse(wetter, saison, wald,
+                                                 boden_f)
                     teile[art] = {
                         "wetter": wetter, "saison": saison,
                         "bestand": wald, "boden": boden_f,
                         "einzeln": einzeln,
+                        # Was den Wert am staerksten drueckt - ohne
+                        # das ist eine niedrige Zahl nicht zu deuten
+                        "bremse": (None if gebremst is None else
+                                   {"was": gebremst[0],
+                                    "warum": gebremst[1],
+                                    "wert": gebremst[2]}),
                     }
             scores[art] = werte
 
