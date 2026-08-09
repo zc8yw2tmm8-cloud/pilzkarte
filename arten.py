@@ -1,5 +1,4 @@
 """
-localhost:3000/#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired&sb=
 Pilzarten und ihre Anforderungen - die einzige Datei zum Nachjustieren.
 
 Aufbau je Groesse: Liste von (von, bis, punkte). None = offenes Ende.
