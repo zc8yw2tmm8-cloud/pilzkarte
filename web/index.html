@@ -12,6 +12,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="konto.css">
 <meta name="theme-color" content="#15181c">
 <title>Pilzkarte</title>
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
@@ -199,6 +200,9 @@
                        font-variant-numeric: tabular-nums;
                        padding-left: 10px; padding-right: 2px; }
   .pop tr.hier td { font-weight: 700; }
+  .navi.eintrag { background: transparent; color: var(--akzent);
+                  border: 1px solid var(--akzent); margin-top: 6px;
+                  cursor: pointer; }
   .navi { display: block; margin-top: 12px; padding: 10px;
           background: var(--akzent); color: #10130f; text-align: center;
           border-radius: 6px; text-decoration: none; font-weight: 600;
@@ -306,6 +310,8 @@
 <div class="laedt" id="laedt">Lade Daten …</div>
 
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="konto_konfig.js" onerror="window.OHNE_KONTO=true"></script>
 <script>
 // ---- Farbskala, gleiche Werte wie in farben.py (dunkel) -------------
 const SKALA = [
@@ -608,6 +614,18 @@ function bremszeile(z) {
     <b>${t.bremse.was}</b> &middot; ${t.bremse.warum}</div>`;
 }
 
+function fundknopf(z, klickOrt) {
+  // Nur wenn angemeldet - sonst waere der Knopf nur eine
+  // Enttaeuschung
+  if (typeof benutzer === "undefined" || !benutzer) return "";
+  const lat = klickOrt ? klickOrt.lat : z.lat;
+  const lon = klickOrt ? klickOrt.lng : z.lon;
+  const wert = z.scores[art][tag] ?? 0;
+  return `<a class="navi eintrag" onclick='fundBeginnen(${lat},
+    ${lon}, ${JSON.stringify(z.id)}, ${wert})'>
+    &#43; Fund hier eintragen</a>`;
+}
+
 function popupInhalt(z, klickOrt) {
   const wert = z.scores[art][tag] ?? 0;
   const k = z.kenn;
@@ -660,6 +678,7 @@ function popupInhalt(z, klickOrt) {
 
     ${navigationsknopf(klickOrt ? klickOrt.lat : z.lat,
                        klickOrt ? klickOrt.lng : z.lon)}
+    ${fundknopf(z, klickOrt)}
   </div>`;
 }
 
@@ -1319,6 +1338,9 @@ fetch("daten.json")
         .catch(() => {});
 
       setzeDeckkraft();
+      if (typeof kontoStarten === "function" && !window.OHNE_KONTO) {
+        kontoStarten();
+      }
       document.getElementById("laedt").remove();
       aktualisiere();
     });
@@ -1328,5 +1350,6 @@ fetch("daten.json")
       "Daten konnten nicht geladen werden: " + e.message;
   });
 </script>
+<script src="konto.js"></script>
 </body>
 </html>

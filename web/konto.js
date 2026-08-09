@@ -1,0 +1,459 @@
+/*
+ * Anmeldung, Routenaufzeichnung und Fundtagebuch.
+ *
+ * Wird von index.html eingebunden. Ohne Supabase-Zugangsdaten in
+ * konto_konfig.js bleibt alles ausgeblendet - die Karte funktioniert
+ * dann wie bisher.
+ */
+
+let sb = null;             // Supabase-Verbindung
+let benutzer = null;       // angemeldeter Benutzer
+let aufzeichnung = null;   // laufende Routenaufzeichnung
+
+// ---- Verbindung -----------------------------------------------------
+
+async function kontoStarten() {
+  if (typeof SUPABASE_URL === "undefined" || !SUPABASE_URL) return;
+
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const { data } = await sb.auth.getSession();
+  benutzer = data.session ? data.session.user : null;
+
+  sb.auth.onAuthStateChange((_, sitzung) => {
+    benutzer = sitzung ? sitzung.user : null;
+    zeigeKontostand();
+  });
+
+  document.getElementById("kontoleiste").hidden = false;
+  zeigeKontostand();
+}
+
+function zeigeKontostand() {
+  const el = document.getElementById("kontostand");
+  if (!el) return;
+
+  if (benutzer) {
+    el.innerHTML = `<button class="tag" onclick="zeigeTagebuch()">
+        Tagebuch</button>
+      <button class="tag" id="aufnahme" onclick="routeUmschalten()">
+        &#9679; Route aufzeichnen</button>
+      <button class="tag" onclick="abmelden()">abmelden</button>`;
+    if (karte) ladeEigeneFunde();
+  } else {
+    el.innerHTML = `<button class="tag" onclick="zeigeAnmeldung()">
+        anmelden</button>`;
+  }
+}
+
+// ---- Anmeldung ------------------------------------------------------
+
+function zeigeAnmeldung() {
+  kasten(`
+    <h3>Anmelden</h3>
+    <p class="klein">Du bekommst eine E-Mail mit einem Link. Kein
+    Passwort noetig.</p>
+    <input type="email" id="epost" placeholder="deine@email.de"
+           autocomplete="email">
+    <button class="voll" onclick="linkSchicken()">Link schicken</button>
+    <p class="klein" id="anmeldehinweis"></p>
+  `);
+}
+
+async function linkSchicken() {
+  const adresse = document.getElementById("epost").value.trim();
+  const hinweis = document.getElementById("anmeldehinweis");
+  if (!adresse) return;
+
+  hinweis.textContent = "Wird verschickt ...";
+  const { error } = await sb.auth.signInWithOtp({
+    email: adresse,
+    options: { emailRedirectTo: window.location.href }
+  });
+
+  hinweis.textContent = error
+    ? "Fehler: " + error.message
+    : "Schau in dein Postfach. Der Link gilt eine Stunde.";
+}
+
+async function abmelden() {
+  if (aufzeichnung) routeUmschalten();
+  await sb.auth.signOut();
+  kastenZu();
+}
+
+// ---- Routenaufzeichnung ---------------------------------------------
+//
+// Der Browser verfolgt die Position, solange die Seite im Vordergrund
+// ist. Wird sie in den Hintergrund geschoben oder das Telefon
+// gesperrt, hoert die Aufzeichnung auf - das ist bei Webseiten so.
+// Fuer ein bis zwei Stunden mit gelegentlichem Draufschauen reicht es.
+
+function routeUmschalten() {
+  if (aufzeichnung) {
+    routeBeenden();
+  } else {
+    routeBeginnen();
+  }
+}
+
+function routeBeginnen() {
+  if (!navigator.geolocation) {
+    melde("Dieser Browser kennt keine Standortbestimmung.");
+    return;
+  }
+
+  aufzeichnung = {
+    beginn: new Date(),
+    punkte: [],
+    wache: null,
+    km: 0
+  };
+
+  aufzeichnung.wache = navigator.geolocation.watchPosition(
+    p => {
+      const punkt = {
+        lat: +p.coords.latitude.toFixed(6),
+        lon: +p.coords.longitude.toFixed(6),
+        t: Math.round((Date.now() - aufzeichnung.beginn) / 1000)
+      };
+
+      // Ausreisser und Stillstand weglassen: unter 8 m ist Rauschen,
+      // ueber 200 m in wenigen Sekunden ist ein Sprung
+      const letzter = aufzeichnung.punkte[aufzeichnung.punkte.length - 1];
+      if (letzter) {
+        const d = abstandKm(letzter.lat, letzter.lon, punkt.lat, punkt.lon);
+        if (d < 0.008) return;
+        if (d > 0.2 && punkt.t - letzter.t < 10) return;
+        aufzeichnung.km += d;
+      }
+
+      aufzeichnung.punkte.push(punkt);
+      zeichneRoute();
+      zeigeAufnahmestand();
+    },
+    fehler => {
+      melde("Standort nicht verfuegbar: " + fehler.message);
+      routeBeenden(true);
+    },
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
+  );
+
+  // Bildschirm wachhalten, soweit der Browser das zulaesst
+  if (navigator.wakeLock) {
+    navigator.wakeLock.request("screen")
+      .then(w => { aufzeichnung.wach = w; })
+      .catch(() => {});
+  }
+
+  zeigeAufnahmestand();
+  melde("Aufzeichnung laeuft. Die Seite muss offen bleiben.", 8000);
+}
+
+function zeichneRoute() {
+  if (!karte || !aufzeichnung || aufzeichnung.punkte.length < 2) return;
+
+  const linie = {
+    type: "Feature",
+    geometry: {
+      type: "LineString",
+      coordinates: aufzeichnung.punkte.map(p => [p.lon, p.lat])
+    }
+  };
+
+  if (karte.getSource("route")) {
+    karte.getSource("route").setData(linie);
+  } else {
+    karte.addSource("route", { type: "geojson", data: linie });
+    karte.addLayer({
+      id: "route", type: "line", source: "route",
+      paint: {
+        "line-color": "#5fb763", "line-width": 4, "line-opacity": 0.85
+      },
+      layout: { "line-cap": "round", "line-join": "round" }
+    });
+  }
+}
+
+function zeigeAufnahmestand() {
+  const b = document.getElementById("aufnahme");
+  if (!b) return;
+  if (!aufzeichnung) {
+    b.textContent = "\u25CF Route aufzeichnen";
+    b.classList.remove("aktiv");
+    return;
+  }
+  const min = Math.round((Date.now() - aufzeichnung.beginn) / 60000);
+  b.textContent = `\u25A0 ${aufzeichnung.km.toFixed(1)} km \u00B7 ${min} min`;
+  b.classList.add("aktiv");
+}
+
+function routeBeenden(stillschweigend) {
+  if (!aufzeichnung) return;
+
+  navigator.geolocation.clearWatch(aufzeichnung.wache);
+  if (aufzeichnung.wach) {
+    try { aufzeichnung.wach.release(); } catch (e) {}
+  }
+
+  const fertig = aufzeichnung;
+  aufzeichnung = null;
+  zeigeAufnahmestand();
+
+  if (stillschweigend || fertig.punkte.length < 3) {
+    if (!stillschweigend) melde("Zu wenige Punkte - nicht gespeichert.");
+    return;
+  }
+
+  const min = Math.round((Date.now() - fertig.beginn) / 60000);
+  kasten(`
+    <h3>Route speichern</h3>
+    <p class="klein">${fertig.km.toFixed(1)} km in ${min} Minuten,
+    ${fertig.punkte.length} Punkte</p>
+    <input type="text" id="routentitel" placeholder="Wo warst du?"
+           value="${new Date().toLocaleDateString("de-DE")}">
+    <textarea id="routennotiz" rows="2"
+      placeholder="Notiz (was gesehen, was gefunden)"></textarea>
+    <button class="voll" onclick='routeSpeichern(${JSON.stringify(
+      { km: fertig.km, min: min, beginn: fertig.beginn,
+        punkte: fertig.punkte })})'>Speichern</button>
+    <button class="voll leer" onclick="kastenZu()">Verwerfen</button>
+  `);
+}
+
+async function routeSpeichern(daten) {
+  if (!sb || !benutzer) {
+    melde("Nicht angemeldet.");
+    return;
+  }
+
+  const linie = "LINESTRING(" +
+    daten.punkte.map(p => `${p.lon} ${p.lat}`).join(",") + ")";
+
+  const { error } = await sb.from("route").insert({
+    benutzer: benutzer.id,
+    titel: document.getElementById("routentitel").value || null,
+    begonnen: daten.beginn,
+    beendet: new Date().toISOString(),
+    weg: linie,
+    laenge_km: +daten.km.toFixed(2),
+    dauer_min: daten.min,
+    punkte: daten.punkte,
+    notiz: document.getElementById("routennotiz").value || null
+  });
+
+  if (error) {
+    melde("Konnte nicht speichern: " + error.message);
+  } else {
+    kastenZu();
+    melde("Route gespeichert.");
+  }
+}
+
+
+// ---- Fund eintragen -------------------------------------------------
+//
+// Der wichtigste Teil: Was hier gesammelt wird, gibt es sonst
+// nirgends. Vor allem die Nullfunde - "war hier, nichts gefunden".
+// Ohne sie lassen sich die Schwellen der Karte nur einseitig pruefen.
+
+let fundOrt = null;
+
+function fundBeginnen(lat, lon, zelle, score) {
+  if (!benutzer) {
+    melde("Erst anmelden, dann lassen sich Funde eintragen.");
+    return;
+  }
+  fundOrt = { lat, lon, zelle, score };
+
+  const heute = new Date().toISOString().slice(0, 10);
+  const arten = Object.entries(D.arten)
+    .map(([a, e]) => `<option value="${a}">${e.name}</option>`).join("");
+
+  kasten(`
+    <h3>Fund eintragen</h3>
+    <p class="klein">${lat.toFixed(5)}, ${lon.toFixed(5)}</p>
+
+    <select id="fundart">${arten}</select>
+    <input type="date" id="funddatum" value="${heute}">
+    <input type="number" id="fundanzahl" placeholder="Wie viele? (kann leer bleiben)" min="1">
+    <textarea id="fundnotiz" rows="2"
+      placeholder="Notiz: Bestand, Bodenbeschaffenheit, Besonderheiten"></textarea>
+
+    <button class="voll" onclick="fundSpeichern(false)">Fund speichern</button>
+    <button class="voll leer" onclick="fundSpeichern(true)">
+      Nichts gefunden &ndash; auch eintragen</button>
+    <p class="klein" style="margin-top:10px">Ein Nullfund ist genauso
+    wertvoll wie ein Fund: Er sagt, dass die Bedingungen hier nicht
+    gereicht haben. Solche Daten gibt es sonst nirgends.</p>
+  `);
+}
+
+async function fundSpeichern(nullfund) {
+  if (!sb || !benutzer || !fundOrt) return;
+
+  const art = document.getElementById("fundart").value;
+  const datum = document.getElementById("funddatum").value;
+  const anzahl = document.getElementById("fundanzahl").value;
+  const notiz = document.getElementById("fundnotiz").value;
+
+  const { error } = await sb.from("fund").insert({
+    benutzer: benutzer.id,
+    art: art,
+    gefunden_am: datum,
+    anzahl: nullfund ? null : (anzahl ? +anzahl : null),
+    ort: `POINT(${fundOrt.lon} ${fundOrt.lat})`,
+    nullfund: nullfund,
+    notiz: notiz || null,
+    zelle: fundOrt.zelle || null,
+    score: fundOrt.score ?? null
+  });
+
+  if (error) {
+    melde("Konnte nicht speichern: " + error.message);
+    return;
+  }
+
+  kastenZu();
+  melde(nullfund ? "Nullfund eingetragen." : "Fund eingetragen.");
+  ladeEigeneFunde();
+}
+
+// ---- Eigene Funde auf der Karte -------------------------------------
+
+let eigeneFunde = [];
+
+async function ladeEigeneFunde() {
+  if (!sb || !benutzer || !karte) return;
+
+  const { data, error } = await sb.from("fund")
+    .select("id, art, gefunden_am, nullfund, anzahl, notiz, ort")
+    .order("gefunden_am", { ascending: false })
+    .limit(500);
+
+  if (error || !data) return;
+  eigeneFunde = data;
+
+  const punkte = {
+    type: "FeatureCollection",
+    features: data.filter(f => f.ort).map(f => {
+      // PostGIS liefert die Geometrie als GeoJSON-Objekt
+      const g = typeof f.ort === "string" ? JSON.parse(f.ort) : f.ort;
+      return {
+        type: "Feature",
+        properties: {
+          art: (D.arten[f.art] || {}).name || f.art,
+          datum: new Date(f.gefunden_am).toLocaleDateString("de-DE"),
+          null: f.nullfund ? 1 : 0,
+          anzahl: f.anzahl || "",
+          notiz: f.notiz || ""
+        },
+        geometry: g
+      };
+    })
+  };
+
+  if (karte.getSource("eigene")) {
+    karte.getSource("eigene").setData(punkte);
+    return;
+  }
+
+  karte.addSource("eigene", { type: "geojson", data: punkte });
+
+  // Eigene Funde in Gruen, Nullfunde als leerer Ring
+  karte.addLayer({
+    id: "eigene", type: "circle", source: "eigene",
+    paint: {
+      "circle-radius": ["interpolate", ["linear"], ["zoom"],
+        10, 6, 13, 9, 16, 12],
+      "circle-color": ["case", ["==", ["get", "null"], 1],
+        "rgba(0,0,0,0)", "#5fb763"],
+      "circle-stroke-width": 2.5,
+      "circle-stroke-color": ["case", ["==", ["get", "null"], 1],
+        "#9aa0a6", "#1a3320"]
+    }
+  });
+
+  karte.on("click", "eigene", e => {
+    const p = e.features[0].properties;
+    new maplibregl.Popup({ maxWidth: "240px" })
+      .setLngLat(e.features[0].geometry.coordinates)
+      .setHTML(`<div class="pop">
+        <b>${p.null == 1 ? "Nichts gefunden" : p.art}</b>
+        <div class="lage">${p.datum}${p.anzahl
+          ? " &middot; " + p.anzahl + " Stück" : ""}</div>
+        ${p.notiz ? `<div class="klein">${p.notiz}</div>` : ""}
+      </div>`)
+      .addTo(karte);
+  });
+  karte.on("mouseenter", "eigene",
+    () => karte.getCanvas().style.cursor = "pointer");
+  karte.on("mouseleave", "eigene",
+    () => karte.getCanvas().style.cursor = "");
+}
+
+// ---- Tagebuch -------------------------------------------------------
+
+async function zeigeTagebuch() {
+  kasten('<h3>Tagebuch</h3><p class="klein">Wird geladen ...</p>');
+
+  const [routen, funde, zahlen] = await Promise.all([
+    sb.from("route").select("*").order("begonnen", { ascending: false })
+      .limit(30),
+    sb.from("fund").select("*").order("gefunden_am", { ascending: false })
+      .limit(30),
+    sb.rpc("meine_zahlen")
+  ]);
+
+  const z = (zahlen.data && zahlen.data[0]) || {};
+
+  const routenListe = (routen.data || []).map(r => `
+    <div class="eintrag">
+      <b>${r.titel || "ohne Titel"}</b>
+      <div class="klein">${new Date(r.begonnen).toLocaleDateString("de-DE")}
+        &middot; ${r.laenge_km || "?"} km &middot; ${r.dauer_min || "?"} min</div>
+      ${r.notiz ? `<div class="klein">${r.notiz}</div>` : ""}
+    </div>`).join("") || '<p class="klein">Noch keine Routen.</p>';
+
+  const fundListe = (funde.data || []).map(f => `
+    <div class="eintrag">
+      <b>${f.nullfund ? "nichts gefunden" : f.art}</b>
+      <div class="klein">${new Date(f.gefunden_am)
+        .toLocaleDateString("de-DE")}${f.anzahl
+        ? " &middot; " + f.anzahl + " Stueck" : ""}</div>
+      ${f.notiz ? `<div class="klein">${f.notiz}</div>` : ""}
+    </div>`).join("") || '<p class="klein">Noch keine Funde.</p>';
+
+  kasten(`
+    <h3>Tagebuch</h3>
+    <div class="zahlen">
+      <span><b>${z.funde || 0}</b> Funde</span>
+      <span><b>${z.arten || 0}</b> Arten</span>
+      <span><b>${z.routen || 0}</b> Routen</span>
+      <span><b>${(+z.km || 0).toFixed(0)}</b> km</span>
+    </div>
+    <h4>Routen</h4>${routenListe}
+    <h4>Funde</h4>${fundListe}
+    <button class="voll leer" onclick="kastenZu()">Schliessen</button>
+  `);
+}
+
+// ---- Kasten ---------------------------------------------------------
+
+function kasten(inhalt) {
+  let el = document.getElementById("kasten");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "kasten";
+    el.className = "kasten-huelle";
+    el.onclick = e => { if (e.target === el) kastenZu(); };
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `<div class="kasten-inhalt">${inhalt}</div>`;
+  el.hidden = false;
+}
+
+function kastenZu() {
+  const el = document.getElementById("kasten");
+  if (el) el.hidden = true;
+}
