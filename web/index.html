@@ -1070,6 +1070,9 @@ fetch("daten.json")
             tileSize: 256
           }
         },
+        // Ohne glyphs kann MapLibre keine Beschriftung zeichnen -
+        // die Zahl im Fundbuendel braucht sie.
+        glyphs: "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
         layers: [{ id: "grund", type: "raster", source: "grund" }]
       },
       bounds: [[g.west, g.sued], [g.ost, g.nord]],
@@ -1117,10 +1120,18 @@ fetch("daten.json")
       // mitteln - in der Zellmitte staende dann ein dunkler Fleck.
       // Gerechnet wird sie beim taeglichen Bauvorgang, mit demselben
       // gewichteten Mittel wie in der oertlichen Karte.
+      // Die Ecken muessen von Anfang an gueltig sein - vier
+      // identische Punkte ergeben eine entartete Flaeche, und
+      // MapLibre rechnet daraus Unendlich.
       karte.addSource("weichbild", {
         type: "image",
         url: LEERBILD,
-        coordinates: [[0, 0], [0, 0], [0, 0], [0, 0]]
+        coordinates: [
+          [D.gebiet.west, D.gebiet.nord],
+          [D.gebiet.ost, D.gebiet.nord],
+          [D.gebiet.ost, D.gebiet.sued],
+          [D.gebiet.west, D.gebiet.sued]
+        ]
       });
       karte.addLayer({
         id: "weich", type: "raster", source: "weichbild",
@@ -1178,7 +1189,7 @@ fetch("daten.json")
           visibility: "none",
           "text-field": ["get", "point_count_abbreviated"],
           "text-size": 12,
-          "text-font": ["Noto Sans Regular"],
+          "text-font": ["Open Sans Regular"],
           "text-allow-overlap": true
         },
         paint: { "text-color": "#ffffff" }
