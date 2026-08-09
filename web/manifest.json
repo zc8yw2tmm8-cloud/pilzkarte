@@ -1,0 +1,17 @@
+{
+  "name": "Pilzkarte",
+  "short_name": "Pilzkarte",
+  "description": "Fundwahrscheinlichkeit für Speisepilze in der Region Braunschweig, Wolfsburg und südliche Lüneburger Heide",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#15181c",
+  "theme_color": "#15181c",
+  "lang": "de",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png",
+      "purpose": "any maskable" }
+  ]
+}
