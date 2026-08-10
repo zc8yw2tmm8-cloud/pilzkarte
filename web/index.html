@@ -218,6 +218,8 @@
              background: rgba(24,28,33,.93); padding: 8px 10px;
              border-radius: 8px; font-size: 11px; line-height: 1.5;
              pointer-events: none; }
+  .legende .fundlegende { margin-top: 5px; padding-top: 5px;
+                          border-top: 1px solid var(--linie); }
   .legende i { display: inline-block; width: 12px; height: 12px;
                border-radius: 2px; margin-right: 5px;
                vertical-align: -2px; }
@@ -1022,12 +1024,15 @@ fetch("daten.json")
         b.classList.toggle("aktiv", an);
 
         if (was === "funde") {
-          ["funde", "funde_buendel", "funde_zahl"].forEach(e => {
-            if (karte.getLayer(e)) {
-              karte.setLayoutProperty(e, "visibility",
-                an ? "visible" : "none");
-            }
-          });
+          // "eigene" sind die selbst eingetragenen Funde aus
+          // konto.js - sie gehoeren zum selben Schalter
+          ["funde", "funde_buendel", "funde_zahl", "eigene"]
+            .forEach(e => {
+              if (karte.getLayer(e)) {
+                karte.setLayoutProperty(e, "visibility",
+                  an ? "visible" : "none");
+              }
+            });
         } else if (was === "nah") {
           nurNah = an;
           aktualisiereFunde();
@@ -1276,7 +1281,13 @@ fetch("daten.json")
       const box = document.createElement("div");
       box.className = "legende";
       box.innerHTML = stufen.map(([w, t]) =>
-        `<div><i style="background:${farbe(w)}"></i>${w}+ ${t}</div>`).join("");
+        `<div><i style="background:${farbe(w)}"></i>${w}+ ${t}</div>`)
+        .join("")
+        + '<div class="fundlegende">'
+        + '<div><i style="background:#b57edc"></i>belegte Funde</div>'
+        + '<div><i style="background:#5fb763"></i>eigene Funde</div>'
+        + '<div><i style="background:transparent;'
+        + 'border:2px solid #9aa0a6"></i>nichts gefunden</div></div>';
       document.getElementById("karte").appendChild(box);
 
       // Ruhiger Hinweis am unteren Rand statt eines Kastens beim Start

@@ -195,6 +195,18 @@ function routeUmschalten() {
   }
 }
 
+// Wie viele Rohpositionen zu einem Punkt zusammengefasst werden.
+// watchPosition liefert etwa jede Sekunde einen Wert, und der
+// springt: bei Baumbestand sind 10 bis 20 Meter Streuung normal,
+// obwohl man stillsteht. Ein Mittel aus mehreren Werten glaettet
+// das, ohne die Strecke zu verfaelschen.
+const GLAETTUNG = 8;
+
+// Rohpositionen mit schlechterer Genauigkeit als das hier ganz
+// verwerfen - unter Kronendach kommen gelegentlich Werte mit
+// 50 Metern Unsicherheit.
+const MAX_UNGENAU = 35;
+
 function routeBeginnen() {
   if (!navigator.geolocation) {
     melde("Dieser Browser kennt keine Standortbestimmung.");
@@ -204,40 +216,21 @@ function routeBeginnen() {
   aufzeichnung = {
     beginn: new Date(),
     punkte: [],
+    puffer: [],
+    verworfen: 0,
     wache: null,
     km: 0
   };
 
   aufzeichnung.wache = navigator.geolocation.watchPosition(
-    p => {
-      const punkt = {
-        lat: +p.coords.latitude.toFixed(6),
-        lon: +p.coords.longitude.toFixed(6),
-        t: Math.round((Date.now() - aufzeichnung.beginn) / 1000)
-      };
-
-      // Ausreisser und Stillstand weglassen: unter 8 m ist Rauschen,
-      // ueber 200 m in wenigen Sekunden ist ein Sprung
-      const letzter = aufzeichnung.punkte[aufzeichnung.punkte.length - 1];
-      if (letzter) {
-        const d = abstandKm(letzter.lat, letzter.lon, punkt.lat, punkt.lon);
-        if (d < 0.008) return;
-        if (d > 0.2 && punkt.t - letzter.t < 10) return;
-        aufzeichnung.km += d;
-      }
-
-      aufzeichnung.punkte.push(punkt);
-      zeichneRoute();
-      zeigeAufnahmestand();
-    },
+    p => rohposition(p),
     fehler => {
       melde("Standort nicht verfuegbar: " + fehler.message);
       routeBeenden(true);
     },
-    { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
   );
 
-  // Bildschirm wachhalten, soweit der Browser das zulaesst
   if (navigator.wakeLock) {
     navigator.wakeLock.request("screen")
       .then(w => { aufzeichnung.wach = w; })
@@ -246,6 +239,64 @@ function routeBeginnen() {
 
   zeigeAufnahmestand();
   melde("Aufzeichnung laeuft. Die Seite muss offen bleiben.", 8000);
+}
+
+function rohposition(p) {
+  if (!aufzeichnung) return;
+
+  const genau = p.coords.accuracy;
+  if (genau && genau > MAX_UNGENAU) {
+    aufzeichnung.verworfen++;
+    zeigeAufnahmestand();
+    return;
+  }
+
+  aufzeichnung.puffer.push({
+    lat: p.coords.latitude,
+    lon: p.coords.longitude,
+    // Genauere Messungen staerker gewichten
+    gewicht: 1 / Math.max(3, genau || 10)
+  });
+
+  if (aufzeichnung.puffer.length >= GLAETTUNG) {
+    mittelwertPunkt();
+  }
+  zeigeAufnahmestand();
+}
+
+function mittelwertPunkt() {
+  const puffer = aufzeichnung.puffer;
+  if (!puffer.length) return;
+
+  // Gewichtetes Mittel - genauere Messungen zaehlen mehr
+  let sg = 0, slat = 0, slon = 0;
+  puffer.forEach(r => {
+    sg += r.gewicht;
+    slat += r.lat * r.gewicht;
+    slon += r.lon * r.gewicht;
+  });
+
+  const punkt = {
+    lat: +(slat / sg).toFixed(6),
+    lon: +(slon / sg).toFixed(6),
+    t: Math.round((Date.now() - aufzeichnung.beginn) / 1000)
+  };
+  aufzeichnung.puffer = [];
+
+  const letzter = aufzeichnung.punkte[aufzeichnung.punkte.length - 1];
+  if (letzter) {
+    const d = abstandKm(letzter.lat, letzter.lon, punkt.lat, punkt.lon);
+    // Unter 10 m ist Rauschen, ueber 300 m in kurzer Zeit ein Sprung
+    if (d < 0.010) return;
+    if (d > 0.3 && punkt.t - letzter.t < 20) {
+      aufzeichnung.verworfen++;
+      return;
+    }
+    aufzeichnung.km += d;
+  }
+
+  aufzeichnung.punkte.push(punkt);
+  zeichneRoute();
 }
 
 function zeichneRoute() {
@@ -282,12 +333,19 @@ function zeigeAufnahmestand() {
     return;
   }
   const min = Math.round((Date.now() - aufzeichnung.beginn) / 60000);
-  b.textContent = `\u25A0 ${aufzeichnung.km.toFixed(1)} km \u00B7 ${min} min`;
+  const punkte = aufzeichnung.punkte.length;
+  b.textContent = `\u25A0 ${aufzeichnung.km.toFixed(1)} km \u00B7 `
+                + `${min} min \u00B7 ${punkte}P`;
   b.classList.add("aktiv");
 }
 
 function routeBeenden(stillschweigend) {
   if (!aufzeichnung) return;
+
+  // Angefangenen Puffer noch verwerten
+  if (aufzeichnung.puffer && aufzeichnung.puffer.length >= 3) {
+    mittelwertPunkt();
+  }
 
   navigator.geolocation.clearWatch(aufzeichnung.wache);
   if (aufzeichnung.wach) {
@@ -372,7 +430,11 @@ function fundBeginnen(lat, lon, zelle, score) {
     <h3>Fund eintragen</h3>
     <p class="klein">${lat.toFixed(5)}, ${lon.toFixed(5)}</p>
 
-    <select id="fundart">${arten}</select>
+    <select id="fundart" onchange="fundArtWechsel()">${arten}
+      <option value="__eigene">— andere Art, selbst eintragen —</option>
+    </select>
+    <input type="text" id="fundeigene" placeholder="Welcher Pilz?"
+           hidden>
     <input type="date" id="funddatum" value="${heute}">
     <input type="number" id="fundanzahl" placeholder="Wie viele? (kann leer bleiben)" min="1">
     <textarea id="fundnotiz" rows="2"
@@ -387,10 +449,25 @@ function fundBeginnen(lat, lon, zelle, score) {
   `);
 }
 
+function fundArtWechsel() {
+  const wahl = document.getElementById("fundart").value;
+  const feld = document.getElementById("fundeigene");
+  feld.hidden = wahl !== "__eigene";
+  if (!feld.hidden) feld.focus();
+}
+
 async function fundSpeichern(nullfund) {
   if (!sb || !benutzer || !fundOrt) return;
 
-  const art = document.getElementById("fundart").value;
+  let art = document.getElementById("fundart").value;
+  if (art === "__eigene") {
+    art = (document.getElementById("fundeigene").value || "").trim();
+    if (!art && !nullfund) {
+      melde("Bitte den Pilznamen eintragen.");
+      return;
+    }
+    art = art || "unbekannt";
+  }
   const datum = document.getElementById("funddatum").value;
   const anzahl = document.getElementById("fundanzahl").value;
   const notiz = document.getElementById("fundnotiz").value;
@@ -420,6 +497,11 @@ async function fundSpeichern(nullfund) {
 // ---- Eigene Funde auf der Karte -------------------------------------
 
 let eigeneFunde = [];
+
+function fundeSichtbar() {
+  const b = document.querySelector("[data-schalter=funde]");
+  return b ? b.classList.contains("aktiv") : false;
+}
 
 async function ladeEigeneFunde() {
   if (!sb || !benutzer || !karte) return;
@@ -461,6 +543,8 @@ async function ladeEigeneFunde() {
   // Eigene Funde in Gruen, Nullfunde als leerer Ring
   karte.addLayer({
     id: "eigene", type: "circle", source: "eigene",
+    // Zusammen mit den belegten Funden ein- und ausschalten
+    layout: { visibility: fundeSichtbar() ? "visible" : "none" },
     paint: {
       "circle-radius": ["interpolate", ["linear"], ["zoom"],
         10, 6, 13, 9, 16, 12],
@@ -513,14 +597,25 @@ async function zeigeTagebuch() {
       ${r.notiz ? `<div class="klein">${r.notiz}</div>` : ""}
     </div>`).join("") || '<p class="klein">Noch keine Routen.</p>';
 
-  const fundListe = (funde.data || []).map(f => `
-    <div class="eintrag">
-      <b>${f.nullfund ? "nichts gefunden" : f.art}</b>
+  const fundListe = (funde.data || []).map(f => {
+    const g = f.ort
+      ? (typeof f.ort === "string" ? JSON.parse(f.ort) : f.ort)
+      : null;
+    const knopf = g && g.coordinates
+      ? `<button class="zeigen" onclick="zeigeFundAufKarte(
+           ${g.coordinates[1]}, ${g.coordinates[0]})">Auf der Karte
+         </button>`
+      : "";
+    return `<div class="eintrag">
+      <div class="kopfzeile">
+        <b>${f.nullfund ? "nichts gefunden" : f.art}</b>${knopf}
+      </div>
       <div class="klein">${new Date(f.gefunden_am)
         .toLocaleDateString("de-DE")}${f.anzahl
-        ? " &middot; " + f.anzahl + " Stueck" : ""}</div>
+        ? " &middot; " + f.anzahl + " Stück" : ""}</div>
       ${f.notiz ? `<div class="klein">${f.notiz}</div>` : ""}
-    </div>`).join("") || '<p class="klein">Noch keine Funde.</p>';
+    </div>`;
+  }).join("") || '<p class="klein">Noch keine Funde.</p>';
 
   kasten(`
     <h3>Tagebuch</h3>
@@ -537,6 +632,17 @@ async function zeigeTagebuch() {
 }
 
 // ---- Kasten ---------------------------------------------------------
+
+function zeigeFundAufKarte(lat, lon) {
+  kastenZu();
+  if (!karte) return;
+
+  // Eigene Funde einblenden, falls sie aus sind
+  const b = document.querySelector("[data-schalter=funde]");
+  if (b && !b.classList.contains("aktiv")) b.click();
+
+  karte.flyTo({ center: [lon, lat], zoom: 13, duration: 900 });
+}
 
 function kasten(inhalt) {
   let el = document.getElementById("kasten");

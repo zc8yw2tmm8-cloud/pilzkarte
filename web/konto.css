@@ -46,3 +46,18 @@
 
 #aufnahme.aktiv { background: #c0392b; border-color: #c0392b;
                   color: #fff; font-weight: 600; }
+
+/* Fund im Tagebuch auf der Karte zeigen */
+.eintrag .kopfzeile { display: flex; align-items: baseline; gap: 8px; }
+.eintrag .kopfzeile b { flex: 1; }
+button.zeigen { flex: 0 0 auto; border: 1px solid var(--linie);
+                background: transparent; color: var(--akzent);
+                padding: 4px 9px; border-radius: 5px; cursor: pointer;
+                font-size: 11.5px; white-space: nowrap; }
+button.zeigen:hover { border-color: var(--akzent); }
+
+.kasten-inhalt select { width: 100%; padding: 11px 12px; margin: 8px 0;
+                        background: var(--grund); color: var(--text);
+                        border: 1px solid var(--linie);
+                        border-radius: 6px; font: inherit;
+                        font-size: 15px; }
