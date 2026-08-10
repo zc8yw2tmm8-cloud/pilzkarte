@@ -34,16 +34,29 @@ function zeigeKontostand() {
   if (!el) return;
 
   if (benutzer) {
-    el.innerHTML = `<button class="tag" onclick="zeigeTagebuch()">
-        Tagebuch</button>
-      <button class="tag" id="aufnahme" onclick="routeUmschalten()">
-        &#9679; Route aufzeichnen</button>
-      <button class="tag" onclick="abmelden()">abmelden</button>`;
+    // Ein Knopf statt dreier - der Rest steht im Menue dahinter
+    const name = (benutzer.email || "").split("@")[0];
+    el.innerHTML = `<button class="tag an" onclick="zeigeKontomenue()"
+      title="${benutzer.email}">&#9679; ${name}</button>`;
     if (karte) ladeEigeneFunde();
+    zeigeRoutenknopf();
   } else {
     el.innerHTML = `<button class="tag" onclick="zeigeAnmeldung()">
         anmelden</button>`;
+    zeigeRoutenknopf();
   }
+}
+
+function zeigeKontomenue() {
+  kasten(`
+    <h3>${(benutzer.email || "").split("@")[0]}</h3>
+    <p class="klein">${benutzer.email}</p>
+    <button class="voll" onclick="zeigeTagebuch()">Tagebuch</button>
+    <button class="voll leer" onclick="kastenZu(); routeUmschalten()">
+      ${aufzeichnung ? "Aufzeichnung beenden" : "Route aufzeichnen"}
+    </button>
+    <button class="voll leer" onclick="abmelden()">Abmelden</button>
+  `);
 }
 
 // ---- Anmeldung ------------------------------------------------------
@@ -178,6 +191,54 @@ async function abmelden() {
   await sb.auth.signOut();
   kastenZu();
   melde("Abgemeldet.");
+}
+
+// ---- Routenknopf auf der Karte --------------------------------------
+//
+// Als Kartensteuerung unter dem Standortknopf - dort sucht man ihn,
+// wenn man unterwegs ist. Das Symbol ist ein Wegverlauf; laeuft die
+// Aufzeichnung, wird daraus ein rotes Viereck zum Beenden.
+
+let routenknopf = null;
+
+const SYMBOL_WEG =
+  '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" ' +
+  'stroke="currentColor" stroke-width="2" stroke-linecap="round" ' +
+  'stroke-linejoin="round">' +
+  '<path d="M4 20c0-3 3-4 6-4s6-1 6-4-3-4-6-4"/>' +
+  '<circle cx="4" cy="20" r="1.6" fill="currentColor"/>' +
+  '<circle cx="19" cy="6" r="1.6" fill="currentColor"/></svg>';
+
+const SYMBOL_STOPP =
+  '<svg viewBox="0 0 24 24" width="18" height="18">' +
+  '<rect x="6" y="6" width="12" height="12" rx="2" fill="#c0392b"/>' +
+  '</svg>';
+
+function zeigeRoutenknopf() {
+  if (!karte) return;
+
+  if (!routenknopf) {
+    const steuerung = {
+      onAdd() {
+        const kasten = document.createElement("div");
+        kasten.className = "maplibregl-ctrl maplibregl-ctrl-group";
+        const knopf = document.createElement("button");
+        knopf.type = "button";
+        knopf.id = "routenknopf";
+        knopf.title = "Route aufzeichnen";
+        knopf.innerHTML = SYMBOL_WEG;
+        knopf.onclick = () => routeUmschalten();
+        kasten.appendChild(knopf);
+        return kasten;
+      },
+      onRemove() {}
+    };
+    karte.addControl(steuerung, "top-right");
+    routenknopf = true;
+  }
+
+  const knopf = document.getElementById("routenknopf");
+  if (knopf) knopf.hidden = !benutzer;
 }
 
 // ---- Routenaufzeichnung ---------------------------------------------
@@ -325,6 +386,33 @@ function zeichneRoute() {
 }
 
 function zeigeAufnahmestand() {
+  const knopf = document.getElementById("routenknopf");
+  if (knopf) {
+    knopf.innerHTML = aufzeichnung ? SYMBOL_STOPP : SYMBOL_WEG;
+    knopf.title = aufzeichnung
+      ? "Aufzeichnung beenden" : "Route aufzeichnen";
+    knopf.classList.toggle("laeuft", !!aufzeichnung);
+  }
+
+  const anzeige = document.getElementById("routenstand");
+  if (aufzeichnung) {
+    const min = Math.round((Date.now() - aufzeichnung.beginn) / 60000);
+    const text = `${aufzeichnung.km.toFixed(1)} km \u00B7 ${min} min `
+               + `\u00B7 ${aufzeichnung.punkte.length} Punkte`;
+    if (anzeige) {
+      anzeige.textContent = text;
+      anzeige.hidden = false;
+    } else {
+      const el = document.createElement("div");
+      el.id = "routenstand";
+      el.className = "routenstand";
+      el.textContent = text;
+      document.getElementById("karte").appendChild(el);
+    }
+  } else if (anzeige) {
+    anzeige.hidden = true;
+  }
+
   const b = document.getElementById("aufnahme");
   if (!b) return;
   if (!aufzeichnung) {

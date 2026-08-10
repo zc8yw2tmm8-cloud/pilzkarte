@@ -61,3 +61,22 @@ button.zeigen:hover { border-color: var(--akzent); }
                         border: 1px solid var(--linie);
                         border-radius: 6px; font: inherit;
                         font-size: 15px; }
+
+/* Routenknopf auf der Karte, unter dem Standortknopf */
+#routenknopf { display: flex; align-items: center;
+               justify-content: center; color: #333; }
+#routenknopf.laeuft { background: rgba(192,57,43,.12); }
+#routenknopf[hidden] { display: none; }
+
+/* Laufende Aufzeichnung: Zahlen am unteren Kartenrand */
+.routenstand { position: absolute; bottom: 46px; right: 10px;
+               z-index: 3; background: rgba(192,57,43,.92);
+               color: #fff; font-size: 11.5px; font-weight: 600;
+               padding: 5px 10px; border-radius: 14px;
+               pointer-events: none;
+               font-variant-numeric: tabular-nums; }
+.routenstand[hidden] { display: none; }
+
+@media (max-width: 700px) {
+  .routenstand { bottom: 40px; right: 8px; font-size: 11px; }
+}

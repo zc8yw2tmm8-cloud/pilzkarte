@@ -34,16 +34,23 @@
   .kopfzeile { display: flex; align-items: baseline; gap: 8px;
                margin-bottom: 7px; }
   h1 { font-size: 15px; font-weight: 600; margin: 0; }
-  .stand { font-size: 11px; color: var(--leise); margin-left: auto; }
+  /* Der Stand gehoert auf die Karte, nicht in die Kopfzeile -
+     dort ist der Platz knapp, und hier stoert er nicht. */
+  .stand { position: absolute; top: 44px; left: 10px; z-index: 2;
+           font-size: 10.5px; color: var(--leise);
+           background: rgba(21,24,28,.75); padding: 2px 6px;
+           border-radius: 4px; pointer-events: none; }
 
   /* Konto oben rechts, nicht im Einstellungsmenue - man will
      sehen, ob man angemeldet ist, ohne erst aufzuklappen. */
-  #kontoleiste { display: flex; gap: 4px; flex: 0 0 auto; }
-  #kontoleiste .tag { padding: 4px 9px; font-size: 11px;
-                      min-height: 26px; border-radius: 13px; }
-  @media (max-width: 700px) {
-    #kontoleiste .tag { padding: 4px 7px; font-size: 10.5px; }
-  }
+  /* Konto als EIN Knopf. Alles Weitere steht im Menue dahinter -
+     sonst platzt die Kopfzeile auf dem Telefon. */
+  #kontoleiste { display: flex; gap: 4px; flex: 0 0 auto;
+                 margin-left: auto; }
+  #kontoleiste .tag { padding: 5px 11px; font-size: 12px;
+                      min-height: 30px; border-radius: 15px; }
+  #kontoleiste .tag.an { border-color: var(--akzent);
+                         color: var(--akzent); }
   .veraltet { color: #e8a33d; font-weight: 600; }
 
   .ansicht { display: flex; gap: 3px; margin-left: 10px; }
@@ -246,7 +253,8 @@
            z-index: 5; }
 
   @media (max-width: 700px) {
-    h1 { font-size: 14px; }
+    h1 { display: none; }
+    .kopfzeile { margin-bottom: 5px; }
     .legende { bottom: 26px; left: 8px; font-size: 10px;
                padding: 5px 7px; line-height: 1.4; }
     .fuss { font-size: 9.5px; padding: 3px 8px; }
@@ -264,7 +272,6 @@
       <button class="um" data-ansicht="liste">Beste Gebiete</button>
       <a class="um" href="info.html">?</a>
     </div>
-    <span class="stand" id="stand"></span>
     <span id="kontoleiste" hidden><span id="kontostand"></span></span>
   </div>
   <div class="leiste" id="arten"></div>
@@ -315,7 +322,9 @@
 
 </header>
 
-<div id="karte"></div>
+<div id="karte">
+  <div class="stand" id="stand"></div>
+</div>
 <div id="liste" hidden></div>
 <div class="laedt" id="laedt">Lade Daten …</div>
 
