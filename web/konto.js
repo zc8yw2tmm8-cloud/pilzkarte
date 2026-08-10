@@ -51,35 +51,133 @@ function zeigeKontostand() {
 function zeigeAnmeldung() {
   kasten(`
     <h3>Anmelden</h3>
-    <p class="klein">Du bekommst eine E-Mail mit einem Link. Kein
-    Passwort noetig.</p>
     <input type="email" id="epost" placeholder="deine@email.de"
-           autocomplete="email">
-    <button class="voll" onclick="linkSchicken()">Link schicken</button>
+           autocomplete="email" inputmode="email">
+    <input type="password" id="passwort" placeholder="Passwort"
+           autocomplete="current-password">
+    <button class="voll" onclick="anmelden()">Anmelden</button>
+    <button class="voll leer" onclick="zeigeRegistrierung()">
+      Noch kein Konto? Hier anlegen</button>
     <p class="klein" id="anmeldehinweis"></p>
   `);
+
+  // Mit Enter abschicken
+  const feld = document.getElementById("passwort");
+  if (feld) feld.onkeydown = e => { if (e.key === "Enter") anmelden(); };
 }
 
-async function linkSchicken() {
-  const adresse = document.getElementById("epost").value.trim();
-  const hinweis = document.getElementById("anmeldehinweis");
-  if (!adresse) return;
+function zeigeRegistrierung() {
+  kasten(`
+    <h3>Konto anlegen</h3>
+    <p class="klein">Nur freigeschaltete Adressen bekommen ein
+    Konto.</p>
+    <input type="email" id="epost" placeholder="deine@email.de"
+           autocomplete="email" inputmode="email">
+    <input type="password" id="passwort" placeholder="Passwort, mindestens 8 Zeichen"
+           autocomplete="new-password">
+    <button class="voll" onclick="registrieren()">Konto anlegen</button>
+    <button class="voll leer" onclick="zeigeAnmeldung()">Zurück</button>
+    <p class="klein" id="anmeldehinweis"></p>
+  `);
 
-  hinweis.textContent = "Wird verschickt ...";
-  const { error } = await sb.auth.signInWithOtp({
-    email: adresse,
-    options: { emailRedirectTo: window.location.href }
+  const feld = document.getElementById("passwort");
+  if (feld) feld.onkeydown = e => {
+    if (e.key === "Enter") registrieren();
+  };
+}
+
+function anmeldedaten() {
+  const adresse = (document.getElementById("epost").value || "").trim();
+  const passwort = document.getElementById("passwort").value || "";
+  const hinweis = document.getElementById("anmeldehinweis");
+
+  if (!adresse || !passwort) {
+    hinweis.textContent = "Bitte beides ausfüllen.";
+    return null;
+  }
+  return { adresse, passwort, hinweis };
+}
+
+function fehlertext(meldung) {
+  // Supabase antwortet auf Englisch - die haeufigsten Faelle
+  // uebersetzen, damit man weiss, was zu tun ist
+  const m = (meldung || "").toLowerCase();
+  if (m.includes("invalid login")) {
+    return "E-Mail oder Passwort stimmt nicht.";
+  }
+  if (m.includes("already registered")) {
+    return "Für diese Adresse gibt es schon ein Konto - "
+         + "dann oben anmelden.";
+  }
+  if (m.includes("nicht freigeschaltet")) {
+    return "Diese Adresse ist nicht freigeschaltet. Sie muss in "
+         + "Supabase in der Tabelle 'erlaubt' stehen.";
+  }
+  if (m.includes("password") && m.includes("6")) {
+    return "Das Passwort ist zu kurz.";
+  }
+  if (m.includes("email not confirmed")) {
+    return "Die Adresse ist noch nicht bestätigt. In Supabase unter "
+         + "Authentication → Providers die Bestätigung abschalten.";
+  }
+  return meldung;
+}
+
+async function anmelden() {
+  const d = anmeldedaten();
+  if (!d) return;
+
+  d.hinweis.textContent = "Melde an ...";
+  const { error } = await sb.auth.signInWithPassword({
+    email: d.adresse, password: d.passwort
   });
 
-  hinweis.textContent = error
-    ? "Fehler: " + error.message
-    : "Schau in dein Postfach. Der Link gilt eine Stunde.";
+  if (error) {
+    d.hinweis.textContent = fehlertext(error.message);
+    return;
+  }
+  kastenZu();
+  melde("Angemeldet.");
+}
+
+async function registrieren() {
+  const d = anmeldedaten();
+  if (!d) return;
+
+  if (d.passwort.length < 8) {
+    d.hinweis.textContent = "Mindestens 8 Zeichen.";
+    return;
+  }
+
+  d.hinweis.textContent = "Lege an ...";
+  const { data, error } = await sb.auth.signUp({
+    email: d.adresse, password: d.passwort
+  });
+
+  if (error) {
+    d.hinweis.textContent = fehlertext(error.message);
+    return;
+  }
+
+  if (data.session) {
+    kastenZu();
+    melde("Konto angelegt und angemeldet.");
+    return;
+  }
+
+  // Ohne Sitzung: Supabase verlangt eine Bestaetigung per Mail
+  d.hinweis.innerHTML =
+    "Konto angelegt. Supabase verlangt noch eine Bestätigung per "
+    + "E-Mail.<br>Abschalten geht in Supabase unter "
+    + "<b>Authentication → Providers → Email</b>, dort "
+    + "<b>Confirm email</b> aus.";
 }
 
 async function abmelden() {
   if (aufzeichnung) routeUmschalten();
   await sb.auth.signOut();
   kastenZu();
+  melde("Abgemeldet.");
 }
 
 // ---- Routenaufzeichnung ---------------------------------------------
