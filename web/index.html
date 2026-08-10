@@ -35,6 +35,15 @@
                margin-bottom: 7px; }
   h1 { font-size: 15px; font-weight: 600; margin: 0; }
   .stand { font-size: 11px; color: var(--leise); margin-left: auto; }
+
+  /* Konto oben rechts, nicht im Einstellungsmenue - man will
+     sehen, ob man angemeldet ist, ohne erst aufzuklappen. */
+  #kontoleiste { display: flex; gap: 4px; flex: 0 0 auto; }
+  #kontoleiste .tag { padding: 4px 9px; font-size: 11px;
+                      min-height: 26px; border-radius: 13px; }
+  @media (max-width: 700px) {
+    #kontoleiste .tag { padding: 4px 7px; font-size: 10.5px; }
+  }
   .veraltet { color: #e8a33d; font-weight: 600; }
 
   .ansicht { display: flex; gap: 3px; margin-left: 10px; }
@@ -256,6 +265,7 @@
       <a class="um" href="info.html">?</a>
     </div>
     <span class="stand" id="stand"></span>
+    <span id="kontoleiste" hidden><span id="kontostand"></span></span>
   </div>
   <div class="leiste" id="arten"></div>
   <div class="regler">
@@ -300,9 +310,7 @@
       <span class="marke">Gel&auml;nde</span>
       <div class="tagleiste" id="ebenen"></div>
     </div>
-    <div class="tagleiste" id="kontoleiste" hidden>
-      <span id="kontostand"></span>
-    </div>
+
   </div>
 
 </header>
@@ -928,7 +936,16 @@ fetch("daten.json")
   .then(r => r.json())
   .then(daten => {
     D = daten;
-    art = Object.keys(D.arten)[0];
+
+    // Nicht immer Steinpilz zeigen, sondern die Art mit den besten
+    // Aussichten - im August ist das eine andere als im Oktober.
+    art = Object.keys(D.arten).reduce((beste, a) => {
+      const schnitt = liste => liste.reduce((s, x) => s + x, 0)
+                             / Math.max(1, liste.length);
+      const wert = a => schnitt(
+        D.zellen.map(z => z.scores[a][0] ?? 0));
+      return wert(a) > wert(beste) ? a : beste;
+    }, Object.keys(D.arten)[0]);
 
     const d = new Date(D.stand);
     const standEl = document.getElementById("stand");

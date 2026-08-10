@@ -395,6 +395,8 @@ async function routeSpeichern(daten) {
     laenge_km: +daten.km.toFixed(2),
     dauer_min: daten.min,
     punkte: daten.punkte,
+    start_lat: daten.punkte[0] ? daten.punkte[0].lat : null,
+    start_lon: daten.punkte[0] ? daten.punkte[0].lon : null,
     notiz: document.getElementById("routennotiz").value || null
   });
 
@@ -507,7 +509,7 @@ async function ladeEigeneFunde() {
   if (!sb || !benutzer || !karte) return;
 
   const { data, error } = await sb.from("fund")
-    .select("id, art, gefunden_am, nullfund, anzahl, notiz, ort")
+    .select("id, art, gefunden_am, nullfund, anzahl, notiz, lat, lon")
     .order("gefunden_am", { ascending: false })
     .limit(500);
 
@@ -516,21 +518,17 @@ async function ladeEigeneFunde() {
 
   const punkte = {
     type: "FeatureCollection",
-    features: data.filter(f => f.ort).map(f => {
-      // PostGIS liefert die Geometrie als GeoJSON-Objekt
-      const g = typeof f.ort === "string" ? JSON.parse(f.ort) : f.ort;
-      return {
-        type: "Feature",
-        properties: {
-          art: (D.arten[f.art] || {}).name || f.art,
-          datum: new Date(f.gefunden_am).toLocaleDateString("de-DE"),
-          null: f.nullfund ? 1 : 0,
-          anzahl: f.anzahl || "",
-          notiz: f.notiz || ""
-        },
-        geometry: g
-      };
-    })
+    features: data.filter(f => f.lat != null && f.lon != null).map(f => ({
+      type: "Feature",
+      properties: {
+        art: (D.arten[f.art] || {}).name || f.art,
+        datum: new Date(f.gefunden_am).toLocaleDateString("de-DE"),
+        null: f.nullfund ? 1 : 0,
+        anzahl: f.anzahl || "",
+        notiz: f.notiz || ""
+      },
+      geometry: { type: "Point", coordinates: [f.lon, f.lat] }
+    }))
   };
 
   if (karte.getSource("eigene")) {
@@ -580,31 +578,36 @@ async function zeigeTagebuch() {
   kasten('<h3>Tagebuch</h3><p class="klein">Wird geladen ...</p>');
 
   const [routen, funde, zahlen] = await Promise.all([
-    sb.from("route").select("*").order("begonnen", { ascending: false })
-      .limit(30),
-    sb.from("fund").select("*").order("gefunden_am", { ascending: false })
-      .limit(30),
+    sb.from("route")
+      .select("id, titel, begonnen, laenge_km, dauer_min, notiz, "
+              + "start_lat, start_lon")
+      .order("begonnen", { ascending: false }).limit(30),
+    sb.from("fund")
+      .select("id, art, gefunden_am, nullfund, anzahl, notiz, lat, lon")
+      .order("gefunden_am", { ascending: false }).limit(30),
     sb.rpc("meine_zahlen")
   ]);
 
   const z = (zahlen.data && zahlen.data[0]) || {};
 
-  const routenListe = (routen.data || []).map(r => `
-    <div class="eintrag">
-      <b>${r.titel || "ohne Titel"}</b>
-      <div class="klein">${new Date(r.begonnen).toLocaleDateString("de-DE")}
-        &middot; ${r.laenge_km || "?"} km &middot; ${r.dauer_min || "?"} min</div>
+  const routenListe = (routen.data || []).map(r => {
+    const knopf = (r.start_lat != null && r.start_lon != null)
+      ? `<button class="zeigen" onclick="zeigeFundAufKarte(
+           ${r.start_lat}, ${r.start_lon})">Auf der Karte</button>`
+      : "";
+    return `<div class="eintrag">
+      <div class="kopfzeile"><b>${r.titel || "ohne Titel"}</b>${knopf}</div>
+      <div class="klein">${new Date(r.begonnen)
+        .toLocaleDateString("de-DE")} &middot; ${r.laenge_km || "?"} km
+        &middot; ${r.dauer_min || "?"} min</div>
       ${r.notiz ? `<div class="klein">${r.notiz}</div>` : ""}
-    </div>`).join("") || '<p class="klein">Noch keine Routen.</p>';
+    </div>`;
+  }).join("") || '<p class="klein">Noch keine Routen.</p>';
 
   const fundListe = (funde.data || []).map(f => {
-    const g = f.ort
-      ? (typeof f.ort === "string" ? JSON.parse(f.ort) : f.ort)
-      : null;
-    const knopf = g && g.coordinates
+    const knopf = (f.lat != null && f.lon != null)
       ? `<button class="zeigen" onclick="zeigeFundAufKarte(
-           ${g.coordinates[1]}, ${g.coordinates[0]})">Auf der Karte
-         </button>`
+           ${f.lat}, ${f.lon})">Auf der Karte</button>`
       : "";
     return `<div class="eintrag">
       <div class="kopfzeile">
