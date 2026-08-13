@@ -839,9 +839,11 @@ def score(kennwerte, art, tag, waldtyp="unbekannt", boden=None,
     if MONATSAUSGLEICH:
         normal = MONATSNORMALE.get(art, {}).get(tag.month)
         if normal and normal > 0.2:
-            wetter = wetter / normal
+            # Nach dem Teilen wieder auf eine ganze Zahl - sonst
+            # steht in der Anzeige 63.829787234042556
+            wetter = round(wetter / normal)
 
-    wetter = max(0, min(100, wetter))
+    wetter = max(0, min(100, round(wetter)))
 
     roh_saison = saison_rohwert(einstellung, tag)
     saison = 1.0 - SAISON_STAERKE * (1.0 - roh_saison)

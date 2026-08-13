@@ -35,15 +35,20 @@ function zeigeKontostand() {
 
   if (benutzer) {
     // Ein Knopf statt dreier - der Rest steht im Menue dahinter
-    const name = (benutzer.email || "").split("@")[0];
+    let name = (benutzer.email || "").split("@")[0];
+    if (name.length > 12) name = name.slice(0, 11) + "\u2026";
     el.innerHTML = `<button class="tag an" onclick="zeigeKontomenue()"
       title="${benutzer.email}">&#9679; ${name}</button>`;
     if (karte) ladeEigeneFunde();
     zeigeRoutenknopf();
+    pruefeMitleser().then(() => setzeAnsicht(ladeAnsicht(), false));
   } else {
     el.innerHTML = `<button class="tag" onclick="zeigeAnmeldung()">
         anmelden</button>`;
     zeigeRoutenknopf();
+    istMitleser = false;
+    fremdeSichtbar = false;
+    zeigeMitleserknopf();
   }
 }
 
@@ -445,6 +450,9 @@ function routeBeenden(stillschweigend) {
   zeigeAufnahmestand();
 
   if (stillschweigend || fertig.punkte.length < 3) {
+    // Die gezeichnete Linie mit entfernen - sonst bleibt ein
+    // gruener Strich auf der Karte stehen
+    loescheRoutenlinie();
     if (!stillschweigend) melde("Zu wenige Punkte - nicht gespeichert.");
     return;
   }
@@ -463,6 +471,12 @@ function routeBeenden(stillschweigend) {
         punkte: fertig.punkte })})'>Speichern</button>
     <button class="voll leer" onclick="kastenZu()">Verwerfen</button>
   `);
+}
+
+function loescheRoutenlinie() {
+  if (!karte) return;
+  if (karte.getLayer("route")) karte.removeLayer("route");
+  if (karte.getSource("route")) karte.removeSource("route");
 }
 
 async function routeSpeichern(daten) {
@@ -492,10 +506,209 @@ async function routeSpeichern(daten) {
     melde("Konnte nicht speichern: " + error.message);
   } else {
     kastenZu();
+    loescheRoutenlinie();
     melde("Route gespeichert.");
   }
 }
 
+
+
+// ---- Helle und dunkle Karte -----------------------------------------
+//
+// Die Wahl haengt am Konto, nicht am Geraet - wer sich auf dem
+// Telefon anmeldet, bekommt dieselbe Ansicht wie am Rechner. Ohne
+// Anmeldung merkt sich der Browser die Wahl fuer sich.
+
+let hell = false;
+
+function ladeAnsicht() {
+  // Erst das Konto fragen, sonst den Browser
+  if (benutzer && benutzer.einstellungen
+      && typeof benutzer.einstellungen.hell === "boolean") {
+    return benutzer.einstellungen.hell;
+  }
+  try {
+    return localStorage.getItem("pilzkarte_hell") === "1";
+  } catch (e) {
+    return false;
+  }
+}
+
+async function setzeAnsicht(neuHell, speichern) {
+  hell = neuHell;
+  document.body.classList.toggle("hell", hell);
+
+  if (karte) {
+    const teil = hell ? "light" : "dark";
+    ["grund", "beschriftung"].forEach(quelle => {
+      const q = karte.getSource(quelle);
+      if (!q) return;
+      const endung = quelle === "grund" ? "nolabels" : "only_labels";
+      q.setTiles(["a", "b", "c"].map(x =>
+        `https://${x}.basemaps.cartocdn.com/${teil}_${endung}/` +
+        `{z}/{x}/{y}.png`));
+    });
+  }
+
+  const knopf = document.querySelector("[data-ansicht-hell]");
+  if (knopf) knopf.textContent = hell ? "dunkel" : "hell";
+
+  if (!speichern) return;
+
+  try {
+    localStorage.setItem("pilzkarte_hell", hell ? "1" : "0");
+  } catch (e) {}
+
+  if (sb && benutzer) {
+    await sb.from("profile")
+      .update({ einstellungen: { hell: hell } })
+      .eq("id", benutzer.id);
+  }
+}
+
+function ansichtUmschalten() {
+  setzeAnsicht(!hell, true);
+}
+
+
+// ---- Funde und Routen aller Nutzer ----------------------------------
+//
+// Nur fuer Mitleser. Wird auf Wunsch eingeblendet.
+
+let istMitleser = false;
+let fremdeSichtbar = false;
+
+async function pruefeMitleser() {
+  if (!sb || !benutzer) {
+    istMitleser = false;
+    return;
+  }
+  const { data } = await sb.from("profile")
+    .select("mitleser, einstellungen").eq("id", benutzer.id).single();
+  istMitleser = !!(data && data.mitleser);
+  if (data && data.einstellungen) {
+    benutzer.einstellungen = data.einstellungen;
+  }
+  zeigeMitleserknopf();
+}
+
+function zeigeMitleserknopf() {
+  const leiste = document.getElementById("darstellung");
+  if (!leiste) return;
+  let b = leiste.querySelector("[data-schalter=fremde]");
+
+  if (!istMitleser) {
+    if (b) b.remove();
+    return;
+  }
+  if (b) return;
+
+  b = document.createElement("button");
+  b.className = "tag";
+  b.dataset.schalter = "fremde";
+  b.innerHTML = "&#9679; alle Nutzer";
+  b.onclick = () => {
+    fremdeSichtbar = !fremdeSichtbar;
+    b.classList.toggle("aktiv", fremdeSichtbar);
+    ladeFremdeDaten();
+  };
+  leiste.appendChild(b);
+}
+
+async function ladeFremdeDaten() {
+  if (!sb || !karte) return;
+
+  const sichtbar = fremdeSichtbar ? "visible" : "none";
+  ["fremde_funde", "fremde_routen"].forEach(e => {
+    if (karte.getLayer(e)) {
+      karte.setLayoutProperty(e, "visibility", sichtbar);
+    }
+  });
+  if (!fremdeSichtbar) return;
+
+  // Funde anderer
+  const { data: funde } = await sb.from("fund")
+    .select("art, gefunden_am, nullfund, anzahl, notiz, lat, lon, benutzer")
+    .neq("benutzer", benutzer.id)
+    .order("gefunden_am", { ascending: false }).limit(1000);
+
+  const fundpunkte = {
+    type: "FeatureCollection",
+    features: (funde || [])
+      .filter(f => f.lat != null && f.lon != null)
+      .map(f => ({
+        type: "Feature",
+        properties: {
+          art: (D.arten[f.art] || {}).name || f.art,
+          datum: new Date(f.gefunden_am).toLocaleDateString("de-DE"),
+          null: f.nullfund ? 1 : 0,
+          anzahl: f.anzahl || "",
+          notiz: f.notiz || ""
+        },
+        geometry: { type: "Point", coordinates: [f.lon, f.lat] }
+      }))
+  };
+
+  if (karte.getSource("fremde_funde")) {
+    karte.getSource("fremde_funde").setData(fundpunkte);
+  } else {
+    karte.addSource("fremde_funde", { type: "geojson",
+                                      data: fundpunkte });
+    karte.addLayer({
+      id: "fremde_funde", type: "circle", source: "fremde_funde",
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"],
+          10, 6, 13, 9, 16, 12],
+        "circle-color": ["case", ["==", ["get", "null"], 1],
+          "rgba(0,0,0,0)", "#e8a33d"],
+        "circle-stroke-width": 2.5,
+        "circle-stroke-color": "#4a3410"
+      }
+    });
+    karte.on("click", "fremde_funde", e => {
+      const p = e.features[0].properties;
+      new maplibregl.Popup({ maxWidth: "240px" })
+        .setLngLat(e.features[0].geometry.coordinates)
+        .setHTML(`<div class="pop">
+          <b>${p.null == 1 ? "Nichts gefunden" : p.art}</b>
+          <div class="lage">${p.datum} &middot; anderer Nutzer</div>
+          ${p.notiz ? `<div class="klein">${p.notiz}</div>` : ""}
+        </div>`).addTo(karte);
+    });
+  }
+
+  // Routen anderer
+  const { data: routen } = await sb.from("route")
+    .select("titel, begonnen, punkte, benutzer")
+    .neq("benutzer", benutzer.id)
+    .order("begonnen", { ascending: false }).limit(200);
+
+  const linien = {
+    type: "FeatureCollection",
+    features: (routen || [])
+      .filter(r => Array.isArray(r.punkte) && r.punkte.length > 1)
+      .map(r => ({
+        type: "Feature",
+        properties: { titel: r.titel || "Route" },
+        geometry: {
+          type: "LineString",
+          coordinates: r.punkte.map(p => [p.lon, p.lat])
+        }
+      }))
+  };
+
+  if (karte.getSource("fremde_routen")) {
+    karte.getSource("fremde_routen").setData(linien);
+  } else {
+    karte.addSource("fremde_routen", { type: "geojson", data: linien });
+    karte.addLayer({
+      id: "fremde_routen", type: "line", source: "fremde_routen",
+      paint: { "line-color": "#e8a33d", "line-width": 2.5,
+               "line-opacity": 0.6, "line-dasharray": [2, 1.5] },
+      layout: { "line-cap": "round", "line-join": "round" }
+    }, karte.getLayer("fremde_funde") ? "fremde_funde" : undefined);
+  }
+}
 
 // ---- Fund eintragen -------------------------------------------------
 //

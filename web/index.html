@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1,
-      maximum-scale=5, viewport-fit=cover">
+      viewport-fit=cover">
 <meta name="description" content="Karte der Fundwahrscheinlichkeit für
       Speisepilze in der Region Braunschweig, Wolfsburg und südliche
       Lüneburger Heide.">
@@ -22,6 +22,19 @@
     --leise: #9aa0a6; --linie: #2f353d; --akzent: #5fb763;
     --warn: #e8a33d;
   }
+  /* Helle Ansicht - dieselben Bausteine, andere Werte. */
+  body.hell {
+    --grund: #f4f2ee; --flaeche: #ffffff; --text: #1c1f22;
+    --leise: #5f6469; --linie: #d9d5cd; --akzent: #2f7a35;
+    --warn: #b4761e;
+  }
+  body.hell .legende { background: rgba(255,255,255,.93); }
+  body.hell .fuss { background: rgba(255,255,255,.85); }
+  body.hell .stand { background: rgba(255,255,255,.8); }
+  body.hell .maplibregl-popup-tip {
+    border-top-color: #ffffff !important;
+    border-bottom-color: #ffffff !important; }
+
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; margin: 0; }
   body { font: 15px/1.45 system-ui, -apple-system, sans-serif;
@@ -305,6 +318,9 @@
         <button class="tag" data-stil="aus">nur Karte</button>
         <button class="tag" data-schalter="funde">&#9679; Funde</button>
         <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
+        <button class="tag" data-ansicht-hell
+                onclick="if(typeof ansichtUmschalten==='function')
+                         ansichtUmschalten()">hell</button>
       </div>
     </div>
 

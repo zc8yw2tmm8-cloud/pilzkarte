@@ -21,11 +21,13 @@
                     padding-top: 10px; }
 .kasten-inhalt .klein { font-size: 12.5px; color: var(--leise); }
 
+/* MINDESTENS 16 px. Darunter zoomt iOS beim Antippen in die Seite
+   hinein und man sieht die Kopfzeile nicht mehr vollstaendig. */
 .kasten-inhalt input, .kasten-inhalt textarea {
   width: 100%; padding: 11px 12px; margin: 8px 0;
   background: var(--grund); color: var(--text);
   border: 1px solid var(--linie); border-radius: 6px;
-  font: inherit; font-size: 15px; }
+  font: inherit; font-size: 16px; }
 
 .kasten-inhalt button.voll {
   width: 100%; padding: 12px; margin-top: 8px;
@@ -60,7 +62,7 @@ button.zeigen:hover { border-color: var(--akzent); }
                         background: var(--grund); color: var(--text);
                         border: 1px solid var(--linie);
                         border-radius: 6px; font: inherit;
-                        font-size: 15px; }
+                        font-size: 16px; }
 
 /* Routenknopf auf der Karte, unter dem Standortknopf */
 #routenknopf { display: flex; align-items: center;
@@ -79,4 +81,11 @@ button.zeigen:hover { border-color: var(--akzent); }
 
 @media (max-width: 700px) {
   .routenstand { bottom: 40px; right: 8px; font-size: 11px; }
+}
+
+/* Der Benutzername darf die Kopfzeile nicht sprengen */
+#kontoleiste .tag { max-width: 40vw; overflow: hidden;
+                    text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 700px) {
+  #kontoleiste .tag { max-width: 32vw; }
 }
