@@ -41,6 +41,8 @@ function zeigeKontostand() {
       title="${benutzer.email}">&#9679; ${name}</button>`;
     if (karte) ladeEigeneFunde();
     zeigeRoutenknopf();
+    zeigeRoutenschalter();
+    ladeRouten();
     pruefeMitleser().then(() => setzeAnsicht(ladeAnsicht(), false));
   } else {
     el.innerHTML = `<button class="tag" onclick="zeigeAnmeldung()">
@@ -49,6 +51,7 @@ function zeigeKontostand() {
     istMitleser = false;
     fremdeSichtbar = false;
     zeigeMitleserknopf();
+    zeigeRoutenschalter();
   }
 }
 
@@ -508,6 +511,7 @@ async function routeSpeichern(daten) {
     kastenZu();
     loescheRoutenlinie();
     melde("Route gespeichert.");
+    ladeRouten();
   }
 }
 
@@ -873,6 +877,163 @@ async function ladeEigeneFunde() {
     () => karte.getCanvas().style.cursor = "");
 }
 
+
+// ---- Gespeicherte Routen auf der Karte ------------------------------
+//
+// Mit Laufrichtung: kleine Pfeile entlang der Linie, dazu ein
+// gruener Punkt am Anfang und ein roter am Ende. Ohne das sieht man
+// zwar den Weg, weiss aber nicht, wo er begann - bei einer
+// Rundstrecke ist das der halbe Sinn.
+
+let routenSichtbar = false;
+
+async function ladeRouten() {
+  if (!sb || !benutzer || !karte) return;
+
+  const { data, error } = await sb.from("route")
+    .select("id, titel, begonnen, laenge_km, dauer_min, punkte")
+    .order("begonnen", { ascending: false }).limit(100);
+
+  if (error || !data) return;
+
+  const linien = [];
+  const enden = [];
+
+  data.forEach(r => {
+    if (!Array.isArray(r.punkte) || r.punkte.length < 2) return;
+    const koord = r.punkte.map(p => [p.lon, p.lat]);
+
+    linien.push({
+      type: "Feature",
+      properties: {
+        titel: r.titel || "Route",
+        datum: new Date(r.begonnen).toLocaleDateString("de-DE"),
+        km: r.laenge_km || "?",
+        min: r.dauer_min || "?"
+      },
+      geometry: { type: "LineString", coordinates: koord }
+    });
+
+    enden.push({
+      type: "Feature",
+      properties: { art: "start" },
+      geometry: { type: "Point", coordinates: koord[0] }
+    });
+    enden.push({
+      type: "Feature",
+      properties: { art: "ziel" },
+      geometry: { type: "Point", coordinates: koord[koord.length - 1] }
+    });
+  });
+
+  const linienDaten = { type: "FeatureCollection", features: linien };
+  const endDaten = { type: "FeatureCollection", features: enden };
+
+  if (karte.getSource("routen")) {
+    karte.getSource("routen").setData(linienDaten);
+    karte.getSource("routen_enden").setData(endDaten);
+    return;
+  }
+
+  const sichtbar = routenSichtbar ? "visible" : "none";
+
+  karte.addSource("routen", { type: "geojson", data: linienDaten });
+  karte.addSource("routen_enden", { type: "geojson", data: endDaten });
+
+  karte.addLayer({
+    id: "routen", type: "line", source: "routen",
+    layout: { visibility: sichtbar, "line-cap": "round",
+              "line-join": "round" },
+    paint: { "line-color": "#5fb763", "line-width": 3.5,
+             "line-opacity": 0.85 }
+  });
+
+  // Laufrichtung: Pfeile entlang der Linie
+  karte.addLayer({
+    id: "routen_pfeile", type: "symbol", source: "routen",
+    layout: {
+      visibility: sichtbar,
+      "symbol-placement": "line",
+      "symbol-spacing": 60,
+      "text-field": "\u25B6",
+      "text-size": 11,
+      "text-font": ["Open Sans Regular"],
+      "text-allow-overlap": true,
+      "text-keep-upright": false,
+      "text-rotation-alignment": "map"
+    },
+    paint: { "text-color": "#eaf6ea", "text-halo-color": "#1a3320",
+             "text-halo-width": 1.5 }
+  });
+
+  // Anfang gruen, Ende rot
+  karte.addLayer({
+    id: "routen_enden", type: "circle", source: "routen_enden",
+    layout: { visibility: sichtbar },
+    paint: {
+      "circle-radius": 6,
+      "circle-color": ["case", ["==", ["get", "art"], "start"],
+        "#5fb763", "#c0392b"],
+      "circle-stroke-width": 2,
+      "circle-stroke-color": "#ffffff"
+    }
+  });
+
+  karte.on("click", "routen", e => {
+    const p = e.features[0].properties;
+    new maplibregl.Popup({ maxWidth: "240px" })
+      .setLngLat(e.lngLat)
+      .setHTML(`<div class="pop"><b>${p.titel}</b>
+        <div class="lage">${p.datum} &middot; ${p.km} km
+        &middot; ${p.min} min</div></div>`)
+      .addTo(karte);
+  });
+  karte.on("mouseenter", "routen",
+    () => karte.getCanvas().style.cursor = "pointer");
+  karte.on("mouseleave", "routen",
+    () => karte.getCanvas().style.cursor = "");
+}
+
+function routenAnzeigen(an) {
+  routenSichtbar = an;
+  ["routen", "routen_pfeile", "routen_enden"].forEach(e => {
+    if (karte && karte.getLayer(e)) {
+      karte.setLayoutProperty(e, "visibility", an ? "visible" : "none");
+    }
+  });
+  const b = document.querySelector("[data-schalter=routen]");
+  if (b) b.classList.toggle("aktiv", an);
+}
+
+function zeigeRoutenschalter() {
+  const leiste = document.getElementById("darstellung");
+  if (!leiste) return;
+  let b = leiste.querySelector("[data-schalter=routen]");
+
+  if (!benutzer) {
+    if (b) b.remove();
+    return;
+  }
+  if (b) return;
+
+  b = document.createElement("button");
+  b.className = "tag";
+  b.dataset.schalter = "routen";
+  b.innerHTML = "&#9679; Routen";
+  b.onclick = () => routenAnzeigen(!routenSichtbar);
+  leiste.appendChild(b);
+}
+
+// Eine bestimmte Route auf der Karte zeigen
+async function zeigeRouteAufKarte(id, lat, lon) {
+  kastenZu();
+  if (!karte) return;
+
+  await ladeRouten();
+  routenAnzeigen(true);
+  karte.flyTo({ center: [lon, lat], zoom: 13, duration: 900 });
+}
+
 // ---- Tagebuch -------------------------------------------------------
 
 async function zeigeTagebuch() {
@@ -893,8 +1054,9 @@ async function zeigeTagebuch() {
 
   const routenListe = (routen.data || []).map(r => {
     const knopf = (r.start_lat != null && r.start_lon != null)
-      ? `<button class="zeigen" onclick="zeigeFundAufKarte(
-           ${r.start_lat}, ${r.start_lon})">Auf der Karte</button>`
+      ? `<button class="zeigen" onclick="zeigeRouteAufKarte(
+           '${r.id}', ${r.start_lat}, ${r.start_lon})">
+         Auf der Karte</button>`
       : "";
     return `<div class="eintrag">
       <div class="kopfzeile"><b>${r.titel || "ohne Titel"}</b>${knopf}</div>

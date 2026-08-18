@@ -77,9 +77,14 @@ def main():
 
     print(f"{len(tage)} Vergleichstage\n", flush=True)
 
-    # WICHTIG: ohne Monatsausgleich rechnen, sonst waere es zirkulaer
+    # WICHTIG: ohne Monatsausgleich rechnen, sonst waere es
+    # zirkulaer. Und ohne Stauchung, weil score() erst teilt und
+    # DANN staucht - die Normale muss deshalb aus den ungestauchten
+    # Werten kommen.
     vorher = arten.MONATSAUSGLEICH
+    vorher_spanne = arten.WETTER_SPANNE
     arten.MONATSAUSGLEICH = False
+    arten.WETTER_SPANNE = 1.0
 
     ergebnis = {}
     monatsnamen = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun",
@@ -103,6 +108,7 @@ def main():
                         for m in range(1, 13)))
 
     arten.MONATSAUSGLEICH = vorher
+    arten.WETTER_SPANNE = vorher_spanne
 
     zeilen = ["MONATSNORMALE = {"]
     for art in sorted(ergebnis):
