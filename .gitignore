@@ -25,3 +25,4 @@ __pycache__/
 arten_vorher.py
 funde_arten_nur_gbif.csv
 wetter_historie.csv
+*.lnk

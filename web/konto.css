@@ -89,3 +89,18 @@ button.zeigen:hover { border-color: var(--akzent); }
 @media (max-width: 700px) {
   #kontoleiste .tag { max-width: 32vw; }
 }
+
+/* Muelleimer im Tagebuch - zurueckhaltend, damit man ihn nicht
+   aus Versehen trifft. Rot erst beim Draufzeigen. */
+button.muell { flex: 0 0 auto; border: 1px solid transparent;
+               background: transparent; color: var(--leise);
+               padding: 4px 6px; border-radius: 5px; cursor: pointer;
+               display: flex; align-items: center; opacity: .55; }
+button.muell:hover { color: #c0392b; border-color: #c0392b;
+                     opacity: 1; }
+
+/* Auf dem Telefon gibt es kein Draufzeigen - dort etwas
+   sichtbarer, aber weiterhin klein */
+@media (max-width: 700px) {
+  button.muell { opacity: .7; padding: 6px 7px; }
+}

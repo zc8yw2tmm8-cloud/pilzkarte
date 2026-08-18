@@ -1034,6 +1034,49 @@ async function zeigeRouteAufKarte(id, lat, lon) {
   karte.flyTo({ center: [lon, lat], zoom: 13, duration: 900 });
 }
 
+
+// ---- Loeschen -------------------------------------------------------
+//
+// Mit Rueckfrage, weil es nicht rueckgaengig zu machen ist. Die
+// Zeilenrechte in der Datenbank erlauben das Loeschen ohnehin nur
+// dem Besitzer - ein Mitleser kann fremde Eintraege sehen, aber
+// nicht entfernen.
+
+const MUELLEIMER =
+  '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" ' +
+  'stroke="currentColor" stroke-width="2" stroke-linecap="round" ' +
+  'stroke-linejoin="round"><path d="M3 6h18"/>' +
+  '<path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/>' +
+  '<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>' +
+  '<path d="M10 11v6M14 11v6"/></svg>';
+
+async function loesche(tabelle, id, beschreibung) {
+  if (!sb || !benutzer) return;
+
+  const was = tabelle === "route" ? "Diese Route" : "Diesen Eintrag";
+  if (!confirm(`${was} wirklich l\u00f6schen?\n\n${beschreibung}\n\n`
+             + "Das l\u00e4sst sich nicht r\u00fcckg\u00e4ngig machen.")) {
+    return;
+  }
+
+  const { error } = await sb.from(tabelle).delete().eq("id", id);
+
+  if (error) {
+    melde("Konnte nicht l\u00f6schen: " + error.message);
+    return;
+  }
+
+  melde(tabelle === "route" ? "Route gel\u00f6scht." : "Eintrag gel\u00f6scht.");
+
+  // Karte und Tagebuch auffrischen
+  if (tabelle === "route") {
+    await ladeRouten();
+  } else {
+    await ladeEigeneFunde();
+  }
+  zeigeTagebuch();
+}
+
 // ---- Tagebuch -------------------------------------------------------
 
 async function zeigeTagebuch() {
@@ -1058,8 +1101,16 @@ async function zeigeTagebuch() {
            '${r.id}', ${r.start_lat}, ${r.start_lon})">
          Auf der Karte</button>`
       : "";
+    const titel = r.titel || "ohne Titel";
+    const datum = new Date(r.begonnen).toLocaleDateString("de-DE");
     return `<div class="eintrag">
-      <div class="kopfzeile"><b>${r.titel || "ohne Titel"}</b>${knopf}</div>
+      <div class="kopfzeile"><b>${titel}</b>${knopf}
+        <button class="muell" title="L\u00f6schen"
+          onclick="loesche('route', '${r.id}',
+            '${titel.replace(/'/g, "")} vom ${datum}, '
+            + '${r.laenge_km || "?"} km')"
+          >${MUELLEIMER}</button>
+      </div>
       <div class="klein">${new Date(r.begonnen)
         .toLocaleDateString("de-DE")} &middot; ${r.laenge_km || "?"} km
         &middot; ${r.dauer_min || "?"} min</div>
@@ -1072,9 +1123,15 @@ async function zeigeTagebuch() {
       ? `<button class="zeigen" onclick="zeigeFundAufKarte(
            ${f.lat}, ${f.lon})">Auf der Karte</button>`
       : "";
+    const name = f.nullfund ? "nichts gefunden" : f.art;
+    const datum = new Date(f.gefunden_am).toLocaleDateString("de-DE");
     return `<div class="eintrag">
       <div class="kopfzeile">
-        <b>${f.nullfund ? "nichts gefunden" : f.art}</b>${knopf}
+        <b>${name}</b>${knopf}
+        <button class="muell" title="L\u00f6schen"
+          onclick="loesche('fund', '${f.id}',
+            '${name.replace(/'/g, "")} vom ${datum}')"
+          >${MUELLEIMER}</button>
       </div>
       <div class="klein">${new Date(f.gefunden_am)
         .toLocaleDateString("de-DE")}${f.anzahl
