@@ -229,13 +229,24 @@
                        font-variant-numeric: tabular-nums;
                        padding-left: 10px; padding-right: 2px; }
   .pop tr.hier td { font-weight: 700; }
-  .navi.eintrag { background: transparent; color: var(--akzent);
-                  border: 1px solid var(--akzent); margin-top: 6px;
-                  cursor: pointer; }
+  .knopfreihe { display: flex; gap: 6px; margin: 8px 0 4px; }
+  .knopfreihe .navi { margin-top: 0; flex: 1; text-align: center;
+                      padding: 9px 8px; font-size: 12.5px; }
+  /* Grundfarbe dunkel - das ist die Navigation. Der Fundknopf
+     bekommt darunter Gruen. */
+  .navi:not(.eintrag) { background: #10130f; color: var(--text);
+                     border: 1px solid var(--linie); margin-top: 6px; }
+  .navi:not(.eintrag):hover { border-color: var(--leise); }
   .navi { display: block; margin-top: 12px; padding: 10px;
-          background: var(--akzent); color: #10130f; text-align: center;
+          background: var(--grund); color: var(--text);
+          border: 1px solid var(--linie); text-align: center;
           border-radius: 6px; text-decoration: none; font-weight: 600;
           font-size: 13px; }
+  /* Fund eintragen ist die haeufigere Handlung und deshalb
+     hervorgehoben. Muss nach .navi stehen, sonst gewinnt dessen
+     Hintergrund. */
+  .navi.eintrag { background: var(--akzent); color: #10130f;
+                  border-color: var(--akzent); cursor: pointer; }
 
   .fuss { position: absolute; bottom: 0; left: 0; right: 0;
           background: rgba(24,28,33,.82); color: var(--leise);
@@ -312,7 +323,7 @@
 
     <div class="zeile">
       <span class="marke">Ansicht</span>
-      <div class="tagleiste">
+      <div class="tagleiste" id="darstellung">
         <button class="tag" data-stil="weich">weich</button>
         <button class="tag aktiv" data-stil="hart">Raster</button>
         <button class="tag" data-stil="aus">nur Karte</button>
@@ -396,9 +407,23 @@ function zeigePopup(ort, inhalt) {
 
   offenesPopup.on("close", () => { offenesPopup = null; });
 
-  // Immer oben beginnen, egal wie lang der Inhalt ist
-  const el = offenesPopup.getElement().querySelector(".pop");
-  if (el) el.scrollTop = 0;
+  // Immer oben beginnen. Mehrfach setzen: Direkt nach dem Einfuegen
+  // ist der Inhalt noch nicht ausgelegt, und ein einzelnes
+  // scrollTop = 0 bleibt dann ohne Wirkung.
+  const nachOben = () => {
+    const el = offenesPopup && offenesPopup.getElement();
+    if (!el) return;
+    // Alle drei Ebenen: der Rahmen kann ebenfalls scrollen, wenn
+    // der Inhalt hoeher ist als die maximale Hoehe
+    el.scrollTop = 0;
+    const rahmen = el.querySelector(".maplibregl-popup-content");
+    if (rahmen) rahmen.scrollTop = 0;
+    const inhalt = el.querySelector(".pop");
+    if (inhalt) inhalt.scrollTop = 0;
+  };
+  nachOben();
+  requestAnimationFrame(nachOben);
+  setTimeout(nachOben, 60);
 
   // Die Karte so verschieben, dass das Fenster vollstaendig
   // sichtbar wird
@@ -658,7 +683,7 @@ function fundknopf(z, klickOrt) {
   const wert = z.scores[art][tag] ?? 0;
   return `<a class="navi eintrag" onclick='fundBeginnen(${lat},
     ${lon}, ${JSON.stringify(z.id)}, ${wert})'>
-    &#43; Fund hier eintragen</a>`;
+    &#43; Fund eintragen</a>`;
 }
 
 function popupInhalt(z, klickOrt) {
@@ -686,6 +711,12 @@ function popupInhalt(z, klickOrt) {
     <div class="score">${D.arten[art].name}
       <b>${wert}</b><span class="max">/100</span></div>
     ${tag === 0 ? trendZeile(z) : ""}
+    ${bremszeile(z)}
+    <div class="knopfreihe">
+      ${fundknopf(z, klickOrt)}
+      ${navigationsknopf(klickOrt ? klickOrt.lat : z.lat,
+                         klickOrt ? klickOrt.lng : z.lon)}
+    </div>
 
     <h4>Standort</h4>
     <div>${z.bestand || "Bestand unbekannt"}</div>
@@ -711,9 +742,6 @@ function popupInhalt(z, klickOrt) {
       Bedingungen ist &ndash; nicht, wie viele Pilze dort
       stehen.</div>
 
-    ${navigationsknopf(klickOrt ? klickOrt.lat : z.lat,
-                       klickOrt ? klickOrt.lng : z.lon)}
-    ${fundknopf(z, klickOrt)}
   </div>`;
 }
 
@@ -759,7 +787,7 @@ function navigationsknopf(lat, lon) {
     ? `https://maps.apple.com/?daddr=${lat},${lon}&dirflg=d`
     : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
   return `<a class="navi" href="${ziel}" target="_blank" rel="noopener">
-    &#10148; Route dorthin</a>`;
+    &#10148; Route</a>`;
 }
 
 function abstandKm(lat1, lon1, lat2, lon2) {
@@ -906,10 +934,20 @@ function baueListe() {
     karte.flyTo({ center: [+b.dataset.lon, +b.dataset.lat], zoom: 12 });
     const z = D.zellen.find(x =>
       x.lat === +b.dataset.lat && x.lon === +b.dataset.lon);
-    if (z) setTimeout(() => new maplibregl.Popup({ maxWidth: "320px" })
-      .setLngLat([z.lon, z.lat]).setHTML(popupInhalt(z)).addTo(karte), 700);
-    // Aus der Liste heraus gibt es keinen Klickort - dann fuehrt die
-    // Navigation zur Zellmitte.
+    // Ueber zeigePopup, damit ein offenes Fenster geschlossen wird
+    // und der Inhalt oben beginnt. Aus der Liste heraus gibt es
+    // keinen Klickort - dann fuehrt die Navigation zur Zellmitte.
+    // Einen noch laufenden Zeitgeber abbrechen. Sonst erzeugt der
+    // erste Klick nach 700 ms ein Fenster, obwohl man inzwischen
+    // eine andere Zelle gewaehlt hat - und dann sind zwei offen.
+    if (window._popupZeit) clearTimeout(window._popupZeit);
+    if (offenesPopup) offenesPopup.remove();
+    if (z) {
+      window._popupZeit = setTimeout(() => {
+        window._popupZeit = null;
+        zeigePopup([z.lon, z.lat], popupInhalt(z));
+      }, 700);
+    }
   });
 }
 
@@ -1303,6 +1341,10 @@ fetch("daten.json")
 
         // Ein zweiter Klick soll erst schliessen, nicht sofort ein
         // neues Fenster oeffnen
+        if (window._popupZeit) {
+          clearTimeout(window._popupZeit);
+          window._popupZeit = null;
+        }
         if (offenesPopup) {
           offenesPopup.remove();
           return;

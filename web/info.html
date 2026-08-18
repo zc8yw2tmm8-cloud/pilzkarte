@@ -318,6 +318,38 @@ Vergleichstagen.</p>
 
 <h2>Woher die Daten kommen</h2>
 
+<p class="klein" id="datenstand">Wetterstand wird geladen &hellip;</p>
+
+<script>
+// Den Stand aus daten.json holen - dieselbe Datei, mit der die
+// Karte rechnet
+fetch("daten.json").then(a => a.json()).then(d => {
+  const el = document.getElementById("datenstand");
+  if (!el) return;
+  const teile = [];
+  if (d.gemessen_bis) {
+    const m = new Date(d.gemessen_bis);
+    const alt = Math.round((Date.now() - m) / 86400000);
+    teile.push(`Letzte gemessene Wetterdaten: <b>` +
+      m.toLocaleDateString("de-DE") + `</b>` +
+      (alt > 1 ? ` (vor ${alt} Tagen)` : ""));
+  }
+  if (d.stand) {
+    teile.push("Karte gerechnet am " +
+      new Date(d.stand).toLocaleDateString("de-DE"));
+  }
+  if (d.tage && d.tage.length) {
+    teile.push("Vorhersage bis " +
+      new Date(d.tage[d.tage.length - 1].datum)
+        .toLocaleDateString("de-DE"));
+  }
+  el.innerHTML = teile.join(" &middot; ");
+}).catch(() => {
+  const el = document.getElementById("datenstand");
+  if (el) el.remove();
+});
+</script>
+
 <table>
   <tr><th>Was</th><th>Quelle</th><th class="z">Auflösung</th></tr>
   <tr><td>Wetter, Vorhersage</td><td>Open-Meteo, DWD ICON-D2</td>

@@ -887,6 +887,64 @@ async function ladeEigeneFunde() {
 
 let routenSichtbar = false;
 
+// Alle geladenen Routen. Gezeichnet wird entweder eine einzelne
+// (nach Klick im Tagebuch) oder alle - deshalb der Speicher.
+let alleRouten = [];
+let gezeigteRoute = null;
+
+function pfeilbildAnlegen() {
+  if (!karte || karte.hasImage("laufpfeil")) return;
+
+  // Ein kleines Dreieck auf durchsichtigem Grund
+  const n = 24;
+  const c = document.createElement("canvas");
+  c.width = c.height = n;
+  const g = c.getContext("2d");
+
+  g.beginPath();
+  g.moveTo(n * 0.30, n * 0.18);
+  g.lineTo(n * 0.80, n * 0.50);
+  g.lineTo(n * 0.30, n * 0.82);
+  g.closePath();
+
+  g.fillStyle = "#eaf6ea";
+  g.fill();
+  g.strokeStyle = "#1a3320";
+  g.lineWidth = 2;
+  g.stroke();
+
+  const bild = g.getImageData(0, 0, n, n);
+  karte.addImage("laufpfeil",
+    { width: n, height: n, data: bild.data }, { pixelRatio: 2 });
+}
+
+function pfeilBildAnlegen() {
+  if (!karte || karte.hasImage("routenpfeil")) return;
+
+  // Ein nach rechts zeigendes Dreieck, weiss mit dunklem Rand.
+  // MapLibre dreht es entlang der Linie.
+  const n = 18;
+  const flaeche = document.createElement("canvas");
+  flaeche.width = n;
+  flaeche.height = n;
+  const stift = flaeche.getContext("2d");
+
+  stift.beginPath();
+  stift.moveTo(n * 0.28, n * 0.18);
+  stift.lineTo(n * 0.80, n * 0.50);
+  stift.lineTo(n * 0.28, n * 0.82);
+  stift.closePath();
+
+  stift.fillStyle = "#f2fbf2";
+  stift.fill();
+  stift.lineWidth = 1.6;
+  stift.strokeStyle = "#1a3320";
+  stift.stroke();
+
+  karte.addImage("routenpfeil",
+    stift.getImageData(0, 0, n, n), { pixelRatio: 2 });
+}
+
 async function ladeRouten() {
   if (!sb || !benutzer || !karte) return;
 
@@ -895,6 +953,19 @@ async function ladeRouten() {
     .order("begonnen", { ascending: false }).limit(100);
 
   if (error || !data) return;
+
+  alleRouten = data.filter(r => Array.isArray(r.punkte)
+                                && r.punkte.length >= 2);
+  zeichneRouten();
+}
+
+function zeichneRouten() {
+  if (!karte) return;
+
+  // Entweder eine bestimmte Route oder alle
+  const data = gezeigteRoute
+    ? alleRouten.filter(r => r.id === gezeigteRoute)
+    : alleRouten;
 
   const linien = [];
   const enden = [];
@@ -932,6 +1003,7 @@ async function ladeRouten() {
   if (karte.getSource("routen")) {
     karte.getSource("routen").setData(linienDaten);
     karte.getSource("routen_enden").setData(endDaten);
+    zeigeRoutenleiste();
     return;
   }
 
@@ -948,22 +1020,25 @@ async function ladeRouten() {
              "line-opacity": 0.85 }
   });
 
-  // Laufrichtung: Pfeile entlang der Linie
+  // Laufrichtung: Pfeile entlang der Linie.
+  //
+  // Als BILD, nicht als Schriftzeichen. Das Dreieck U+25B6 ist in
+  // Open Sans nicht enthalten - mit text-field blieb die Linie
+  // deshalb pfeillos, ohne Fehlermeldung.
+  pfeilBildAnlegen();
+
   karte.addLayer({
     id: "routen_pfeile", type: "symbol", source: "routen",
     layout: {
       visibility: sichtbar,
       "symbol-placement": "line",
-      "symbol-spacing": 60,
-      "text-field": "\u25B6",
-      "text-size": 11,
-      "text-font": ["Open Sans Regular"],
-      "text-allow-overlap": true,
-      "text-keep-upright": false,
-      "text-rotation-alignment": "map"
-    },
-    paint: { "text-color": "#eaf6ea", "text-halo-color": "#1a3320",
-             "text-halo-width": 1.5 }
+      "symbol-spacing": 55,
+      "icon-image": "routenpfeil",
+      "icon-size": 0.8,
+      "icon-allow-overlap": true,
+      "icon-ignore-placement": true,
+      "icon-rotation-alignment": "map"
+    }
   });
 
   // Anfang gruen, Ende rot
@@ -1003,6 +1078,50 @@ function routenAnzeigen(an) {
   });
   const b = document.querySelector("[data-schalter=routen]");
   if (b) b.classList.toggle("aktiv", an);
+  zeigeRoutenleiste();
+}
+
+function zeigeRoutenleiste() {
+  // Kleine Zeile auf der Karte: was gerade zu sehen ist, mit
+  // Knopf zum Umschalten und zum Ausblenden.
+  let el = document.getElementById("routenleiste");
+
+  if (!routenSichtbar || !alleRouten.length) {
+    if (el) el.remove();
+    return;
+  }
+
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "routenleiste";
+    el.className = "routenleiste";
+    document.getElementById("karte").appendChild(el);
+  }
+
+  if (gezeigteRoute) {
+    const r = alleRouten.find(x => x.id === gezeigteRoute);
+    const titel = r ? (r.titel || "Route") : "Route";
+    el.innerHTML = `<span>${titel}</span>
+      <button onclick="alleRoutenZeigen()">alle ${alleRouten.length}
+        </button>
+      <button onclick="routenAusblenden()" title="Ausblenden">
+        &times;</button>`;
+  } else {
+    el.innerHTML = `<span>${alleRouten.length} Routen</span>
+      <button onclick="routenAusblenden()" title="Ausblenden">
+        &times;</button>`;
+  }
+}
+
+function alleRoutenZeigen() {
+  gezeigteRoute = null;
+  zeichneRouten();
+  routenAnzeigen(true);
+}
+
+function routenAusblenden() {
+  gezeigteRoute = null;
+  routenAnzeigen(false);
 }
 
 function zeigeRoutenschalter() {
@@ -1020,7 +1139,13 @@ function zeigeRoutenschalter() {
   b.className = "tag";
   b.dataset.schalter = "routen";
   b.innerHTML = "&#9679; Routen";
-  b.onclick = () => routenAnzeigen(!routenSichtbar);
+  b.onclick = () => {
+    if (routenSichtbar) {
+      routenAusblenden();
+    } else {
+      alleRoutenZeigen();
+    }
+  };
   leiste.appendChild(b);
 }
 
@@ -1029,9 +1154,25 @@ async function zeigeRouteAufKarte(id, lat, lon) {
   kastenZu();
   if (!karte) return;
 
-  await ladeRouten();
+  if (!alleRouten.length) await ladeRouten();
+
+  // Nur diese eine zeichnen
+  gezeigteRoute = id;
+  zeichneRouten();
   routenAnzeigen(true);
-  karte.flyTo({ center: [lon, lat], zoom: 13, duration: 900 });
+
+  // Auf die ganze Route zoomen, nicht nur auf den Anfang
+  const r = alleRouten.find(x => x.id === id);
+  if (r && r.punkte.length > 1) {
+    const lats = r.punkte.map(p => p.lat);
+    const lons = r.punkte.map(p => p.lon);
+    karte.fitBounds(
+      [[Math.min(...lons), Math.min(...lats)],
+       [Math.max(...lons), Math.max(...lats)]],
+      { padding: 70, duration: 900, maxZoom: 15 });
+  } else {
+    karte.flyTo({ center: [lon, lat], zoom: 13, duration: 900 });
+  }
 }
 
 

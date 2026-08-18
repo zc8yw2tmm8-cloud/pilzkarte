@@ -104,3 +104,25 @@ button.muell:hover { color: #c0392b; border-color: #c0392b;
 @media (max-width: 700px) {
   button.muell { opacity: .7; padding: 6px 7px; }
 }
+
+/* Welche Route gerade zu sehen ist, mit Umschalten und Ausblenden */
+.routenleiste { position: absolute; bottom: 46px; left: 50%;
+                transform: translateX(-50%); z-index: 3;
+                display: flex; align-items: center; gap: 8px;
+                background: rgba(21,24,28,.92); color: var(--text);
+                padding: 5px 6px 5px 12px; border-radius: 16px;
+                font-size: 12px; border: 1px solid var(--linie);
+                max-width: 90vw; }
+.routenleiste span { white-space: nowrap; overflow: hidden;
+                     text-overflow: ellipsis; }
+.routenleiste button { background: transparent; color: var(--akzent);
+                       border: 1px solid var(--linie);
+                       border-radius: 11px; padding: 3px 9px;
+                       font-size: 11px; cursor: pointer;
+                       white-space: nowrap; }
+.routenleiste button:hover { border-color: var(--akzent); }
+body.hell .routenleiste { background: rgba(255,255,255,.94); }
+
+@media (max-width: 700px) {
+  .routenleiste { bottom: 40px; font-size: 11px; }
+}
