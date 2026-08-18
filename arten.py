@@ -751,6 +751,32 @@ MONATSNORMALE = {
 # Abschalten, falls sich der Umbau als falsch erweist
 MONATSAUSGLEICH = True
 
+# Wie stark das Wetter ueberhaupt ausschlagen darf.
+#
+# Die Baender wurden gegen ZUFAELLIGE Tage kalibriert. Gegen
+# Meldetage nachgerechnet - also mit herausgerechnetem
+# Sammlerverhalten - bleiben von 660 gemessenen Werten nur 233
+# statistisch belastbar, und deren Median liegt bei 0.72.
+#
+# Beispiel Sommersteinpilz, viel Regen: Das Verhaeltnis fiel von
+# 3.05 auf 1.22. Zwei Drittel des scheinbaren Wettereffekts waren
+# die Frage, wann Menschen sammeln gehen.
+#
+# Die Baender bleiben deshalb in ihrer Struktur - die Richtung
+# stimmt vermutlich, denn eine Verzerrung verstaerkt einen echten
+# Effekt, sie erfindet ihn selten. Aber ihre Spannweite wird
+# gestaucht: Der Abstand zwischen bestem und schlechtestem Wetter
+# schrumpft auf diesen Anteil.
+#
+# 1.0 = wie kalibriert (uebertrieben)
+# 0.0 = Wetter spielt keine Rolle
+WETTER_SPANNE = 0.62
+
+# Auf welchen Wert hin gestaucht wird: den Mittelwert der
+# erreichbaren Punkte. So bleibt ein durchschnittlicher Tag etwa
+# gleich bewertet, nur die Ausschlaege werden kleiner.
+
+
 def bremse(wetter, saison, bestand, boden):
     """
     Welcher Faktor drueckt den Score am staerksten?
@@ -841,7 +867,12 @@ def score(kennwerte, art, tag, waldtyp="unbekannt", boden=None,
         if normal and normal > 0.2:
             # Nach dem Teilen wieder auf eine ganze Zahl - sonst
             # steht in der Anzeige 63.829787234042556
-            wetter = round(wetter / normal)
+            wetter = wetter / normal
+
+    # Spannweite stauchen, siehe WETTER_SPANNE oben. Um 50 herum,
+    # weil das etwa einem durchschnittlichen Tag entspricht.
+    if WETTER_SPANNE < 1.0:
+        wetter = 50 + (wetter - 50) * WETTER_SPANNE
 
     wetter = max(0, min(100, round(wetter)))
 

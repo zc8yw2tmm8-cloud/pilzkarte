@@ -215,6 +215,13 @@ von 0 senkt den Score also nicht auf null, sondern auf
 {round((1-staerke)*100)} % &ndash; ein Restwert bleibt, weil auch ausserhalb
 der Hauptzeit einzelne Funde vorkommen.</p>
 
+<div class="hinweis"><b>Wetter nachgemessen:</b> Die Schwellen
+wurden gegen zufaellige Tage kalibriert. Menschen sammeln aber nach
+Regen - gegen Meldetage gerechnet fiel das Verhaeltnis beim
+Sommersteinpilz von 3,05 auf 1,22. Von 660 Schwellen sind nur 233
+belastbar. Der Wettereinfluss wurde deshalb auf 60 Prozent
+gedaempft (WETTER_SPANNE in arten.py).</div>
+
 <h2>Woher die Daten kommen</h2>
 <ul>
   <li><b>Wetter:</b> Open-Meteo. Vergangenheit aus dem ERA5-Archiv

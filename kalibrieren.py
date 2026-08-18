@@ -25,11 +25,34 @@ from kennwerte import berechne, zahl
 HINTERGRUND = "hintergrund.csv"
 FUNDE = "funde_wetter2.csv"
 AUFWAND = "aufwand.csv"
+
+# Meldetage: An welchen Tagen wurde ueberhaupt gesammelt?
+#
+# Der Grund ist derselbe wie bei den Baumarten und beim Boden:
+# Menschen gehen nicht zufaellig in den Wald. Sie gehen nach Regen,
+# weil sie wissen, dass dann Pilze kommen. Vergleicht man Fundtage
+# mit ZUFAELLIGEN Tagen, misst man dieses Verhalten mit.
+#
+# Gemessen macht das bis zu zwei Drittel des Effekts aus: Beim
+# Sommersteinpilz fiel das Verhaeltnis bei viel Regen von 3.05 auf
+# 1.22, sobald gegen Meldetage verglichen wurde.
+#
+# Jeder Hintergrundtag wird deshalb mit der Zahl der Meldungen
+# dieses Tages gewichtet. Tage, an denen niemand draussen war,
+# zaehlen gar nicht.
+MELDETAGE = "aufwand_tage.csv"
 BERICHT = "kalibrierung.txt"
 
 MONATE = (6, 7, 8, 9, 10, 11)     # relevanter Zeitraum
 SAISON = (9, 10, 11)              # Hauptsaison Steinpilz
-STICHPROBE = 2                    # jeden n-ten Tag im Hintergrund auswerten
+# Jeden n-ten Tag im Hintergrund auswerten.
+#
+# 1 = alle Tage. Das kostet Rechenzeit, ist aber noetig: Seit die
+# Vergleichstage nach Meldungen gewichtet werden, sind die
+# Auswahlverhaeltnisse deutlich naeher an 1.0 - und um einen
+# Unterschied zwischen 1.17 und 0.85 von Zufall zu trennen, braucht
+# es mehr Vergleichstage, nicht weniger.
+STICHPROBE = 1
 
 # Funde oberhalb dieser Hoehe weglassen. Der Hintergrund stammt aus dem
 # Flachland; Bergland hat ein anderes Klima und waere kein fairer
@@ -102,6 +125,8 @@ def hintergrund_kennwerte(punkte):
                 continue
 
             k["monat"] = tag.month
+            # Wird fuer die Gewichtung nach Meldetagen gebraucht
+            k["tag"] = tag
             k["hoehe"] = reihe[i].get("hoehe")
             ergebnis.append(k)
 
@@ -138,9 +163,55 @@ def quantile(werte, anteile):
     return [werte[min(int(len(werte) * a), len(werte) - 1)] for a in anteile]
 
 
+def quantile_gewichtet(werte, gewichte, anteile):
+    """
+    Quantile mit Gewichten.
+
+    Ohne Gewichte waeren die Klassengrenzen an zufaelligen Tagen
+    ausgerichtet, die Anteile aber an Meldetagen - beides muss
+    zusammenpassen.
+    """
+    paare = sorted((w, g) for w, g in zip(werte, gewichte) if g > 0)
+    if not paare:
+        return quantile(werte, anteile)
+
+    gesamt = sum(g for _, g in paare)
+    ergebnis = []
+    for p in anteile:
+        ziel = gesamt * p
+        summe = 0.0
+        gewaehlt = paare[-1][0]
+        for w, g in paare:
+            summe += g
+            if summe >= ziel:
+                gewaehlt = w
+                break
+        ergebnis.append(gewaehlt)
+    return ergebnis
+
+
+def lade_meldetage():
+    """Zahl der Pilzmeldungen je Tag. Leer, wenn die Datei fehlt."""
+    if not os.path.exists(MELDETAGE):
+        return {}
+    with open(MELDETAGE, "r", encoding="utf-8") as f:
+        return {z["datum"]: int(z["meldungen"])
+                for z in csv.DictReader(f)}
+
+
+MELDUNGEN = {}
+
+
 def auswahlverhaeltnis(funde, hintergrund, feld, faktor, einheit, titel):
     """Kernrechnung: Fundanteil je Klasse geteilt durch Hintergrundanteil."""
-    h_werte = [h[feld] for h in hintergrund if h.get(feld) is not None]
+    # Jeder Hintergrundtag mit der Zahl der Meldungen gewichtet.
+    # Ohne Meldedaten zaehlt jeder Tag gleich - dann ist es die
+    # alte, verzerrte Rechnung.
+    paare = [(h[feld],
+              MELDUNGEN.get(h["tag"].isoformat(), 0) if MELDUNGEN else 1.0)
+             for h in hintergrund if h.get(feld) is not None]
+    h_werte = [w for w, g in paare]
+    h_gewichte = [g for w, g in paare]
     f_werte = [f[feld] for f in funde if f.get(feld) is not None]
 
     if len(h_werte) < 200 or len(f_werte) < 30:
@@ -148,8 +219,11 @@ def auswahlverhaeltnis(funde, hintergrund, feld, faktor, einheit, titel):
             f"({len(f_werte)} Funde, {len(h_werte)} Hintergrund)")
         return None
 
-    # Klassengrenzen aus dem Hintergrund - jede Klasse etwa 20 %
-    grenzen = quantile(h_werte, [0.2, 0.4, 0.6, 0.8])
+    # Klassengrenzen aus dem Hintergrund - jede Klasse etwa 20 %.
+    # Ebenfalls gewichtet: Ein Tag mit zehn Meldungen soll die
+    # Grenzen staerker bestimmen als einer mit einer.
+    grenzen = quantile_gewichtet(h_werte, h_gewichte,
+                                 [0.2, 0.4, 0.6, 0.8])
     grenzen = sorted(set(grenzen))
 
     if len(grenzen) < 2:
@@ -163,16 +237,26 @@ def auswahlverhaeltnis(funde, hintergrund, feld, faktor, einheit, titel):
         return len(grenzen)
 
     anzahl_klassen = len(grenzen) + 1
-    h_zahl = [0] * anzahl_klassen
-    f_zahl = [0] * anzahl_klassen
+    h_zahl = [0.0] * anzahl_klassen
+    f_zahl = [0.0] * anzahl_klassen
 
-    for w in h_werte:
-        h_zahl[klasse(w)] += 1
+    for w, g in zip(h_werte, h_gewichte):
+        h_zahl[klasse(w)] += g
     for w in f_werte:
         f_zahl[klasse(w)] += 1
 
+    # Durch die SUMME DER GEWICHTE teilen, nicht durch die Anzahl.
+    # Sonst summieren sich die Anteile auf ein Vielfaches von 100 %
+    # und alle Verhaeltnisse sind um denselben Faktor zu klein.
+    h_summe = sum(h_zahl)
+    f_summe = sum(f_zahl)
+    if h_summe <= 0 or f_summe <= 0:
+        sag(f"  {titel}: keine gewichteten Vergleichstage")
+        return None
+
     sag(f"\n  {titel}  ({len(f_werte)} Funde)")
-    sag(f"  {'Bereich':<22}{'Funde':>8}{'normal':>9}{'Verhaeltnis':>13}")
+    sag(f"  {'Bereich':<22}{'Funde':>8}{'normal':>9}"
+        f"{'Verhaeltnis':>14}")
 
     ergebnis = []
     for i in range(anzahl_klassen):
@@ -186,26 +270,50 @@ def auswahlverhaeltnis(funde, hintergrund, feld, faktor, einheit, titel):
         if einheit:
             bereich += f" {einheit}"
 
-        f_anteil = f_zahl[i] / len(f_werte)
-        h_anteil = h_zahl[i] / len(h_werte)
+        f_anteil = f_zahl[i] / f_summe
+        h_anteil = h_zahl[i] / h_summe
         verh = f_anteil / h_anteil if h_anteil > 0 else 0
 
+        # Wie sicher ist dieses Verhaeltnis? Bei wenigen Funden je
+        # Klasse schwankt es stark. Die Faustformel: Der relative
+        # Fehler liegt bei etwa 1/Wurzel(Anzahl).
+        n_klasse = f_zahl[i]
+        streuung = (verh / (n_klasse ** 0.5)) if n_klasse >= 1 else 0
+
+        # Nur als Signal werten, was groesser ist als die Streuung.
+        # Ein Verhaeltnis von 1.3 bei 9 Funden sagt nichts - dort
+        # liegt die Streuung bei 0.43.
+        deutlich = streuung > 0 and abs(verh - 1.0) > 2 * streuung
+
         marker = ""
-        if verh >= 1.5:
+        if not deutlich:
+            marker = "  (unsicher)"
+        elif verh >= 1.5:
             marker = "  <<<"
         elif verh >= 1.15:
             marker = "  <"
-        elif verh <= 0.5:
+        elif verh <= 0.7:
             marker = "  --"
 
         sag(f"  {bereich:<22}{f_anteil*100:7.1f}%{h_anteil*100:8.1f}%"
-            f"{verh:12.2f}{marker}")
+            f"{verh:8.2f} \u00b1{streuung:5.2f}{marker}")
 
         ergebnis.append({
             "von": grenzen[i-1] if i > 0 else None,
             "bis": grenzen[i] if i < anzahl_klassen - 1 else None,
             "verhaeltnis": round(verh, 2),
+            "streuung": round(streuung, 2),
+            "deutlich": deutlich,
+            "funde": int(f_zahl[i]),
         })
+
+    sicher = sum(1 for e in ergebnis if e["deutlich"])
+    if sicher == 0:
+        sag("    -> kein belastbares Signal "
+            "(alle Werte im Bereich der Streuung)")
+    elif sicher < len(ergebnis) // 2:
+        sag(f"    -> nur {sicher} von {len(ergebnis)} Klassen "
+            f"belastbar")
 
     return ergebnis
 
@@ -275,7 +383,35 @@ def main():
     print(f"  {len(punkte)} Punkte")
 
     print("Rechne Hintergrund-Kennwerte (dauert etwas) ...")
+    global MELDUNGEN
+    MELDUNGEN = lade_meldetage()
     hintergrund = hintergrund_kennwerte(punkte)
+
+    if MELDUNGEN:
+        # Pruefen, ob genug Hintergrundtage ueberhaupt Meldungen
+        # haben - sonst waere die Gewichtung auf wenige Tage
+        # gestuetzt und damit unzuverlaessig
+        mit = sum(1 for h in hintergrund
+                  if MELDUNGEN.get(h["tag"].isoformat(), 0) > 0)
+        anteil = mit / max(1, len(hintergrund))
+
+        if anteil < 0.25:
+            sag(f"ACHTUNG: Nur {mit} von {len(hintergrund)} "
+                f"Vergleichstagen haben Meldungen ({anteil*100:.0f} %).")
+            sag("Zu wenig fuer eine belastbare Gewichtung - es wird")
+            sag("gegen alle Tage gerechnet.\n")
+            MELDUNGEN = {}
+        else:
+            sag(f"Massstab: {mit} von {len(hintergrund)} "
+                f"Vergleichstagen mit Meldungen ({anteil*100:.0f} %)")
+            sag("Damit ist das Sammlerverhalten herausgerechnet - es")
+            sag("bleibt der Zusammenhang mit den Pilzen.\n")
+    else:
+        sag(f"ACHTUNG: {MELDETAGE} fehlt.")
+        sag("Verglichen wird gegen ZUFAELLIGE Tage. Das misst zum")
+        sag("Teil, wann Menschen sammeln gehen - nicht nur, wann")
+        sag("Pilze wachsen. Fuer eine saubere Messung erst:")
+        sag("  python aufwand_tage.py\n")
     print(f"  {len(hintergrund)} Vergleichstage\n")
 
     funde = lade_funde()
