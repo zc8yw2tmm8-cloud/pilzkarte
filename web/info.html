@@ -66,6 +66,16 @@
   td.z { text-align: right; font-variant-numeric: tabular-nums;
          white-space: nowrap; }
 
+  .beispiel { background: var(--flaeche); border-radius: 8px;
+              padding: 4px 16px 14px; margin: 14px 0 24px; }
+  .beispiel table { margin: 8px 0 14px; }
+  .beispiel td { padding: 6px 8px; }
+  .rechnung { text-align: center; padding: 14px 8px;
+              background: var(--grund); border-radius: 6px;
+              font-size: 15px; font-variant-numeric: tabular-nums;
+              margin: 4px 0 12px; }
+  .rechnung b { color: var(--akzent); font-size: 19px; }
+
   .skala div { display: flex; align-items: center; gap: 11px;
                padding: 5px 0; }
   .skala i { width: 26px; height: 14px; border-radius: 3px;
@@ -90,182 +100,320 @@
 
 <main class="breite">
 
-<p class="gross">Die Karte zeigt, wo die Bedingungen für eine
-bestimmte Pilzart gerade günstig sind.</p>
+<p>Die Pilzkarte hilft dir, <b>interessante Suchgebiete zu
+finden</b>.</p>
 
-<p>Wähle oben eine Art und schau auf die Karte. Je höher der Wert,
-desto besser passt das aktuelle Wetter zu dem, was diese Art
-braucht &ndash; und desto eher lohnt dort die Suche.</p>
+<p>Wähle oben eine Pilzart und schau auf die Karte. Je höher der Wert,
+desto besser passen die aktuellen Bedingungen zu den typischen
+Bedingungen dieser Art.</p>
+
+<div class="kasten gut">
+  <p class="gross" style="margin:0">Die Karte zeigt dir keine Pilze.
+  Sie zeigt dir, wo sich die Suche heute eher lohnen könnte.</p>
+</div>
 
 
-<h2>Was der Wert bedeutet</h2>
+<h2>Was bedeutet der Wert?</h2>
 
 <div class="skala">
   <div><i style="background:rgb(45,175,75)"></i>
-    <span><b>95+</b> &nbsp;sehr gut</span></div>
+    <span><b>95+</b> &middot; sehr gut</span></div>
   <div><i style="background:rgb(130,220,70)"></i>
-    <span><b>80+</b> &nbsp;gut</span></div>
+    <span><b>80&ndash;94</b> &middot; gut</span></div>
   <div><i style="background:rgb(255,225,90)"></i>
-    <span><b>60+</b> &nbsp;möglich</span></div>
+    <span><b>60&ndash;79</b> &middot; interessant</span></div>
   <div><i style="background:rgb(250,155,40)"></i>
-    <span><b>40+</b> &nbsp;schwach</span></div>
+    <span><b>40&ndash;59</b> &middot; eher schwach</span></div>
   <div><i style="background:rgb(200,60,60)"></i>
-    <span><b>unter 40</b> &nbsp;kaum</span></div>
+    <span><b>unter 40</b> &middot; ungünstig</span></div>
 </div>
 
-<div class="kasten">
-  <p><b>100 heißt nicht, dass dort Pilze stehen.</b> Es heißt: Wetter,
-  Jahreszeit, Bäume und Boden passen an dieser Stelle so gut zu dieser
-  Art, wie es überhaupt möglich ist.</p>
-  <p class="klein">Und niedrige Werte heißen nicht immer dasselbe. Im
-  Popup steht deshalb, <b>was gerade bremst</b> &ndash; ob es zu
-  trocken ist, die falsche Jahreszeit, oder ob schlicht die passenden
-  Bäume fehlen.</p>
+<p><b>100 bedeutet nicht, dass dort ein Pilz steht.</b> Es bedeutet,
+dass die berücksichtigten Bedingungen für diese Art besonders gut
+zusammenpassen.</p>
+
+<p>Bei niedrigen Werten zeigt dir das Popup, <b>was die Bedingungen
+gerade verschlechtert</b> &ndash; zum Beispiel zu wenig Feuchtigkeit,
+eine unpassende Jahreszeit oder fehlende passende Bäume.</p>
+
+<h3>Jede Pilzart wird für sich bewertet</h3>
+
+<p>Die Werte verschiedener Arten lassen sich nicht direkt vergleichen.
+Eine 70 beim Steinpilz bedeutet nicht automatisch mehr Pilze als eine
+50 beim Schwefelporling.</p>
+
+<p>Der Wert zeigt vor allem, <b>welche Gebiete für die ausgewählte Art
+momentan interessanter sind</b>.</p>
+
+
+<h2>So entsteht ein Wert</h2>
+
+<p>Ein Beispiel von heute, mit echten Zahlen aus der Karte:</p>
+
+<div id="beispiel" class="beispiel">
+  <p class="klein">Wird geladen &hellip;</p>
 </div>
 
-<p><b>Die Arten lassen sich nicht direkt vergleichen.</b> Eine 70 beim
-Steinpilz bedeutet nicht mehr Pilze als eine 50 beim
-Schwefelporling &ndash; jede Zahl gilt nur für ihre eigene Art.</p>
 
-<p class="klein">Warum: Der Schwefelporling wächst am Holz und hängt
-kaum am Bodenwasser. Bei Trockenheit fällt sein Wert deshalb weniger
-ab als der eines Bodenpilzes. Als Hinweis, wonach sich das Suchen
-heute eher lohnt, taugt der Vergleich trotzdem.</p>
-
-
-<h2>Was einfließt</h2>
+<h2>Was wird berücksichtigt?</h2>
 
 <h3>Wetter</h3>
 
-<p>Bodenfeuchte, Bodentemperatur, Regen der letzten Wochen, Zahl der
-Regentage, die Wasserbilanz, längere Trockenheit und Frost.</p>
+<p>Unter anderem werden berücksichtigt:</p>
 
-<p>Dabei zählt nicht, <i>ob</i> es feucht ist, sondern ob es
-<b>feuchter ist als sonst um diese Jahreszeit</b>. Im Oktober ist der
-Boden immer nass &ndash; das allein sagt noch nichts.</p>
+<ul>
+  <li>Bodenfeuchtigkeit</li>
+  <li>Bodentemperatur</li>
+  <li>Niederschlag der vergangenen Wochen</li>
+  <li>Anzahl der Regentage</li>
+  <li>Wasserbilanz</li>
+  <li>längere Trockenperioden</li>
+  <li>Frost</li>
+</ul>
+
+<p>Dabei zählt nicht nur, wie feucht es gerade ist. Entscheidend ist
+auch, <b>wie die Bedingungen im Vergleich zu dieser Jahreszeit
+normalerweise sind</b>.</p>
 
 <h3>Jahreszeit</h3>
 
-<p>Jede Art hat ihre Zeit. Wann genau, wurde nicht aus Büchern
-übernommen, sondern aus echten Fundmeldungen gerechnet: In welchem
-Monat wird diese Art besonders oft gemeldet, gemessen an dem, wie
-viele Menschen überhaupt unterwegs waren?</p>
+<p>Jede Pilzart hat ihre eigene Saison.</p>
+
+<p>Die Karte nutzt dafür echte Fundmeldungen und wertet aus,
+<b>wann eine Art besonders häufig gefunden wird</b>.</p>
+
+<p>Dabei wird auch berücksichtigt, wie viele andere Pilze im gleichen
+Zeitraum gemeldet wurden. So lässt sich besser unterscheiden, ob eine
+Art tatsächlich häufiger vorkommt oder einfach mehr Menschen
+unterwegs waren.</p>
 
 <h3>Bäume</h3>
 
-<p>Viele Pilze leben mit bestimmten Bäumen zusammen. Die Karte kennt
-für jede Stelle die Baumartenmischung und rechnet sie mit ein.</p>
+<p>Viele Pilze sind eng mit bestimmten Baumarten verbunden.</p>
+
+<p>Deshalb berücksichtigt die Karte die vorhandene Baumartenmischung
+und kann erkennen, ob ein Gebiet passende Bäume für die jeweilige
+Pilzart bietet.</p>
 
 <h3>Boden</h3>
 
-<p>Säuregrad, Sand- und Tonanteil. Wo genug Funde vorliegen, fließt
-das ein &ndash; sonst bleibt der Boden außen vor.</p>
+<p>Bei einigen Arten werden zusätzlich Bodeneigenschaften
+berücksichtigt, zum Beispiel:</p>
+
+<ul>
+  <li>Säuregrad (pH-Wert)</li>
+  <li>Sandanteil</li>
+  <li>Tonanteil</li>
+</ul>
+
+<p>Diese Informationen werden dort verwendet, wo genügend Funddaten
+vorhanden sind.</p>
 
 
-<h2>Wie genau ist das?</h2>
+<h2>Wie genau ist die Karte?</h2>
 
-<p>Die Karte arbeitet mit Feldern von etwa <b>2 mal 2 Kilometern</b>.
-Sie beantwortet also:</p>
+<p>Die Karte arbeitet mit Bereichen von etwa
+<b>2 &times; 2 Kilometern</b>.</p>
+
+<p>Sie beantwortet deshalb eher die Frage:</p>
 
 <div class="kasten gut">
-  <p><b>„Wohin fahre ich heute?"</b></p>
-  <p class="klein">Und nicht: „Wo genau steht der Pilz?"</p>
+  <p class="gross" style="margin:0">„Wohin fahre ich heute?"</p>
 </div>
 
-<p>Innerhalb eines Feldes gilt der Wert für das Waldstück dort &ndash;
-nicht für Äcker oder Ortschaften, die zufällig mit im Quadrat
-liegen.</p>
+<p>und nicht: „Wo genau steht der Pilz?"</p>
+
+<p>Der angezeigte Wert bezieht sich auf geeignete Waldflächen
+innerhalb des jeweiligen Bereichs &ndash; nicht auf Äcker, Straßen
+oder Ortschaften.</p>
 
 
-<h2>Warum die Karte aus Funden lernt</h2>
+<h2>Die Karte lernt aus echten Funden</h2>
 
-<p>Die meisten Faustregeln über Pilze stammen aus Beobachtungen von
-Sammlern. Das klingt vernünftig, hat aber einen Haken: Menschen gehen
-nicht überall und nicht jederzeit gleich oft in den Wald.</p>
+<p>Die Berechnung basiert nicht nur auf allgemeinen Angaben über
+Pilze.</p>
 
-<div class="kasten warn">
-  <h3>Ein Beispiel</h3>
-  <p>Kiefernwald macht <b>45 %</b> der Waldfläche dieser Region aus,
-  aber nur <b>14 %</b> der Pilzmeldungen. Eiche umgekehrt: 21 % der
-  Fläche, 45 % der Meldungen.</p>
-  <p class="klein">Nicht weil dort keine Pilze wachsen &ndash; sondern
-  weil Spaziergänger Laubwald bevorzugen. Wer das nicht
-  herausrechnet, misst am Ende, wo Menschen gerne hingehen.</p>
-</div>
+<p>Für die verschiedenen Arten werden <b>echte Fundmeldungen</b>
+ausgewertet. Dadurch lässt sich erkennen, unter welchen Bedingungen
+und zu welchen Zeiten eine Art tatsächlich häufiger gemeldet wird.</p>
 
-<p>Deshalb vergleicht diese Karte Fundorte nicht mit dem Wald
-allgemein, sondern mit den <b>Orten und Tagen, an denen überhaupt
-Pilze gemeldet wurden</b>. Was danach übrig bleibt, hat mit den
-Pilzen zu tun und nicht mit uns.</p>
-
-<p class="klein">Das Ergebnis war unbequem: Zehn Annahmen, die
-plausibel klangen, haben sich als falsch erwiesen. Und beim Wetter
-blieb nach der Korrektur weniger übrig als gedacht &ndash; der
-Unterschied zwischen einem guten und einem schlechten Tag ist real,
-aber kleiner, als es zunächst aussah.</p>
+<p>Je mehr hochwertige Funddaten verfügbar sind, desto besser lassen
+sich diese Zusammenhänge bestimmen.</p>
 
 
-<h2>Was noch nicht sicher ist</h2>
+<h2>Wie gut sind die Daten?</h2>
 
-<p>Nicht jeder Wert der Karte ist gleich gut belegt:</p>
+<p>Nicht für jede Pilzart stehen gleich viele Funddaten zur
+Verfügung.</p>
 
-<table>
-  <tr><th></th><th>gemessen für</th></tr>
-  <tr><td>Wetter</td><td>alle 11 Arten</td></tr>
-  <tr><td>Jahreszeit</td><td>alle 11 Arten</td></tr>
-  <tr><td>Bäume</td><td>4 Arten</td></tr>
-  <tr><td>Boden</td><td>4 Arten</td></tr>
-</table>
+<p><b>Für alle 11 Arten:</b></p>
+<ul>
+  <li>Wetter</li>
+  <li>Jahreszeit</li>
+</ul>
 
-<p>Wo die Funde nicht reichten, stammen die Werte aus der
-Pilzliteratur &ndash; oder es gibt gar keinen Faktor. Das betrifft
-vor allem die selteneren Arten wie Edelreizker und die beiden
-Hexenröhrlinge.</p>
+<p><b>Zusätzlich für:</b></p>
+<ul>
+  <li>Steinpilz</li>
+  <li>Marone</li>
+  <li>Parasol</li>
+  <li>Schwefelporling</li>
+</ul>
 
-<p class="klein">Und die ehrlichste Antwort auf die Frage, ob die
-Karte stimmt: <b>Das weiß noch niemand.</b> Bisher ist alles
-Statistik gegen Statistik. Erst wenn eine Saison lang Funde
-<i>und</i> vergebliche Suchen eingetragen sind, lässt sich prüfen, ob
-hohe Werte tatsächlich häufiger zu Funden führen.</p>
+<p>werden auch Baum- und Bodeneigenschaften ausgewertet.</p>
+
+<p>Bei selteneren Arten wie Edelreizker und den beiden
+Hexenröhrlingen ist die Datenbasis kleiner. Deshalb stehen dort nicht
+alle Faktoren zur Verfügung.</p>
 
 
-<h2>Woher die Daten kommen</h2>
+<h2>Woher kommen die Daten?</h2>
 
 <table>
-  <tr><th>Was</th><th>Quelle</th></tr>
-  <tr><td>Wetter und Vorhersage</td><td>Open-Meteo / DWD</td></tr>
-  <tr><td>Fundmeldungen</td><td>GBIF</td></tr>
+  <tr><th>Daten</th><th>Quelle</th></tr>
+  <tr><td>Wetter und Wettervorhersage</td><td>Open-Meteo / DWD</td></tr>
+  <tr><td>Pilz-Fundmeldungen</td><td>GBIF</td></tr>
   <tr><td>Baumarten</td><td>Thünen-Institut</td></tr>
   <tr><td>Boden</td><td>ISRIC SoilGrids</td></tr>
-  <tr><td>Waldflächen, Karte</td><td>OpenStreetMap</td></tr>
+  <tr><td>Waldflächen und Kartendaten</td><td>OpenStreetMap</td></tr>
   <tr><td>Gelände</td><td>LGLN Niedersachsen</td></tr>
 </table>
 
 
 <div class="kasten warn">
   <h2 style="margin-top:0">Bitte beachten</h2>
-  <p>Die Karte zeigt <b>Bedingungen, keine Pilze</b>. Sie kann nicht
-  wissen, ob an einer Stelle etwas steht &ndash; und erst recht nicht,
-  ob ein Fund essbar ist.</p>
-  <p><b>Iss nie einen Pilz, weil eine Karte grün war.</b> Bei
-  Unsicherheit gehört jeder Fund zu einer Pilzberatung.</p>
-  <p class="klein">In Naturschutzgebieten ist das Sammeln
-  eingeschränkt oder verboten, und auch sonst gelten örtliche Regeln.
-  Erkundige dich vorher.</p>
+
+  <p>Die Pilzkarte zeigt <b>Bedingungen, keine Pilze</b>.</p>
+
+  <p>Sie kann nicht feststellen, ob an einer bestimmten Stelle
+  tatsächlich ein Pilz wächst. Und sie kann nicht beurteilen, ob ein
+  gefundener Pilz essbar ist.</p>
+
+  <p><b>Iss niemals einen Pilz, nur weil die Karte dort einen hohen
+  Wert anzeigt.</b> Bei Unsicherheit sollte jeder Fund von einer
+  erfahrenen Pilzberaterin oder einem erfahrenen Pilzberater bestimmt
+  werden.</p>
+
+  <p>Auch beim Sammeln gelten gesetzliche und örtliche Regeln. In
+  Naturschutzgebieten kann das Sammeln eingeschränkt oder verboten
+  sein. Informiere dich deshalb vor der Suche über die geltenden
+  Vorschriften.</p>
 </div>
 
 
-<p class="gross" style="margin-top:36px">Wetter beobachten. Wald und
-Boden berücksichtigen. Aus echten Funden lernen. Und dann selbst
-nachschauen.</p>
+<h3>Kurz gesagt</h3>
+
+<p class="gross">Wetter beobachten. Wald und Boden berücksichtigen.
+Echte Funddaten auswerten. Ein interessantes Suchgebiet finden. Und
+dann selbst nachschauen.</p>
 
 <div class="fuss">
-  <p>Ein privates Lernprojekt für die Region Braunschweig &ndash;
-  Wolfsburg &ndash; Elm &ndash; südliche Lüneburger Heide.</p>
   <p><a href="index.html">&larr; Zurück zur Karte</a></p>
 </div>
 
 </main>
+
+<script>
+// Ein echtes Rechenbeispiel aus den Daten von heute.
+//
+// Gesucht wird die Zelle mit dem hoechsten Wert - dort sieht man am
+// besten, wie die vier Faktoren zusammenkommen.
+fetch("daten.json").then(a => a.json()).then(d => {
+  const el = document.getElementById("beispiel");
+  if (!el) return;
+
+  // Art mit den besten Aussichten heute
+  let besteArt = null, besterSchnitt = -1;
+  Object.keys(d.arten).forEach(a => {
+    const werte = d.zellen.map(z => z.scores[a][0] ?? 0);
+    const s = werte.reduce((x, y) => x + y, 0) / werte.length;
+    if (s > besterSchnitt) { besterSchnitt = s; besteArt = a; }
+  });
+
+  // Beste Zelle dieser Art
+  let zelle = null, bester = -1;
+  d.zellen.forEach(z => {
+    const w = z.scores[besteArt][0] ?? 0;
+    if (w > bester && z.teile && z.teile[besteArt]) {
+      bester = w; zelle = z;
+    }
+  });
+
+  if (!zelle) { el.innerHTML = ""; return; }
+
+  const t = zelle.teile[besteArt];
+  const name = d.arten[besteArt].name;
+  const komma = x => (x === null || x === undefined)
+    ? "–" : String(x).replace(".", ",");
+
+  // Welche Wettergroessen haben Punkte gebracht?
+  const NAMEN = {
+    bf07: "Bodenfeuchte", bt07: "Bodentemperatur",
+    bilanz_14: "Wasserbilanz 14 Tage",
+    bilanz_60: "Wasserbilanz 60 Tage",
+    regen_reife: "Regen Tag 4–14",
+    regen_frisch: "Regen letzte 3 Tage",
+    regentage: "Regentage von 14", temp: "Lufttemperatur"
+  };
+  const einzeln = Object.entries(t.einzeln || {})
+    .filter(([f, p]) => p > 0)
+    .sort((a, b) => b[1] - a[1]);
+
+  const punktzeilen = einzeln.map(([f, p]) =>
+    `<tr><td>${NAMEN[f] || f}</td>
+     <td class="z">${p} Punkte</td></tr>`).join("");
+
+  const faktor = (titel, wert, erklaerung) => `
+    <tr><td>${titel}<br><span class="klein">${erklaerung}</span></td>
+        <td class="z"><b>${komma(wert)}</b></td></tr>`;
+
+  el.innerHTML = `
+    <p><b>${name}</b> &middot; ${zelle.titel}</p>
+
+    <p class="klein">Zuerst die Wetterpunkte. Jede Größe bringt
+    Punkte, wenn sie in dem Bereich liegt, in dem diese Art
+    besonders oft gefunden wurde:</p>
+
+    <table>
+      ${punktzeilen}
+      <tr><td><b>Wetterpunkte</b></td>
+          <td class="z"><b>${t.wetter} von 100</b></td></tr>
+    </table>
+
+    <p class="klein">Diese Punkte werden dann mit drei Faktoren
+    verrechnet. Jeder liegt zwischen 0 und 1 und kann den Wert nur
+    senken – ein fehlender Faktor lässt sich nicht durch einen
+    anderen ausgleichen:</p>
+
+    <table>
+      ${faktor("Jahreszeit", t.saison,
+               "wie gut der Monat zu dieser Art passt")}
+      ${faktor("Bäume", t.bestand,
+               zelle.bestand || "Bestand unbekannt")}
+      ${faktor("Boden", t.boden,
+               zelle.boden
+                 ? ("pH " + komma(zelle.boden.ph) + ", Ton "
+                    + komma(zelle.boden.ton) + " %")
+                 : "keine Bodendaten")}
+    </table>
+
+    <div class="rechnung">
+      ${t.wetter} &times; ${komma(t.saison)} &times;
+      ${komma(t.bestand)} &times; ${komma(t.boden)}
+      = <b>${zelle.scores[besteArt][0]}</b>
+    </div>
+
+    <p class="klein">Das ist der höchste Wert, den diese Art heute in
+    der ganzen Region erreicht. Er sagt: Hier passt gerade am meisten
+    zusammen – nicht, dass dort ein Pilz steht.</p>
+  `;
+}).catch(() => {
+  const el = document.getElementById("beispiel");
+  if (el) el.innerHTML = '<p class="klein">Beispiel konnte nicht '
+    + 'geladen werden.</p>';
+});
+</script>
+
 
 <script>
 // Wetterstand aus derselben Datei holen, mit der die Karte rechnet
