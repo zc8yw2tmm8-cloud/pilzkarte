@@ -16,6 +16,7 @@ Braucht: hintergrund.csv, funde_wetter2.csv, aufwand.csv
 Ergebnis: Tabellen im Terminal und in kalibrierung.txt
 """
 import csv
+import protokoll
 import os
 from datetime import date
 from collections import defaultdict
@@ -464,6 +465,20 @@ def main():
         f.write("\n".join(zeilen_bericht))
 
     print(f"\n\nBericht in {BERICHT} gespeichert.")
+
+    # Festhalten, woraus diese Kalibrierung entstanden ist - sonst
+    # ist sie spaeter nicht nachvollziehbar
+    protokoll.notiere(
+        "Wetterbaender und Saison",
+        [HINTERGRUND, FUNDE, AUFWAND, MELDETAGE],
+        {"MONATE": str(MONATE), "STICHPROBE": STICHPROBE,
+         "gegen_Meldetage": bool(MELDUNGEN),
+         "WETTER_SPANNE in arten.py": arten.WETTER_SPANNE},
+        {"Vergleichstage": len(hintergrund),
+         "Meldetage": len(MELDUNGEN),
+         "Funde gesamt": sum(len(v) for v in funde.values()),
+         "Arten": len(funde),
+         "Bericht": BERICHT})
 
 
 main()

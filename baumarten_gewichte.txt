@@ -2,13 +2,13 @@
 # MIT Aufwandskorrektur
 
 # marone
-        "baumarten": {"laerche": 1.0, "erle": 1.0, "kiefer": 0.68, "birke": 0.61, "tanne": 0.5, "laub_lang": 0.5, "buche": 0.49, "eiche": 0.48, "laub_kurz": 0.44, "fichte": 0.36, "douglasie": 0.26},
+        "baumarten": {"buche": 1.0, "birke": 1.0, "laerche": 1.0, "kiefer": 0.99, "eiche": 0.98, "laub_kurz": 0.96},
 
 # parasol
-        "baumarten": {"erle": 1.0, "birke": 0.66, "fichte": 0.65, "tanne": 0.5, "laub_lang": 0.5, "kiefer": 0.48, "laub_kurz": 0.48, "eiche": 0.45, "laerche": 0.33, "douglasie": 0.26, "buche": 0.16},
+        "baumarten": {"birke": 1.0, "erle": 1.0, "eiche": 0.6, "laub_kurz": 0.59, "kiefer": 0.48, "laerche": 0.38, "buche": 0.24},
 
 # schwefelporling
-        "baumarten": {"erle": 1.0, "laub_kurz": 0.7, "tanne": 0.5, "laub_lang": 0.5, "eiche": 0.46, "kiefer": 0.39, "laerche": 0.34, "birke": 0.32, "buche": 0.3, "douglasie": 0.17, "fichte": 0.05},
+        "baumarten": {"laub_kurz": 1.0, "erle": 1.0, "eiche": 0.89, "birke": 0.77, "buche": 0.76, "laerche": 0.74, "kiefer": 0.69},
 
 # steinpilz
-        "baumarten": {"fichte": 1.0, "buche": 0.82, "kiefer": 0.7, "eiche": 0.52, "tanne": 0.5, "laub_lang": 0.5, "laerche": 0.45, "laub_kurz": 0.33, "douglasie": 0.32, "birke": 0.26, "erle": 0.16},
+        "baumarten": {"buche": 1.0, "kiefer": 0.74, "eiche": 0.73, "laerche": 0.64, "birke": 0.58},

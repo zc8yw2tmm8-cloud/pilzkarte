@@ -143,7 +143,10 @@ ARTEN = {
         # Gemessen (n=43, Sammlerdichte herausgerechnet): Fichte 1.67,
         # Buche 1.37, Kiefer 1.16 - bestaetigt die Literatur.
         # Birke 0.44 und Erle 0.27 nach unten gezogen.
-        "baumarten": {"fichte": 1.0, "buche": 1.0, "tanne": 0.9, "kiefer": 0.74, "eiche": 0.73, "laerche": 0.64, "birke": 0.58, "douglasie": 0.45, "laub_lang": 0.45, "laub_kurz": 0.25, "erle": 0.12},
+        "baumarten": {"fichte": 1.0, "buche": 1.0, "tanne": 0.9,
+                      "kiefer": 0.85, "eiche": 0.75, "douglasie": 0.45,
+                      "laerche": 0.5, "laub_lang": 0.45, "birke": 0.25,
+                      "laub_kurz": 0.25, "erle": 0.12},
         "waldanteil_wirkung": 0.10,
         # gemessen: leicht 0.71, stark 0.23 (nur Nov)
         "frost_abzug": (15, 40),   # (leichter, starker Frost)
@@ -218,7 +221,10 @@ ARTEN = {
         # Gemessen (n=44): Laerche 1.86, Kiefer 1.27, Laubholz unter 1.
         # Bestaetigt den Nadelwaldpilz. Fichte 0.67 nehme ich nicht
         # ernst - sie macht nur 2 % der Meldeorte aus.
-        "baumarten": {"fichte": 1.0, "laerche": 1.0, "buche": 1.0, "birke": 1.0, "kiefer": 0.99, "eiche": 0.98, "laub_kurz": 0.96, "tanne": 0.9, "douglasie": 0.6, "erle": 0.3, "laub_lang": 0.25},
+        "baumarten": {"fichte": 1.0, "kiefer": 0.95, "tanne": 0.9,
+                      "laerche": 0.8, "douglasie": 0.6, "buche": 0.5,
+                      "eiche": 0.35, "birke": 0.35, "laub_lang": 0.25,
+                      "laub_kurz": 0.2, "erle": 0.3},
         "waldanteil_wirkung": 0.12,
         # KORREKTUR: nicht frosthart. Leicht 0.00 im Nov
         "frost_abzug": (20, 35),   # (leichter, starker Frost)
@@ -324,7 +330,10 @@ ARTEN = {
         # Gemessen (n=73): kein starkes Signal ausser Erle 2.55 und
         # Birke 1.68 - passt zu einem Pilz, der Waldraender und
         # Lichtungen mag. Buche 0.41 leicht nach unten.
-        "baumarten": {"birke": 1.0, "erle": 1.0, "laub_lang": 1.0, "fichte": 0.85, "douglasie": 0.7, "tanne": 0.7, "eiche": 0.6, "laub_kurz": 0.59, "kiefer": 0.48, "laerche": 0.38, "buche": 0.24},
+        "baumarten": {"eiche": 1.0, "birke": 1.0, "erle": 1.0,
+                      "laub_lang": 1.0, "laub_kurz": 1.0, "kiefer": 0.9,
+                      "laerche": 0.85, "buche": 0.7, "fichte": 0.85,
+                      "douglasie": 0.7, "tanne": 0.7},
         "waldanteil_wirkung": 0.02,
         # gemessen: leicht 0.64, stark 0.00 (nur Nov)
         "frost_abzug": (20, 45),   # (leichter, starker Frost)
@@ -360,7 +369,10 @@ ARTEN = {
         # Gemessen (n=86): Erle 2.55, sonst. Laubholz kurz 1.79,
         # Eiche 1.16, Fichte 0.14. Erle und Weide sind bekannte Wirte -
         # deshalb deutlich hochgesetzt.
-        "baumarten": {"laub_kurz": 1.0, "erle": 1.0, "eiche": 0.89, "laub_lang": 0.8, "birke": 0.77, "buche": 0.76, "laerche": 0.74, "kiefer": 0.69, "douglasie": 0.08, "tanne": 0.08, "fichte": 0.06},
+        "baumarten": {"eiche": 1.0, "laub_kurz": 0.9, "erle": 0.85,
+                      "laub_lang": 0.8, "buche": 0.4, "birke": 0.3,
+                      "laerche": 0.15, "kiefer": 0.12, "fichte": 0.06,
+                      "douglasie": 0.08, "tanne": 0.08},
         "waldanteil_wirkung": 0.04,
         # gemessen: leicht 1.74 - Holzbewohner, unbeeindruckt
         "frost_abzug": (0, 8),   # (leichter, starker Frost)
@@ -735,7 +747,6 @@ MONATSNORMALE = {
     "sommersteinpilz": {1: 1.044, 2: 1.098, 3: 1.111, 4: 0.997, 5: 0.913, 6: 0.781, 7: 0.729, 8: 0.685, 9: 0.963, 10: 1.347, 11: 1.239, 12: 1.094},
     "steinpilz": {1: 0.759, 2: 0.859, 3: 0.879, 4: 1.004, 5: 1.106, 6: 0.871, 7: 0.793, 8: 0.761, 9: 1.057, 10: 1.799, 11: 1.256, 12: 0.856},
 }
-
 
 # Abschalten, falls sich der Umbau als falsch erweist
 MONATSAUSGLEICH = True

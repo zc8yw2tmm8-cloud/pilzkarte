@@ -34,8 +34,14 @@ GBIF-Fundmeldungen gegen 47.000 Vergleichstage. Maß ist das
 Auswahlverhältnis — Anteil bei Funden geteilt durch Anteil an
 normalen Tagen.
 
-**Elf Arten.** Sieben kalibriert, vier neu und noch geschätzt
-(hexenroehrling, netzhexe, reizker, krauseglucke).
+**Elf Arten.** Welcher Faktor gemessen und welcher geschätzt ist,
+zeigt `python herkunft.py` — nicht raten, nachsehen. Die vier neuen
+Arten (hexenroehrling, netzhexe, reizker, krauseglucke) haben eine
+gemessene Saison, aber Wetterbänder und Baumarten aus der Literatur.
+
+**Der Wettereinfluss ist auf 62 % gedämpft** (`WETTER_SPANNE` in
+`arten.py`). Grund: Gegen Meldetage nachgerechnet halten nur 233 von
+660 Schwellen der Prüfung stand.
 
 ### Acht widerlegte Annahmen
 
