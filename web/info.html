@@ -2,14 +2,15 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1,
+      viewport-fit=cover">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#15181c">
-<title>Wie die Pilzkarte rechnet</title>
+<title>So funktioniert die Pilzkarte</title>
 <style>
   :root {
     --grund: #15181c; --flaeche: #1e2228; --text: #e6e6e6;
@@ -17,145 +18,276 @@
     --warn: #e8a33d;
   }
   * { box-sizing: border-box; }
-  body { font: 16px/1.6 system-ui, -apple-system, sans-serif;
-         background: var(--grund); color: var(--text);
-         margin: 0; padding: 0 0 80px;
+  body { margin: 0; background: var(--grund); color: var(--text);
+         font: 16px/1.65 system-ui, -apple-system, "Segoe UI",
+               Roboto, sans-serif;
          -webkit-text-size-adjust: 100%; }
-  .breite { max-width: 720px; margin: 0 auto; padding: 0 18px; }
 
-  header { border-bottom: 1px solid var(--linie); padding: 14px 0;
-           margin-bottom: 30px; }
-  header .breite { display: flex; align-items: center; gap: 14px; }
-  header a { display: inline-block; color: var(--akzent); text-decoration: none; font-size: 15px; padding: 8px 14px; margin: 0 0 10px -14px; border-radius: 8px; min-height: 40px; line-height: 24px; }
+  .breite { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+
+  header { border-bottom: 1px solid var(--linie);
+           padding: 14px 0 20px; margin-bottom: 26px; }
+  header a { display: inline-block; color: var(--akzent);
+             text-decoration: none; font-size: 15px;
+             padding: 8px 14px; margin: 0 0 10px -14px;
+             border-radius: 8px; min-height: 40px; line-height: 24px; }
   header a:hover { background: var(--flaeche); }
-  header h1 { font-size: 17px; margin: 0; font-weight: 600; }
 
-  h2 { font-size: 21px; margin: 46px 0 12px; font-weight: 600;
-       line-height: 1.3; }
-  h3 { font-size: 15px; margin: 26px 0 8px; font-weight: 600; }
+  h1 { font-size: 25px; margin: 6px 0 0; line-height: 1.25; }
+  h2 { font-size: 20px; margin: 38px 0 12px; }
+  h3 { font-size: 16px; margin: 26px 0 8px; }
+
   p { margin: 0 0 14px; }
-  .gross { font-size: 19px; line-height: 1.5; color: var(--text); }
-  .leise { color: var(--leise); }
-  .klein { font-size: 13px; color: var(--leise); }
+  ul { margin: 0 0 16px; padding-left: 22px; }
+  li { margin-bottom: 5px; }
 
-  /* Die Formel als Kacheln */
-  .formel { display: flex; align-items: stretch; gap: 8px;
-            flex-wrap: wrap; margin: 22px 0; }
-  .kachel { flex: 1 1 110px; background: var(--flaeche);
-            border-radius: 10px; padding: 12px 10px; text-align: center;
-            border: 1px solid var(--linie); }
-  .kachel .zahl { font-size: 24px; font-weight: 700; display: block;
-                  line-height: 1.2; }
-  .kachel .was { font-size: 11px; color: var(--leise);
-                 text-transform: uppercase; letter-spacing: .05em; }
-  .kachel .quelle { font-size: 11px; color: var(--leise); margin-top: 3px; }
-  .mal { align-self: center; font-size: 18px; color: var(--leise);
-         flex: 0 0 auto; }
-  .kachel.ergebnis { background: transparent;
-                     border: 2px solid var(--akzent); }
-  .kachel.ergebnis .zahl { color: var(--akzent); font-size: 30px; }
+  .klein { font-size: 13.5px; color: var(--leise); }
+  .gross { font-size: 18px; }
 
-  /* Balken */
-  .balken { margin: 4px 0 10px; }
-  .balken .zeile { display: flex; align-items: center; gap: 8px;
-                   margin-bottom: 4px; font-size: 13.5px; }
-  .balken .name { flex: 0 0 148px; }
-  .balken .spur { flex: 1; height: 16px; background: var(--flaeche);
-                  border-radius: 3px; overflow: hidden; position: relative; }
-  .balken .fuell { height: 100%; background: var(--akzent);
-                   border-radius: 3px; }
-  .balken .fuell.minus { background: #c0392b; }
-  .balken .zahl { flex: 0 0 54px; text-align: right;
-                  font-variant-numeric: tabular-nums; }
-
-  /* Saisonkurve */
-  .saison { display: flex; align-items: flex-end; gap: 3px;
-            height: 72px; margin: 10px 0 4px; }
-  .saison .monat { flex: 1; display: flex; flex-direction: column;
-                   justify-content: flex-end; height: 100%; }
-  .saison .stab { border-radius: 3px 3px 0 0; background: var(--linie); }
-  .saison .mn { font-size: 10px; color: var(--leise); text-align: center;
-                margin-top: 3px; }
-
-  /* Vergleichstabelle */
-  table { width: 100%; border-collapse: collapse; margin: 10px 0 6px;
-          font-size: 14px; }
-  th, td { padding: 7px 8px; border-bottom: 1px solid var(--linie);
-           text-align: left; }
-  th { font-size: 11px; text-transform: uppercase; color: var(--leise);
-       letter-spacing: .05em; font-weight: 600; }
-  td.z { text-align: right; font-variant-numeric: tabular-nums;
-         white-space: nowrap; }
-  .stark { color: var(--akzent); font-weight: 600; }
-  .schwach { color: #c0392b; }
+  .datenstand-oben { margin: 16px 0 4px; padding: 11px 15px;
+                     background: var(--flaeche); border-radius: 8px;
+                     border-left: 3px solid var(--akzent); }
+  .datenstand-oben p { margin: 0; font-size: 13.5px;
+                       color: var(--leise); }
 
   .kasten { background: var(--flaeche); border-radius: 10px;
-            padding: 16px 18px; margin: 20px 0;
-            border-left: 3px solid var(--akzent); }
-  .kasten.warn { border-left-color: var(--warn); }
+            padding: 16px 19px; margin: 20px 0; }
   .kasten h3 { margin-top: 0; }
   .kasten p:last-child { margin-bottom: 0; }
+  .kasten.warn { border-left: 3px solid var(--warn); }
+  .kasten.gut { border-left: 3px solid var(--akzent); }
 
-  details { margin: 12px 0; }
-  summary { cursor: pointer; color: var(--akzent); font-size: 14px;
-            padding: 6px 0; }
-  summary::-webkit-details-marker { display: none; }
-  summary::before { content: "▸ "; }
-  details[open] summary::before { content: "▾ "; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0 20px;
+          font-size: 14.5px; }
+  th, td { text-align: left; padding: 8px 10px;
+           border-bottom: 1px solid var(--linie); }
+  th { color: var(--leise); font-weight: 600; font-size: 12.5px;
+       text-transform: uppercase; letter-spacing: .04em; }
+  td.z { text-align: right; font-variant-numeric: tabular-nums;
+         white-space: nowrap; }
 
-  .wahl { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0; }
-  .wahl button { border: 1px solid var(--linie); background: transparent;
-                 color: var(--text); padding: 6px 12px; border-radius: 16px;
-                 cursor: pointer; font-size: 13px; min-height: 34px; }
-  .wahl button.aktiv { background: var(--akzent); border-color: var(--akzent);
-                       color: #10130f; }
+  .skala div { display: flex; align-items: center; gap: 11px;
+               padding: 5px 0; }
+  .skala i { width: 26px; height: 14px; border-radius: 3px;
+             flex: 0 0 auto; }
 
-  ul { padding-left: 22px; margin: 0 0 14px; }
-  li { margin: 6px 0; }
-  a { color: var(--akzent); }
-
-  @media (max-width: 640px) {
-    body { font-size: 15px; }
-    h2 { font-size: 19px; margin-top: 38px; }
-    .gross { font-size: 17px; }
-    .balken .name { flex: 0 0 108px; font-size: 12.5px; }
-    .kachel .zahl { font-size: 20px; }
-  }
+  .fuss { margin: 44px 0 60px; padding-top: 20px;
+          border-top: 1px solid var(--linie);
+          font-size: 13.5px; color: var(--leise); }
+  .fuss a { color: var(--akzent); }
 </style>
 </head>
 <body>
 
 <header><div class="breite">
   <a href="index.html">&larr; Karte</a>
-  <h1>Wie die Pilzkarte rechnet</h1>
+  <h1>So funktioniert die Pilzkarte</h1>
 
-<div class="datenstand-oben"><p class="klein" id="datenstand">Wetterstand wird geladen &hellip;</p>
+  <div class="datenstand-oben">
+    <p class="klein" id="datenstand">Wetterstand wird geladen &hellip;</p>
+  </div>
+</div></header>
+
+<main class="breite">
+
+<p class="gross">Die Karte zeigt, wo die Bedingungen für eine
+bestimmte Pilzart gerade günstig sind.</p>
+
+<p>Wähle oben eine Art und schau auf die Karte. Je höher der Wert,
+desto besser passt das aktuelle Wetter zu dem, was diese Art
+braucht &ndash; und desto eher lohnt dort die Suche.</p>
+
+
+<h2>Was der Wert bedeutet</h2>
+
+<div class="skala">
+  <div><i style="background:rgb(45,175,75)"></i>
+    <span><b>95+</b> &nbsp;sehr gut</span></div>
+  <div><i style="background:rgb(130,220,70)"></i>
+    <span><b>80+</b> &nbsp;gut</span></div>
+  <div><i style="background:rgb(255,225,90)"></i>
+    <span><b>60+</b> &nbsp;möglich</span></div>
+  <div><i style="background:rgb(250,155,40)"></i>
+    <span><b>40+</b> &nbsp;schwach</span></div>
+  <div><i style="background:rgb(200,60,60)"></i>
+    <span><b>unter 40</b> &nbsp;kaum</span></div>
+</div>
+
+<div class="kasten">
+  <p><b>100 heißt nicht, dass dort Pilze stehen.</b> Es heißt: Wetter,
+  Jahreszeit, Bäume und Boden passen an dieser Stelle so gut zu dieser
+  Art, wie es überhaupt möglich ist.</p>
+  <p class="klein">Und niedrige Werte heißen nicht immer dasselbe. Im
+  Popup steht deshalb, <b>was gerade bremst</b> &ndash; ob es zu
+  trocken ist, die falsche Jahreszeit, oder ob schlicht die passenden
+  Bäume fehlen.</p>
+</div>
+
+<p><b>Die Arten lassen sich nicht direkt vergleichen.</b> Eine 70 beim
+Steinpilz bedeutet nicht mehr Pilze als eine 50 beim
+Schwefelporling &ndash; jede Zahl gilt nur für ihre eigene Art.</p>
+
+<p class="klein">Warum: Der Schwefelporling wächst am Holz und hängt
+kaum am Bodenwasser. Bei Trockenheit fällt sein Wert deshalb weniger
+ab als der eines Bodenpilzes. Als Hinweis, wonach sich das Suchen
+heute eher lohnt, taugt der Vergleich trotzdem.</p>
+
+
+<h2>Was einfließt</h2>
+
+<h3>Wetter</h3>
+
+<p>Bodenfeuchte, Bodentemperatur, Regen der letzten Wochen, Zahl der
+Regentage, die Wasserbilanz, längere Trockenheit und Frost.</p>
+
+<p>Dabei zählt nicht, <i>ob</i> es feucht ist, sondern ob es
+<b>feuchter ist als sonst um diese Jahreszeit</b>. Im Oktober ist der
+Boden immer nass &ndash; das allein sagt noch nichts.</p>
+
+<h3>Jahreszeit</h3>
+
+<p>Jede Art hat ihre Zeit. Wann genau, wurde nicht aus Büchern
+übernommen, sondern aus echten Fundmeldungen gerechnet: In welchem
+Monat wird diese Art besonders oft gemeldet, gemessen an dem, wie
+viele Menschen überhaupt unterwegs waren?</p>
+
+<h3>Bäume</h3>
+
+<p>Viele Pilze leben mit bestimmten Bäumen zusammen. Die Karte kennt
+für jede Stelle die Baumartenmischung und rechnet sie mit ein.</p>
+
+<h3>Boden</h3>
+
+<p>Säuregrad, Sand- und Tonanteil. Wo genug Funde vorliegen, fließt
+das ein &ndash; sonst bleibt der Boden außen vor.</p>
+
+
+<h2>Wie genau ist das?</h2>
+
+<p>Die Karte arbeitet mit Feldern von etwa <b>2 mal 2 Kilometern</b>.
+Sie beantwortet also:</p>
+
+<div class="kasten gut">
+  <p><b>„Wohin fahre ich heute?"</b></p>
+  <p class="klein">Und nicht: „Wo genau steht der Pilz?"</p>
+</div>
+
+<p>Innerhalb eines Feldes gilt der Wert für das Waldstück dort &ndash;
+nicht für Äcker oder Ortschaften, die zufällig mit im Quadrat
+liegen.</p>
+
+
+<h2>Warum die Karte aus Funden lernt</h2>
+
+<p>Die meisten Faustregeln über Pilze stammen aus Beobachtungen von
+Sammlern. Das klingt vernünftig, hat aber einen Haken: Menschen gehen
+nicht überall und nicht jederzeit gleich oft in den Wald.</p>
+
+<div class="kasten warn">
+  <h3>Ein Beispiel</h3>
+  <p>Kiefernwald macht <b>45 %</b> der Waldfläche dieser Region aus,
+  aber nur <b>14 %</b> der Pilzmeldungen. Eiche umgekehrt: 21 % der
+  Fläche, 45 % der Meldungen.</p>
+  <p class="klein">Nicht weil dort keine Pilze wachsen &ndash; sondern
+  weil Spaziergänger Laubwald bevorzugen. Wer das nicht
+  herausrechnet, misst am Ende, wo Menschen gerne hingehen.</p>
+</div>
+
+<p>Deshalb vergleicht diese Karte Fundorte nicht mit dem Wald
+allgemein, sondern mit den <b>Orten und Tagen, an denen überhaupt
+Pilze gemeldet wurden</b>. Was danach übrig bleibt, hat mit den
+Pilzen zu tun und nicht mit uns.</p>
+
+<p class="klein">Das Ergebnis war unbequem: Zehn Annahmen, die
+plausibel klangen, haben sich als falsch erwiesen. Und beim Wetter
+blieb nach der Korrektur weniger übrig als gedacht &ndash; der
+Unterschied zwischen einem guten und einem schlechten Tag ist real,
+aber kleiner, als es zunächst aussah.</p>
+
+
+<h2>Was noch nicht sicher ist</h2>
+
+<p>Nicht jeder Wert der Karte ist gleich gut belegt:</p>
+
+<table>
+  <tr><th></th><th>gemessen für</th></tr>
+  <tr><td>Wetter</td><td>alle 11 Arten</td></tr>
+  <tr><td>Jahreszeit</td><td>alle 11 Arten</td></tr>
+  <tr><td>Bäume</td><td>4 Arten</td></tr>
+  <tr><td>Boden</td><td>4 Arten</td></tr>
+</table>
+
+<p>Wo die Funde nicht reichten, stammen die Werte aus der
+Pilzliteratur &ndash; oder es gibt gar keinen Faktor. Das betrifft
+vor allem die selteneren Arten wie Edelreizker und die beiden
+Hexenröhrlinge.</p>
+
+<p class="klein">Und die ehrlichste Antwort auf die Frage, ob die
+Karte stimmt: <b>Das weiß noch niemand.</b> Bisher ist alles
+Statistik gegen Statistik. Erst wenn eine Saison lang Funde
+<i>und</i> vergebliche Suchen eingetragen sind, lässt sich prüfen, ob
+hohe Werte tatsächlich häufiger zu Funden führen.</p>
+
+
+<h2>Woher die Daten kommen</h2>
+
+<table>
+  <tr><th>Was</th><th>Quelle</th></tr>
+  <tr><td>Wetter und Vorhersage</td><td>Open-Meteo / DWD</td></tr>
+  <tr><td>Fundmeldungen</td><td>GBIF</td></tr>
+  <tr><td>Baumarten</td><td>Thünen-Institut</td></tr>
+  <tr><td>Boden</td><td>ISRIC SoilGrids</td></tr>
+  <tr><td>Waldflächen, Karte</td><td>OpenStreetMap</td></tr>
+  <tr><td>Gelände</td><td>LGLN Niedersachsen</td></tr>
+</table>
+
+
+<div class="kasten warn">
+  <h2 style="margin-top:0">Bitte beachten</h2>
+  <p>Die Karte zeigt <b>Bedingungen, keine Pilze</b>. Sie kann nicht
+  wissen, ob an einer Stelle etwas steht &ndash; und erst recht nicht,
+  ob ein Fund essbar ist.</p>
+  <p><b>Iss nie einen Pilz, weil eine Karte grün war.</b> Bei
+  Unsicherheit gehört jeder Fund zu einer Pilzberatung.</p>
+  <p class="klein">In Naturschutzgebieten ist das Sammeln
+  eingeschränkt oder verboten, und auch sonst gelten örtliche Regeln.
+  Erkundige dich vorher.</p>
+</div>
+
+
+<p class="gross" style="margin-top:36px">Wetter beobachten. Wald und
+Boden berücksichtigen. Aus echten Funden lernen. Und dann selbst
+nachschauen.</p>
+
+<div class="fuss">
+  <p>Ein privates Lernprojekt für die Region Braunschweig &ndash;
+  Wolfsburg &ndash; Elm &ndash; südliche Lüneburger Heide.</p>
+  <p><a href="index.html">&larr; Zurück zur Karte</a></p>
+</div>
+
+</main>
 
 <script>
-// Den Stand aus daten.json holen - dieselbe Datei, mit der die
-// Karte rechnet
+// Wetterstand aus derselben Datei holen, mit der die Karte rechnet
 fetch("daten.json").then(a => a.json()).then(d => {
   const el = document.getElementById("datenstand");
   if (!el) return;
+
   const teile = [];
   if (d.gemessen_bis) {
     const m = new Date(d.gemessen_bis);
-    // Auf KALENDERTAGE rechnen. Mit Stunden ergibt "gestern"
-    // je nach Uhrzeit 1 oder 2 - dann steht da "gestern (vor 2
-    // Tagen)".
+    // In KALENDERTAGEN rechnen. Mit Stunden ergaebe "gestern" je
+    // nach Uhrzeit 1 oder 2 - dann steht da "gestern (vor 2 Tagen)".
     const heute = new Date();
     const t0 = Date.UTC(m.getFullYear(), m.getMonth(), m.getDate());
     const t1 = Date.UTC(heute.getFullYear(), heute.getMonth(),
                         heute.getDate());
     const alt = Math.round((t1 - t0) / 86400000);
-    teile.push(`Letzte gemessene Wetterdaten: <b>` +
-      m.toLocaleDateString("de-DE") + `</b>` +
-      (alt === 0 ? " (heute)" : alt === 1 ? " (gestern)"
-       : ` (vor ${alt} Tagen)`));
-  }
-  if (d.stand) {
-    teile.push("Karte gerechnet am " +
-      new Date(d.stand).toLocaleDateString("de-DE"));
+
+    teile.push("Wetterdaten bis <b>"
+      + m.toLocaleDateString("de-DE") + "</b>"
+      + (alt <= 0 ? " (heute)" : alt === 1 ? " (gestern)"
+         : ` (vor ${alt} Tagen)`));
   }
   if (d.tage && d.tage.length) {
     teile.push("Vorhersage bis " +
@@ -164,518 +296,10 @@ fetch("daten.json").then(a => a.json()).then(d => {
   }
   el.innerHTML = teile.join(" &middot; ");
 }).catch(() => {
-  const el = document.getElementById("datenstand");
+  const el = document.querySelector(".datenstand-oben");
   if (el) el.remove();
 });
-</script></div>
-
-</div></header>
-
-<div class="breite">
-
-<p class="gross">Jede Fläche auf der Karte bekommt eine Zahl zwischen
-0 und 100. Sie sagt, wie gut die Bedingungen dort gerade sind &ndash;
-<b>nicht</b>, ob tatsächlich Pilze stehen.</p>
-
-<h2>Ein Beispiel, gerade eben gerechnet</h2>
-
-<div class="wahl" id="artwahl"></div>
-<p id="beispieltext" class="leise">Lade Daten …</p>
-
-<div class="formel" id="formel"></div>
-
-<h3>Wo die Wetterpunkte herkommen</h3>
-<div class="balken" id="punkte"></div>
-<p class="klein" id="punkteinfo"></p>
-
-<h2>Woran man erkennt, wo Pilze wachsen</h2>
-
-<p>Niemand kann von außen sehen, ob unter dem Laub gerade ein Pilz
-steht. Was sich beobachten lässt, sind die Umstände &ndash; und
-einige davon hängen mit Funden zusammen.</p>
-
-<p>Diese Karte benutzt vier Gruppen von Umständen. Nicht weil es
-genau vier wären, sondern weil es für diese vier brauchbare Daten
-gibt:</p>
-
-<table>
-  <tr><th>Was</th><th>Warum</th></tr>
-  <tr><td><b>Wetter</b></td>
-      <td>Feuchtigkeit und Bodentemperatur der letzten Wochen</td></tr>
-  <tr><td><b>Jahreszeit</b></td>
-      <td>Jede Art hat ihre Monate</td></tr>
-  <tr><td><b>Bäume</b></td>
-      <td>Die meisten Arten leben mit bestimmten Baumarten
-          zusammen</td></tr>
-  <tr><td><b>Boden</b></td>
-      <td>Säuregrad und Tongehalt &ndash; Ton hält Wasser</td></tr>
-</table>
-
-<p>Die vier werden multipliziert, nicht addiert. Fehlt eines,
-nützt der Rest wenig: Ein perfekt feuchter Waldboden im Februar
-ergibt trotzdem fast null.</p>
-
-<div class="kasten">
-  <h3>Was fehlt</h3>
-  <p>Vieles, was Sammler wissen, steht in keiner Datenbank &ndash;
-  wie alt der Bestand ist, ob dort schon einmal etwas stand, wie das
-  Moos aussieht, ob der Waldrand nach Süden zeigt. Manches ließe
-  sich noch beschaffen, anderes nicht.</p>
-  <p class="klein">Deshalb ist die Zahl auf der Karte kein Urteil,
-  sondern ein Hinweis, wo sich der Weg eher lohnt.</p>
-</div>
-
-<h3>Die Saison der gewählten Art</h3>
-<div class="saison" id="saisonkurve"></div>
-<p class="klein" id="saisontext"></p>
-
-<h2>Der Unterschied zu anderen Pilzkarten</h2>
-
-<p class="gross">Die Schwellenwerte sind nicht geschätzt.
-Sie sind gemessen.</p>
-
-<p>Die naheliegende Methode wäre: im Bestimmungsbuch nachschlagen,
-Zahlen abtippen, fertig. Das Problem daran zeigt ein Beispiel aus
-diesem Projekt.</p>
-
-<div class="kasten warn">
-  <h3>Sechsmal danebengelegen</h3>
-  <p>Eine plausible Annahme war: Steinpilze erscheinen 8 bis 14 Tage
-  nach Regen. Steht so in Büchern, klingt richtig.</p>
-  <p>Gemessen an 549 echten Funden traf das auf <b>15,7 %</b> zu
-  &ndash; deutlich <i>weniger</i>, als der Zufall ergeben hätte. Die
-  Regel zeigte in die falsche Richtung und flog raus.</p>
-  <p class="klein">Ähnlich bei fünf weiteren Annahmen: Der Maronen&shy;röhrling
-  galt als Sandpilz, der Parasol als trockenheitsverträglich, Marone
-  und Birkenpilz als frosthart. Alles falsch.</p>
-</div>
-
-<h3>Wie das Messen funktioniert</h3>
-
-<div class="kasten">
-  <p>Jemand behauptet: <i>„An 30 % meiner Fundtage hat es
-  geregnet."</i></p>
-  <p>Klingt nach einem Zusammenhang &ndash; ist aber keiner. Denn es
-  regnet ohnehin an etwa 30 % aller Tage. Die Zahl beschreibt nur das
-  Wetter, nicht die Pilze.</p>
-  <p>Sagt er dagegen <i>„80 % meiner Fundtage waren Regentage"</i>,
-  dann ist das auffällig. Fast dreimal so oft, wie zu erwarten
-  wäre.</p>
-  <p class="klein">Genau so wird hier gerechnet: nicht „bei welchen
-  Bedingungen wurde gefunden", sondern „<b>wie viel häufiger</b> als
-  sonst".</p>
-</div>
-
-<p>Für das Wetter sind der Maßstab rund <b>47.000 gewöhnliche
-Tage</b> an zufälligen Waldpunkten seit 2019. Für Boden und Bäume
-dagegen die <b>Orte, an denen Menschen überhaupt Pilze melden</b>
-&ndash; und das ist ein wichtiger Unterschied.</p>
-
-<h3>Warum der Maßstab so viel ausmacht</h3>
-
-<p>Vergleicht man Fundorte mit zufälligen Waldpunkten, misst man
-auch, wo Menschen unterwegs sind. Wie stark das wirkt, zeigt der
-Steinpilz beim Säuregrad des Bodens:</p>
-
-<table>
-  <tr><th>pH-Wert</th>
-      <th class="z">gegen Waldpunkte</th>
-      <th class="z">gegen Meldeorte</th></tr>
-  <tr><td>niedrig</td><td class="z stark">1,70</td>
-      <td class="z">0,68</td></tr>
-  <tr><td>mittel</td><td class="z stark">1,77</td>
-      <td class="z">1,24</td></tr>
-  <tr><td>hoch</td><td class="z schwach">0,17</td>
-      <td class="z">0,95</td></tr>
-</table>
-
-<p>Links sieht es nach einem starken Zusammenhang aus: Steinpilze
-mögen saure Böden. Rechts, gegen die Meldeorte gerechnet, bleibt fast
-nichts übrig.</p>
-
-<p class="klein">Der Grund: Saure Böden liegen in dieser Region im
-Norden, kalkreiche im Süden. Wer wo spazieren geht, hat mit
-Pilzbiologie nichts zu tun.</p>
-
-<div class="kasten warn">
-  <h3>Der Boden sagt weniger, als gedacht</h3>
-  <p>Über alle Arten hinweg: An Fundorten liegt der pH-Wert bei 5,4,
-  an Meldeorten bei 5,3. Sandanteil 43,9 gegen 43,3 Prozent.
-  Tonanteil 21,1 gegen 21,0. <b>Praktisch kein Unterschied.</b></p>
-  <p>Bei Parasol und Schwefelporling kehrte sich die Richtung sogar
-  um &ndash; sie bevorzugen <i>höheren</i> pH, nicht niedrigeren.</p>
-  <p class="klein">Die Bodenfaktoren wurden daraufhin stark
-  abgeflacht. Wo zu wenige Fundorte vorliegen, steht jetzt gar kein
-  Faktor mehr statt eines geschätzten.</p>
-</div>
-
-<h3>Und bei den Bäumen dasselbe</h3>
-
-<table>
-  <tr><th>Baumart</th><th class="z">Anteil am Wald</th>
-      <th class="z">Anteil an Meldungen</th></tr>
-  <tr><td>Kiefer</td><td class="z">45,3 %</td>
-      <td class="z schwach">11,7 %</td></tr>
-  <tr><td>Eiche</td><td class="z">21,4 %</td>
-      <td class="z stark">43,6 %</td></tr>
-  <tr><td>Buche</td><td class="z">9,5 %</td>
-      <td class="z stark">26,5 %</td></tr>
-</table>
-
-<p>Spaziergänger bevorzugen Laubwald. Ohne diese Korrektur hätte die
-Karte behauptet, alle Pilze mieden Kiefernwälder &ndash; auch der
-Maronenröhrling, der ein Nadelwaldpilz ist.</p>
-
-<h3>Eine Falle, die den besten Monat verschoben hat</h3>
-
-<p>Wetter und Jahreszeit hängen zusammen: Im Oktober ist der Boden
-feuchter und kühler als im August. Beides fließt in den Score ein
-&ndash; das Wetter direkt, die Jahreszeit über den Saisonfaktor.</p>
-
-<p>Der Saisonfaktor kommt aber aus Fundmeldungen je Aufwand und
-Monat. Er sagt schon, dass im Oktober mehr gefunden wird. Multipliziert
-man ihn mit Wetterpunkten, die aus demselben Grund hoch sind, zählt
-der Herbst <b>zweimal</b>.</p>
-
-<table>
-  <tr><th>Steinpilz</th><th class="z">September</th>
-      <th class="z">Oktober</th></tr>
-  <tr><td>Saison, gemessen</td><td class="z stark">0,90</td>
-      <td class="z">0,74</td></tr>
-  <tr><td>Wetterpunkte im Mittel</td><td class="z">45</td>
-      <td class="z stark">77</td></tr>
-  <tr><td>Score</td><td class="z">35</td>
-      <td class="z stark">48</td></tr>
-</table>
-
-<p>Die Messung sagt: September ist der beste Monat. Die Karte zeigte
-Oktober. Bei vier von elf Arten war der Höhepunkt um einen Monat
-verschoben.</p>
-
-<p class="klein">Behoben, indem die Wetterpunkte am
-<b>Monatsnormalwert</b> gemessen werden: Sie sagen jetzt, ob ein Tag
-besser oder schlechter ist als ein gewöhnlicher Tag desselben Monats
-&ndash; nicht mehr, ob es überhaupt feucht ist. Gerechnet aus 31.535
-Vergleichstagen.</p>
-
-<h2>Woher die Daten kommen</h2>
-
-
-
-<table>
-  <tr><th>Was</th><th>Quelle</th><th class="z">Auflösung</th></tr>
-  <tr><td>Wetter, Vorhersage</td><td>Open-Meteo, DWD ICON-D2</td>
-      <td class="z">2–11 km</td></tr>
-  <tr><td>Baumarten</td><td>Thünen-Institut</td><td class="z">10 m</td></tr>
-  <tr><td>Waldflächen, Ortsnamen</td><td>OpenStreetMap</td>
-      <td class="z">—</td></tr>
-  <tr><td>Boden</td><td>ISRIC SoilGrids</td><td class="z">250 m</td></tr>
-  <tr><td>Höhen</td><td>Open-Meteo</td><td class="z">—</td></tr>
-  <tr><td>Fundmeldungen</td><td>GBIF</td><td class="z">—</td></tr>
-</table>
-
-<details>
-  <summary>Die einzelnen Kenngrößen</summary>
-  <table>
-    <tr><th>Größe</th><th>Berechnung</th></tr>
-    <tr><td>Bodenfeuchte</td><td>Mittel der letzten 5 Tage,
-        Schicht 0–7 cm</td></tr>
-    <tr><td>Bodentemperatur</td><td>Mittel der letzten 5 Tage</td></tr>
-    <tr><td>Niederschlag Tag 4–14</td>
-        <td>Summe des Regens, der 4 bis 14 Tage vorher fiel</td></tr>
-    <tr><td>Regentage</td><td>Tage mit mindestens 1 mm, von 14</td></tr>
-    <tr><td>Wasserbilanz</td><td>Regen minus Verdunstung, über 14 und
-        60 Tage. <b>Der stärkste Einzelwert.</b></td></tr>
-    <tr><td>Frosttage</td><td>Tage unter 0 °C in den letzten 14</td></tr>
-  </table>
-  <p class="klein">Dazu Abzüge: ausgetrockneter Boden, über 14 Tage
-  ohne Regen, Dürre über 60 Tage, Frost. Der Frostabzug ist an
-  November-Funden gemessen und wirkt beim Schwefelporling nicht &ndash;
-  als Holzbewohner steht er geschützter.</p>
-</details>
-
-<details>
-  <summary>Alle Punktbänder der gewählten Art</summary>
-  <div id="baender"></div>
-</details>
-
-<h3>Wie viel das Wetter wirklich sagt</h3>
-
-<p>Die Wetterschwellen wurden gegen zufällige Tage gemessen. Menschen
-gehen aber nicht zufällig sammeln &ndash; sie gehen <b>nach Regen</b>,
-weil sie wissen, dass dann Pilze kommen. Ein Teil des scheinbaren
-Zusammenhangs war also nur die Frage, wann jemand im Wald war.</p>
-
-<p>Nachgerechnet gegen die Tage, an denen tatsächlich Pilze gemeldet
-wurden:</p>
-
-<table>
-  <tr><th>Sommersteinpilz, viel Regen</th><th class="z"></th></tr>
-  <tr><td>gegen zufällige Tage</td><td class="z stark">3,05</td></tr>
-  <tr><td>gegen Meldetage</td><td class="z">1,22</td></tr>
-</table>
-
-<p><b>Zwei Drittel des Effekts waren Sammlerverhalten.</b> Dasselbe
-Muster bei allen Arten: Steinpilz 1,99 auf 1,22, Pfifferling 2,78 auf
-1,62, Netzstieliger Hexenröhrling 2,48 auf 0,99.</p>
-
-<p>Umgekehrt waren die Werte bei Trockenheit zu niedrig &ndash; beim
-Steinpilz 0,12 statt 0,41. Auch das erklärt sich: An trockenen Tagen
-geht kaum jemand los, also fehlen die Funde, die es trotzdem gäbe.</p>
-
-<div class="kasten warn">
-  <h3>Was daraus folgt</h3>
-  <p>Von 660 gemessenen Wetterschwellen sind nach dieser Korrektur nur
-  <b>233 statistisch belastbar</b> &ndash; die übrigen lassen sich
-  nicht sicher von Zufall unterscheiden.</p>
-  <p>Die Karte dämpft den Wettereinfluss deshalb auf etwa
-  <b>60 Prozent</b> des ursprünglich gemessenen Werts. Der Unterschied
-  zwischen einem guten und einem schlechten Tag ist real, aber
-  kleiner als es zunächst aussah.</p>
-  <p class="klein">Am besten hielten Lufttemperatur und Bodenfeuchte
-  stand, am schlechtesten die Regenmaße &ndash; also ausgerechnet
-  das, worauf man vor dem Losfahren schaut.</p>
-</div>
-
-<h2>Was die Zahl bedeutet &ndash; und was nicht</h2>
-
-<p>Der Wert sagt: <b>Wie nah ist diese Art hier an ihren besten
-Bedingungen?</b> 100 hieße, dass Wetter, Jahreszeit, Bäume und Boden
-alle optimal sind.</p>
-
-<p>Er sagt <b>nicht</b>, wie viele Pilze dort stehen. Und zwischen
-zwei Arten sind die Zahlen <b>nicht direkt vergleichbar</b>.</p>
-
-<div class="kasten warn">
-  <h3>Ein Beispiel</h3>
-  <p>Im August bei Trockenheit steht der Schwefelporling oft höher
-  als der Steinpilz. Das liegt nicht daran, dass mehr davon wächst,
-  sondern daran, dass er als Holzbewohner kaum am Bodenwasser hängt
-  — gemessen an 1.141 Funden. Sein Wert fällt bei Dürre also weniger
-  ab.</p>
-  <p class="klein">Als grober Hinweis, wonach sich das Suchen heute
-  eher lohnt, taugt der Vergleich trotzdem. Als Aussage über
-  Mengenverhältnisse nicht.</p>
-</div>
-
-<p>Im Popup steht bei niedrigen Werten, <b>was bremst</b> — Wetter,
-Jahreszeit, Bestand oder Boden. Eine 3 im August wegen Trockenheit
-bedeutet etwas anderes als eine 3 im Januar wegen der Jahreszeit.</p>
-
-<h2>Was die Karte nicht kann</h2>
-
-<div class="kasten warn">
-  <p><b>Sie erkennt keine Pilze und sagt nichts über Essbarkeit.</b>
-  Jeden Fund selbst sicher bestimmen &ndash; im Zweifel über eine
-  Pilzberatung.</p>
-</div>
-
-<ul>
-  <li><b>Nur Wald.</b> Die Karte kennt nur Flächen, die in
-  OpenStreetMap als Wald eingetragen sind. Wiesen, Parks und
-  Streuobstwiesen fehlen &ndash; obwohl gerade dort Parasol und
-  Schwefelporling stehen.</li>
-
-  <li><b>2 km sind grob.</b> Die Karte beantwortet „wohin fahre ich",
-  nicht „wo genau im Wald". Innerhalb einer Zelle gilt die Zahl für
-  das Waldstück dort — nicht für Äcker oder Ortschaften, die
-  zufällig mit im Quadrat liegen.</li>
-
-  <li><b>Baumarten von 2017/2018.</b> Wo dort Fichte steht, kann heute
-  Kahlfläche sein.</li>
-
-  <li><b>Schutzgebiete fehlen in dieser Ansicht.</b> Wo gesammelt
-  werden darf, steht im Verzeichnis des jeweiligen Bundeslandes.</li>
-
-  <li><b>Nur für Norddeutschland geprüft.</b> Die Schwellen sind an
-  Flachlandfunden gemessen. Anderswo läge die Karte vermutlich
-  daneben.</li>
-</ul>
-
-<h2 id="ehrlich">Wie sicher ist das alles?</h2>
-
-<p>Die Zahlen unten sagen, worauf die einzelnen Teile beruhen.
-Je mehr Funde dahinterstehen, desto belastbarer.</p>
-
-<table>
-  <tr><th>Teil</th><th class="z">Grundlage</th></tr>
-  <tr><td>Wetterbedingungen<br>
-      <span class="klein">Feuchte, Temperatur, Regen</span></td>
-      <td class="z">3.834 Funde</td></tr>
-  <tr><td>Jahreszeiten je Art</td>
-      <td class="z">3.834 Funde</td></tr>
-  <tr><td>Boden<br>
-      <span class="klein">Säuregrad und Tongehalt</span></td>
-      <td class="z">428 Fundorte gegen<br>2.378 Meldeorte</td></tr>
-  <tr><td>Baumarten</td>
-      <td class="z">8.094 Meldeorte</td></tr>
-</table>
-
-<p class="klein">Ein Vorbehalt bleibt bei allem: Fundmeldungen aus
-dem Internet zeigen auch, wo Menschen unterwegs waren. Die
-Berechnung gleicht das aus, so gut es geht &ndash; ganz verschwindet
-es nicht.</p>
-
-<p class="klein">Bei Pfifferling und Sommersteinpilz gibt es in
-dieser Region noch zu wenige gemeldete Funde. Ihre Werte für Boden
-und Bäume sind deshalb vorläufig.</p>
-
-<div class="kasten warn">
-  <h3>Nicht jeder Wert ist gemessen</h3>
-  <p>Wetter und Jahreszeit sind bei <b>allen elf Arten</b> aus
-  Fundmeldungen gerechnet. Bei den <b>Bäumen</b> reichten die Zahlen
-  nur für vier Arten &ndash; Steinpilz, Marone, Parasol und
-  Schwefelporling. Beim <b>Boden</b> ebenfalls für vier; die
-  übrigen haben gar keinen Bodenfaktor mehr.</p>
-  <p class="klein">Wo nicht genug Funde vorlagen, stammen die Werte
-  aus der Pilzliteratur. Bei den gemessenen Arten haben sich
-  plausible Annahmen zehnmal als falsch erwiesen &ndash; die
-  ungeprüften also entsprechend vorsichtig nehmen.</p>
-</div>
-
-<p class="klein" style="margin-top:34px">Wetterdaten Open-Meteo &middot;
-Kartendaten OpenStreetMap-Mitwirkende (ODbL) &middot;
-Baumarten Thünen-Institut &middot; Boden ISRIC SoilGrids (CC BY 4.0)
-&middot; Fundmeldungen GBIF</p>
-
-</div>
-
-<script>
-const MONATE = ["J","F","M","A","M","J","J","A","S","O","N","D"];
-const FELDNAMEN = {
-  bf07: "Bodenfeuchte", bt07: "Bodentemperatur", temp: "Lufttemperatur",
-  regen_reife: "Regen Tag 4–14", regentage: "Regentage",
-  bilanz_14: "Wasserbilanz 14 T", bilanz_60: "Wasserbilanz 60 T",
-  trockenheit: "Abzug Trockenheit", lange_trocken: "Abzug lange trocken",
-  duerre_60: "Abzug Dürre", frost: "Abzug Frost"
-};
-const komma = (z, n = 2) =>
-  z === null || z === undefined ? "–" : z.toFixed(n).replace(".", ",");
-
-let D = null, art = null, zelle = null;
-
-function waehleZelle() {
-  // Die Zelle mit dem höchsten Wert für diese Art - ein Beispiel,
-  // bei dem man auch etwas sieht
-  const mit = D.zellen.filter(z => z.teile && z.teile[art]);
-  if (!mit.length) return null;
-  return mit.reduce((a, b) =>
-    (b.scores[art][0] ?? 0) > (a.scores[art][0] ?? 0) ? b : a);
-}
-
-function zeichne() {
-  zelle = waehleZelle();
-  const e = D.arten[art];
-
-  document.querySelectorAll("#artwahl button").forEach(b =>
-    b.classList.toggle("aktiv", b.dataset.art === art));
-
-  if (!zelle) {
-    document.getElementById("beispieltext").textContent =
-      "Für diese Art liegen gerade keine Daten vor.";
-    return;
-  }
-
-  const t = zelle.teile[art];
-  const end = zelle.scores[art][0];
-
-  document.getElementById("beispieltext").innerHTML =
-    `Beste Fläche für <b>${e.name}</b> heute:
-     <b>${zelle.titel}</b>${zelle.bestand ? " &ndash; " + zelle.bestand : ""}`;
-
-  document.getElementById("formel").innerHTML = `
-    <div class="kachel"><span class="zahl">${t.wetter}</span>
-      <span class="was">Wetter</span>
-      <div class="quelle">von 100</div></div>
-    <div class="mal">×</div>
-    <div class="kachel"><span class="zahl">${komma(t.saison)}</span>
-      <span class="was">Saison</span>
-      <div class="quelle">${MONATVOLL[new Date(D.stand).getMonth()]}</div></div>
-    <div class="mal">×</div>
-    <div class="kachel"><span class="zahl">${komma(t.bestand)}</span>
-      <span class="was">Bestand</span>
-      <div class="quelle">Bäume</div></div>
-    <div class="mal">×</div>
-    <div class="kachel"><span class="zahl">${komma(t.boden)}</span>
-      <span class="was">Boden</span>
-      <div class="quelle">pH, Ton</div></div>
-    <div class="mal">=</div>
-    <div class="kachel ergebnis"><span class="zahl">${end}</span>
-      <span class="was">Score</span></div>`;
-
-  // Punktbalken
-  const eintraege = Object.entries(t.einzeln).filter(([, p]) => p !== 0);
-  const groesste = Math.max(...eintraege.map(([, p]) => Math.abs(p)), 1);
-  document.getElementById("punkte").innerHTML = eintraege
-    .sort((a, b) => b[1] - a[1])
-    .map(([f, p]) => `
-      <div class="zeile">
-        <span class="name">${FELDNAMEN[f] || f}</span>
-        <span class="spur"><span class="fuell${p < 0 ? " minus" : ""}"
-          style="width:${Math.abs(p) / groesste * 100}%"></span></span>
-        <span class="zahl">${p > 0 ? "+" : ""}${p}</span>
-      </div>`).join("") + `
-      <div class="zeile" style="margin-top:8px;
-           border-top:1px solid var(--linie);padding-top:6px">
-        <span class="name"><b>Summe</b></span>
-        <span class="spur"></span>
-        <span class="zahl"><b>${t.wetter}</b></span></div>`;
-
-  document.getElementById("punkteinfo").textContent =
-    "Jede Größe bringt Punkte, wenn sie im gemessenen Bereich liegt. " +
-    "Die Höchstpunktzahl ist verschieden — was stärker mit Funden " +
-    "zusammenhängt, zählt mehr.";
-
-  // Saisonkurve
-  const kurve = e.saison_jahr || [];
-  const jetzt = new Date(D.stand).getMonth();
-  document.getElementById("saisonkurve").innerHTML = kurve.map((w, i) => `
-    <div class="monat">
-      <div class="stab" style="height:${Math.max(3, w * 100)}%;
-        background:${i === jetzt ? "var(--akzent)"
-          : w >= 0.6 ? "#3f6b44" : "var(--linie)"}"></div>
-      <div class="mn">${MONATE[i]}</div>
-    </div>`).join("");
-
-  const best = kurve.indexOf(Math.max(...kurve));
-  document.getElementById("saisontext").innerHTML =
-    `Bester Monat für ${e.name}: <b>${MONATVOLL[best]}</b>.
-     Heute steht die Saison bei <b>${komma(e.saison)}</b>.
-     Die Kurve stammt aus Fundmeldungen &ndash; geteilt durch alle
-     Pilzmeldungen desselben Monats, damit nicht mitgezählt wird,
-     dass im Oktober mehr Menschen im Wald sind.`;
-
-  // Bänder
-  document.getElementById("baender").innerHTML =
-    Object.entries(e.baender || {}).map(([feld, baender]) => {
-      const zeilen = baender.map(([von, bis, p]) => {
-        const skala = feld === "bf07" ? 100 : 1;
-        const eh = feld === "bf07" ? " %" : feld === "bt07"
-          || feld === "temp" ? " °C" : feld === "regentage" ? "" : " mm";
-        const b = von === null ? `bis ${komma(bis * skala, 0)}${eh}`
-          : bis === null ? `ab ${komma(von * skala, 0)}${eh}`
-          : `${komma(von * skala, 0)}–${komma(bis * skala, 0)}${eh}`;
-        return `<tr><td>${b}</td><td class="z">${p}</td></tr>`;
-      }).join("");
-      return `<h3>${FELDNAMEN[feld] || feld}</h3><table>${zeilen}</table>`;
-    }).join("") || "<p class='klein'>Keine Angaben.</p>";
-}
-
-const MONATVOLL = ["Januar","Februar","März","April","Mai","Juni","Juli",
-                   "August","September","Oktober","November","Dezember"];
-
-fetch("daten.json").then(r => r.json()).then(d => {
-  D = d;
-  art = Object.keys(D.arten)[0];
-  document.getElementById("artwahl").innerHTML = Object.entries(D.arten)
-    .map(([a, e]) => `<button data-art="${a}">${e.name}</button>`).join("");
-  document.querySelectorAll("#artwahl button").forEach(b =>
-    b.onclick = () => { art = b.dataset.art; zeichne(); });
-  zeichne();
-}).catch(e => {
-  document.getElementById("beispieltext").textContent =
-    "Daten konnten nicht geladen werden.";
-});
 </script>
+
 </body>
 </html>
