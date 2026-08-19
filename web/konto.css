@@ -1,128 +1,1467 @@
-/* Anmeldung, Tagebuch, Routenaufzeichnung */
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1,
+      viewport-fit=cover">
+<meta name="description" content="Karte der Fundwahrscheinlichkeit für
+      Speisepilze in der Region Braunschweig, Wolfsburg und südliche
+      Lüneburger Heide.">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="konto.css">
+<meta name="theme-color" content="#15181c">
+<title>Pilzkarte</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+  :root {
+    --grund: #15181c; --flaeche: #1e2228; --text: #e6e6e6;
+    --leise: #9aa0a6; --linie: #2f353d; --akzent: #5fb763;
+    --warn: #e8a33d;
+  }
+  /* Helle Ansicht - dieselben Bausteine, andere Werte. */
+  body.hell {
+    --grund: #f4f2ee; --flaeche: #ffffff; --text: #1c1f22;
+    --leise: #5f6469; --linie: #d9d5cd; --akzent: #2f7a35;
+    --warn: #b4761e;
+  }
+  body.hell .legende { background: rgba(255,255,255,.93); }
+  body.hell .fuss { background: rgba(255,255,255,.85); }
+  body.hell .stand { background: rgba(255,255,255,.8); }
+  body.hell .maplibregl-popup-tip {
+    border-top-color: #ffffff !important;
+    border-bottom-color: #ffffff !important; }
 
-#kontoleiste { display: flex; gap: 6px; margin-top: 5px;
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body { font: 15px/1.45 system-ui, -apple-system, sans-serif;
+         background: var(--grund); color: var(--text);
+         display: flex; flex-direction: column;
+         -webkit-text-size-adjust: 100%; }
+
+  header { background: var(--flaeche); border-bottom: 1px solid var(--linie);
+           padding: 8px 10px 6px; flex: 0 0 auto; }
+  .kopfzeile { display: flex; align-items: baseline; gap: 8px;
+               margin-bottom: 7px; }
+  h1 { font-size: 15px; font-weight: 600; margin: 0; }
+  /* Der Stand gehoert auf die Karte, nicht in die Kopfzeile -
+     dort ist der Platz knapp, und hier stoert er nicht. */
+  .stand { position: absolute; top: 44px; left: 10px; z-index: 2;
+           font-size: 10.5px; color: var(--leise);
+           background: rgba(21,24,28,.75); padding: 2px 6px;
+           border-radius: 4px; pointer-events: none; }
+
+  /* Konto oben rechts, nicht im Einstellungsmenue - man will
+     sehen, ob man angemeldet ist, ohne erst aufzuklappen. */
+  /* Konto als EIN Knopf. Alles Weitere steht im Menue dahinter -
+     sonst platzt die Kopfzeile auf dem Telefon. */
+  #kontoleiste { display: flex; gap: 4px; flex: 0 0 auto;
+                 margin-left: auto; }
+  #kontoleiste .tag { padding: 5px 11px; font-size: 12px;
+                      min-height: 30px; border-radius: 15px; }
+  #kontoleiste .tag.an { border-color: var(--akzent);
+                         color: var(--akzent); }
+  .veraltet { color: #e8a33d; font-weight: 600; }
+
+  .ansicht { display: flex; gap: 3px; margin-left: 10px; }
+  .um { border: 1px solid var(--linie); background: transparent;
+        color: var(--leise); padding: 4px 10px; cursor: pointer;
+        font-size: 12px; border-radius: 5px; min-height: 30px; }
+  .um.aktiv { background: var(--linie); color: var(--text); }
+  a.um { text-decoration: none; display: flex; align-items: center;
+         justify-content: center; min-width: 32px; }
+
+  #liste { flex: 1 1 auto; overflow-y: auto; padding: 12px 12px 60px;
+           -webkit-overflow-scrolling: touch; }
+  #liste h2 { font-size: 15px; margin: 20px 0 6px;
+              border-bottom: 1px solid var(--linie); padding-bottom: 4px;
+              display: flex; align-items: baseline; }
+  #liste h2:first-child { margin-top: 0; }
+  #liste h2 .saison { margin-left: auto; font-weight: 400; font-size: 12px;
+                      color: var(--leise); }
+  #liste table { width: 100%; border-collapse: collapse; }
+  #liste td { padding: 7px 5px; border-bottom: 1px solid var(--linie);
+              vertical-align: top; }
+  #liste td.rang { width: 24px; color: var(--leise);
+                   font-variant-numeric: tabular-nums; }
+  #liste td.wert { text-align: right; width: 46px; font-size: 18px;
+                   font-weight: 700; font-variant-numeric: tabular-nums; }
+  #liste td.hin { width: 62px; text-align: right; }
+  #liste .klein { font-size: 11px; color: var(--leise); }
+  #liste button.hin { border: 1px solid var(--linie); background: transparent;
+                      color: var(--akzent); padding: 5px 9px;
+                      border-radius: 5px; cursor: pointer; font-size: 12px;
+                      min-height: 32px; white-space: nowrap; }
+  #liste .leer { color: var(--leise); font-size: 13px; padding: 8px 0; }
+  #liste details { margin: 0 0 4px; }
+  #liste summary { cursor: pointer; color: var(--akzent); font-size: 13px;
+                   padding: 8px 5px; list-style: none; }
+  #liste summary::-webkit-details-marker { display: none; }
+  #liste summary::before { content: "▸ "; }
+  #liste details[open] summary::before { content: "▾ "; }
+
+  .leiste { display: flex; gap: 6px; overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--linie) transparent;
+            padding-bottom: 3px; }
+  @media (max-width: 700px) { .leiste { scrollbar-width: none; } }
+  /* Am Rechner eine schmale Bildlaufleiste zeigen - sonst sieht
+     man nicht, dass es weitergeht, und das Mausrad scrollt
+     senkrecht statt waagerecht. Auf dem Telefon wischt man
+     ohnehin. */
+  .leiste::-webkit-scrollbar { height: 6px; }
+  .leiste::-webkit-scrollbar-thumb { background: var(--linie);
+                                     border-radius: 3px; }
+  .leiste::-webkit-scrollbar-track { background: transparent; }
+  @media (max-width: 700px) {
+    .leiste::-webkit-scrollbar { display: none; }
+  }
+  .art { flex: 0 0 auto; border: 1px solid var(--linie);
+         background: var(--grund); color: var(--text);
+         padding: 7px 12px; border-radius: 20px; cursor: pointer;
+         font-size: 13px; min-height: 38px; white-space: nowrap;
+         display: flex; align-items: baseline; gap: 5px; }
+  .art .wert { font-size: 10px; opacity: .6; }
+  .art .wert b { font-size: 14px; opacity: 1; }
+  .art.aktiv { background: var(--akzent); border-color: var(--akzent);
+               color: #10130f; }
+  .art.aktiv .wert { opacity: .75; }
+
+  .regler { display: flex; align-items: center; gap: 10px;
+            margin-top: 8px; }
+  .regler input[type=range] { flex: 1; min-width: 0; height: 26px;
+                              accent-color: var(--akzent);
+                              cursor: pointer; }
+  /* Pfeile nur am Rechner - auf dem Telefon ist der Regler mit dem
+     Finger schneller und der Platz knapp. */
+  .pfeilknopf { flex: 0 0 auto; border: 1px solid var(--linie);
+                background: transparent; color: var(--text);
+                width: 30px; height: 30px; border-radius: 6px;
+                cursor: pointer; font-size: 11px; line-height: 1;
+                padding: 0; }
+  .pfeilknopf:hover { border-color: var(--akzent);
+                      color: var(--akzent); }
+  .pfeilknopf:disabled { opacity: .3; cursor: default;
+                         border-color: var(--linie); color: var(--text); }
+  @media (max-width: 700px) { .pfeilknopf { display: none; } }
+
+  .regler #tagname { flex: 0 0 auto; font-size: 13px; font-weight: 600;
+                     color: var(--akzent); min-width: 74px;
+                     text-align: right; }
+  .regler .marke { flex: 0 0 62px; font-size: 11px;
+                   color: var(--leise); }
+  .regler #deckwert { flex: 0 0 auto; font-size: 12px;
+                      color: var(--leise); min-width: 74px;
+                      text-align: right; }
+
+  /* Alle Einstellungszeilen gleich aufgebaut: Ueberbegriff links in
+     fester Breite, danach die Knoepfe - so beginnen sie in einer
+     Spalte. */
+  .zeile { display: flex; align-items: center; gap: 10px;
+           margin-top: 6px; }
+  .zeile > .marke { flex: 0 0 62px; font-size: 11px;
+                    color: var(--leise); }
+  .zeile .tagleiste { margin-top: 0; flex: 1; min-width: 0; }
+
+  .mehr { margin-top: 7px; background: transparent; border: 0;
+          color: var(--leise); font-size: 12px; cursor: pointer;
+          padding: 5px 0; display: flex; align-items: center;
+          gap: 6px; min-height: 32px; }
+  .mehr .pfeil { display: inline-block; transition: transform .18s; }
+  .mehr.offen .pfeil { transform: rotate(180deg); }
+  .mehr.offen { color: var(--akzent); }
+  #einstellungen[hidden] { display: none; }
+  #einstellungen { padding-bottom: 2px; }
+
+  .tagleiste { display: flex; gap: 4px; margin-top: 6px;
                overflow-x: auto; scrollbar-width: none; }
-#kontoleiste::-webkit-scrollbar { display: none; }
+  .tagleiste::-webkit-scrollbar { display: none; }
+  .tag { flex: 0 0 auto; border: 1px solid var(--linie);
+         background: transparent; color: var(--leise);
+         padding: 5px 10px; border-radius: 14px; cursor: pointer;
+         font-size: 12px; min-height: 32px; white-space: nowrap; }
+  .tag.aktiv { border-color: var(--akzent); color: var(--akzent);
+               font-weight: 600; }
 
-.kasten-huelle { position: fixed; inset: 0; z-index: 40;
-                 background: rgba(0,0,0,.65); display: grid;
-                 place-items: center; padding: 18px; }
-.kasten-huelle[hidden] { display: none; }
+  #ebenen .tag.aktiv { border-style: solid; }
+  #darstellung { margin-top: 5px; }
+  #darstellung .tag { font-size: 11px; padding: 4px 9px;
+                      min-height: 28px; }
 
-.kasten-inhalt { background: var(--flaeche); border-radius: 10px;
-                 padding: 20px 22px; width: 100%; max-width: 420px;
-                 max-height: 84vh; overflow-y: auto;
-                 overscroll-behavior: contain; }
-.kasten-inhalt h3 { margin: 0 0 10px; font-size: 17px; }
-.kasten-inhalt h4 { margin: 18px 0 6px; font-size: 12px;
-                    text-transform: uppercase; letter-spacing: .06em;
-                    color: var(--leise);
-                    border-top: 1px solid var(--linie);
-                    padding-top: 10px; }
-.kasten-inhalt .klein { font-size: 12.5px; color: var(--leise); }
+  #karte { flex: 1 1 auto; min-height: 0; }
+  #karte[hidden], #liste[hidden] { display: none; }
 
-/* MINDESTENS 16 px. Darunter zoomt iOS beim Antippen in die Seite
-   hinein und man sieht die Kopfzeile nicht mehr vollstaendig. */
-.kasten-inhalt input, .kasten-inhalt textarea {
-  width: 100%; padding: 11px 12px; margin: 8px 0;
-  background: var(--grund); color: var(--text);
-  border: 1px solid var(--linie); border-radius: 6px;
-  font: inherit; font-size: 16px; }
+  .maplibregl-popup-content {
+    background: var(--flaeche); color: var(--text);
+    border-radius: 8px; padding: 12px 14px;
+    max-width: 300px; font-size: 12.5px; }
+  .pop { max-height: 52vh; overflow-y: auto;
+         overscroll-behavior: contain;
+         /* Platz fuer die Bildlaufleiste, sonst verdeckt sie rechts
+            die Zahlen */
+         padding-right: 10px;
+         scrollbar-width: thin;
+         scrollbar-color: var(--linie) transparent; }
+  .pop::-webkit-scrollbar { width: 7px; }
+  .pop::-webkit-scrollbar-thumb { background: var(--linie);
+                                  border-radius: 4px; }
+  .pop::-webkit-scrollbar-track { background: transparent; }
+  .maplibregl-popup-tip { border-top-color: var(--flaeche) !important;
+                          border-bottom-color: var(--flaeche) !important; }
+  .maplibregl-popup-close-button { color: var(--leise); font-size: 20px;
+                                   padding: 2px 8px; }
 
-.kasten-inhalt button.voll {
-  width: 100%; padding: 12px; margin-top: 8px;
-  background: var(--akzent); color: #10130f; border: 0;
-  border-radius: 6px; font-size: 15px; font-weight: 600;
-  cursor: pointer; min-height: 46px; }
-.kasten-inhalt button.voll.leer {
-  background: transparent; color: var(--leise);
-  border: 1px solid var(--linie); }
+  .pop .titel { font-size: 14px; font-weight: 600; }
+  .pop .lage { font-size: 10.5px; color: var(--leise); margin-bottom: 8px; }
+  .pop .score { font-size: 13px; }
+  .pop .score b { font-size: 20px; color: var(--akzent); margin-left: 4px; }
+  .pop .score .max { font-size: 11px; color: var(--leise); }
+  .pop .trend { font-size: 12px; margin: 3px 0; }
+  .pop h4 { margin: 10px 0 3px; font-size: 9.5px; font-weight: 700;
+            letter-spacing: .08em; color: var(--leise);
+            border-top: 1px solid var(--linie); padding-top: 5px; }
+  .pop table { width: 100%; border-collapse: collapse; }
+  .pop td { padding: 1px 0; font-size: 12px; }
+  .pop td:last-child { text-align: right; white-space: nowrap;
+                       font-variant-numeric: tabular-nums;
+                       padding-left: 10px; padding-right: 2px; }
+  .pop tr.hier td { font-weight: 700; }
+  .knopfreihe { display: flex; gap: 6px; margin: 8px 0 4px; }
+  .knopfreihe .navi { margin-top: 0; flex: 1; text-align: center;
+                      padding: 9px 8px; font-size: 12.5px; }
+  /* Grundfarbe dunkel - das ist die Navigation. Der Fundknopf
+     bekommt darunter Gruen. */
+  .navi:not(.eintrag) { background: #10130f; color: var(--text);
+                     border: 1px solid var(--linie); margin-top: 6px; }
+  .navi:not(.eintrag):hover { border-color: var(--leise); }
+  .navi { display: block; margin-top: 12px; padding: 10px;
+          background: var(--grund); color: var(--text);
+          border: 1px solid var(--linie); text-align: center;
+          border-radius: 6px; text-decoration: none; font-weight: 600;
+          font-size: 13px; }
+  /* Fund eintragen ist die haeufigere Handlung und deshalb
+     hervorgehoben. Muss nach .navi stehen, sonst gewinnt dessen
+     Hintergrund. */
+  .navi.eintrag { background: var(--akzent); color: #10130f;
+                  border-color: var(--akzent); cursor: pointer; }
 
-.zahlen { display: flex; gap: 14px; flex-wrap: wrap;
-          margin: 12px 0 4px; font-size: 12px; color: var(--leise); }
-.zahlen b { font-size: 20px; color: var(--text); display: block;
-            line-height: 1.2; }
+  .fuss { position: absolute; bottom: 0; left: 0; right: 0;
+          background: rgba(24,28,33,.82); color: var(--leise);
+          font-size: 10.5px; padding: 4px 10px; text-align: center;
+          pointer-events: none; }
+  .fuss a { color: var(--leise); pointer-events: auto; }
 
-.eintrag { padding: 9px 0; border-bottom: 1px solid var(--linie); }
-.eintrag:last-child { border-bottom: 0; }
+  .legende { position: absolute; bottom: 30px; left: 10px;
+             background: rgba(24,28,33,.93); padding: 8px 10px;
+             border-radius: 8px; font-size: 11px; line-height: 1.5;
+             pointer-events: none; }
+  .legende .fundlegende { margin-top: 5px; padding-top: 5px;
+                          border-top: 1px solid var(--linie); }
+  .legende i { display: inline-block; width: 12px; height: 12px;
+               border-radius: 2px; margin-right: 5px;
+               vertical-align: -2px; }
 
-#aufnahme.aktiv { background: #c0392b; border-color: #c0392b;
-                  color: #fff; font-weight: 600; }
+  .meldung { position: fixed; left: 50%; bottom: 24px;
+             transform: translateX(-50%); z-index: 30;
+             background: rgba(30,34,40,.96); color: var(--text);
+             border: 1px solid var(--linie); border-radius: 8px;
+             padding: 10px 14px; font-size: 12.5px; max-width: 88vw;
+             box-shadow: 0 2px 12px rgba(0,0,0,.5); }
+  .meldung[hidden] { display: none; }
 
-/* Fund im Tagebuch auf der Karte zeigen */
-.eintrag .kopfzeile { display: flex; align-items: baseline; gap: 8px; }
-.eintrag .kopfzeile b { flex: 1; }
-button.zeigen { flex: 0 0 auto; border: 1px solid var(--linie);
-                background: transparent; color: var(--akzent);
-                padding: 4px 9px; border-radius: 5px; cursor: pointer;
-                font-size: 11.5px; white-space: nowrap; }
-button.zeigen:hover { border-color: var(--akzent); }
+  .laedt { position: absolute; inset: 0; display: grid; place-items: center;
+           background: var(--grund); font-size: 14px; color: var(--leise);
+           z-index: 5; }
 
-.kasten-inhalt select { width: 100%; padding: 11px 12px; margin: 8px 0;
-                        background: var(--grund); color: var(--text);
-                        border: 1px solid var(--linie);
-                        border-radius: 6px; font: inherit;
-                        font-size: 16px; }
+  @media (max-width: 700px) {
+    h1 { display: none; }
+    .kopfzeile { margin-bottom: 5px; }
+    .legende { bottom: 26px; left: 8px; font-size: 10px;
+               padding: 5px 7px; line-height: 1.4; }
+    .fuss { font-size: 9.5px; padding: 3px 8px; }
+    .pop { max-height: 46vh; }
+  }
+</style>
+</head>
+<body>
 
-/* Routenknopf auf der Karte, unter dem Standortknopf */
-#routenknopf { display: flex; align-items: center;
-               justify-content: center; color: #333; }
-#routenknopf.laeuft { background: rgba(192,57,43,.12); }
-#routenknopf[hidden] { display: none; }
+<header>
+  <div class="kopfzeile">
+    <h1>Pilzkarte</h1>
+    <div class="ansicht">
+      <button class="um aktiv" data-ansicht="karte">Karte</button>
+      <button class="um" data-ansicht="liste">Beste Gebiete</button>
+      <a class="um" href="info.html">?</a>
+    </div>
+    <span id="kontoleiste" hidden><span id="kontostand"></span></span>
+  </div>
+  <div class="leiste" id="arten"></div>
+  <div class="regler">
+    <span class="marke">Ausblick</span>
+    <button class="pfeilknopf" id="tagzurueck"
+            title="ein Tag zurueck">&#9664;</button>
+    <input type="range" id="tagregler" min="0" max="6" value="0" step="1">
+    <button class="pfeilknopf" id="tagvor"
+            title="ein Tag vor">&#9654;</button>
+    <span id="tagname">Heute</span>
+  </div>
 
-/* Laufende Aufzeichnung: Zahlen am unteren Kartenrand */
-.routenstand { position: absolute; bottom: 46px; right: 10px;
-               z-index: 3; background: rgba(192,57,43,.92);
-               color: #fff; font-size: 11.5px; font-weight: 600;
-               padding: 5px 10px; border-radius: 14px;
-               pointer-events: none;
-               font-variant-numeric: tabular-nums; }
-.routenstand[hidden] { display: none; }
+  <button class="mehr" id="mehrknopf">
+    <span class="pfeil">&#9662;</span> Einstellungen
+  </button>
 
-@media (max-width: 700px) {
-  .routenstand { bottom: 40px; right: 8px; font-size: 11px; }
+  <div id="einstellungen" hidden>
+    <div class="regler">
+      <span class="marke">Deckkraft</span>
+      <input type="range" id="deckregler" min="15" max="100" value="88"
+             step="5">
+      <span id="deckwert">88 %</span>
+    </div>
+
+    <div class="zeile">
+      <span class="marke">Ansicht</span>
+      <div class="tagleiste" id="darstellung">
+        <button class="tag" data-stil="weich">weich</button>
+        <button class="tag aktiv" data-stil="hart">Raster</button>
+        <button class="tag" data-stil="aus">nur Karte</button>
+        <button class="tag" data-schalter="funde">&#9679; Funde</button>
+        <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
+        <button class="tag" data-ansicht-hell
+                onclick="if(typeof ansichtUmschalten==='function')
+                         ansichtUmschalten()">hell</button>
+      </div>
+    </div>
+
+    <div class="zeile" id="baumzeile" hidden>
+      <span class="marke">Wald</span>
+      <div class="tagleiste" id="baumleiste"></div>
+    </div>
+
+    <div class="zeile" id="gelaendezeile" hidden>
+      <span class="marke">Gel&auml;nde</span>
+      <div class="tagleiste" id="ebenen"></div>
+    </div>
+
+  </div>
+
+</header>
+
+<div id="karte">
+  <div class="stand" id="stand"></div>
+</div>
+<div id="liste" hidden></div>
+<div class="laedt" id="laedt">Lade Daten …</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="konto_konfig.js" onerror="window.OHNE_KONTO=true"></script>
+<script>
+// ---- Farbskala, gleiche Werte wie in farben.py (dunkel) -------------
+const SKALA = [
+  [0.00, [150, 40, 70]], [0.25, [225, 70, 55]], [0.50, [250, 155, 40]],
+  [0.65, [255, 225, 90]], [0.85, [130, 220, 70]], [1.00, [45, 175, 75]]
+];
+
+function farbe(wert) {
+  const p = Math.max(0, Math.min(100, wert)) / 100;
+  for (let i = 0; i < SKALA.length - 1; i++) {
+    const [p0, c0] = SKALA[i], [p1, c1] = SKALA[i + 1];
+    if (p >= p0 && p <= p1) {
+      const t = (p - p0) / (p1 - p0);
+      const m = k => Math.round(c0[k] + (c1[k] - c0[k]) * t);
+      return `rgb(${m(0)},${m(1)},${m(2)})`;
+    }
+  }
+  return "rgb(45,175,75)";
 }
 
-/* Der Benutzername darf die Kopfzeile nicht sprengen */
-#kontoleiste .tag { max-width: 40vw; overflow: hidden;
-                    text-overflow: ellipsis; white-space: nowrap; }
-@media (max-width: 700px) {
-  #kontoleiste .tag { max-width: 32vw; }
+const komma = (z, n = 1) =>
+  z === null || z === undefined ? "–" : z.toFixed(n).replace(".", ",");
+
+let D = null, art = null, tag = 0, karte = null;
+let offenesPopup = null;
+
+const WOCHENTAGE = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+
+function tagname(i) {
+  const t = D.tage[i];
+  if (!t) return "";
+  if (t.versatz === 0) return "Heute";
+  if (t.versatz === 1) return "Morgen";
+  const d = new Date(t.datum);
+  return `${WOCHENTAGE[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`;
 }
 
-/* Muelleimer im Tagebuch - zurueckhaltend, damit man ihn nicht
-   aus Versehen trifft. Rot erst beim Draufzeigen. */
-button.muell { flex: 0 0 auto; border: 1px solid transparent;
-               background: transparent; color: var(--leise);
-               padding: 4px 6px; border-radius: 5px; cursor: pointer;
-               display: flex; align-items: center; opacity: .55; }
-button.muell:hover { color: #c0392b; border-color: #c0392b;
-                     opacity: 1; }
+function zeigePopup(ort, inhalt) {
+  offenesPopup = new maplibregl.Popup({
+    maxWidth: "320px",
+    // Von selbst so ausrichten, dass es ins Bild passt - sonst haengt
+    // es bei einem Klick am unteren Rand halb ausserhalb
+    anchor: undefined,
+    offset: 8,
+    focusAfterOpen: false
+  }).setLngLat(ort).setHTML(inhalt).addTo(karte);
 
-/* Auf dem Telefon gibt es kein Draufzeigen - dort etwas
-   sichtbarer, aber weiterhin klein */
-@media (max-width: 700px) {
-  button.muell { opacity: .7; padding: 6px 7px; }
+  offenesPopup.on("close", () => { offenesPopup = null; });
+
+  // Immer oben beginnen. Mehrfach setzen: Direkt nach dem Einfuegen
+  // ist der Inhalt noch nicht ausgelegt, und ein einzelnes
+  // scrollTop = 0 bleibt dann ohne Wirkung.
+  const nachOben = () => {
+    const el = offenesPopup && offenesPopup.getElement();
+    if (!el) return;
+    // Alle drei Ebenen: der Rahmen kann ebenfalls scrollen, wenn
+    // der Inhalt hoeher ist als die maximale Hoehe
+    el.scrollTop = 0;
+    const rahmen = el.querySelector(".maplibregl-popup-content");
+    if (rahmen) rahmen.scrollTop = 0;
+    const inhalt = el.querySelector(".pop");
+    if (inhalt) inhalt.scrollTop = 0;
+  };
+  nachOben();
+  requestAnimationFrame(nachOben);
+  setTimeout(nachOben, 60);
+
+  // Die Karte so verschieben, dass das Fenster vollstaendig
+  // sichtbar wird
+  setTimeout(() => {
+    const kasten = offenesPopup && offenesPopup.getElement();
+    if (!kasten) return;
+    const r = kasten.getBoundingClientRect();
+    const c = karte.getContainer().getBoundingClientRect();
+    let dx = 0, dy = 0;
+    if (r.bottom > c.bottom - 10) dy = r.bottom - c.bottom + 20;
+    if (r.top < c.top + 10) dy = r.top - c.top - 20;
+    if (r.right > c.right - 10) dx = r.right - c.right + 20;
+    if (r.left < c.left + 10) dx = r.left - c.left - 20;
+    if (dx || dy) karte.panBy([dx, dy], { duration: 260 });
+  }, 60);
 }
 
-/* Welche Route gerade zu sehen ist, mit Umschalten und Ausblenden */
-.routenleiste { position: absolute; bottom: 46px; left: 50%;
-                transform: translateX(-50%); z-index: 3;
-                display: flex; align-items: center; gap: 8px;
-                background: rgba(21,24,28,.92); color: var(--text);
-                padding: 5px 6px 5px 12px; border-radius: 16px;
-                font-size: 12px; border: 1px solid var(--linie);
-                max-width: 90vw; }
-.routenleiste span { white-space: nowrap; overflow: hidden;
-                     text-overflow: ellipsis; }
-.routenleiste button { background: transparent; color: var(--akzent);
-                       border: 1px solid var(--linie);
-                       border-radius: 11px; padding: 3px 9px;
-                       font-size: 11px; cursor: pointer;
-                       white-space: nowrap; }
-.routenleiste button:hover { border-color: var(--akzent); }
-body.hell .routenleiste { background: rgba(255,255,255,.94); }
-
-@media (max-width: 700px) {
-  .routenleiste { bottom: 40px; font-size: 11px; }
+function melde(text, dauer = 6000) {
+  let el = document.getElementById("meldung");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "meldung";
+    el.className = "meldung";
+    document.body.appendChild(el);
+  }
+  el.textContent = text;
+  el.hidden = false;
+  clearTimeout(el._zeit);
+  el._zeit = setTimeout(() => { el.hidden = true; }, dauer);
 }
+
+// Standort geben Browser nur ueber https heraus - sonst passiert beim
+// Antippen schlicht nichts, ohne jede Meldung.
+const sicher = location.protocol === "https:" ||
+               location.hostname === "localhost" ||
+               location.hostname === "127.0.0.1";
+
+// ---- Daten in GeoJSON-Rechtecke umwandeln ---------------------------
+const LEERBILD = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEA" +
+  "AAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+
+// Die vorgerechneten Bilder der weichen Darstellung, aus karten.json
+let bilder = null;
+
+function zeigeWeichbild() {
+  if (!bilder || !karte.getSource("weichbild")) return;
+
+  const datei = (bilder.bilder[art] || {})[String(tag)];
+  const g = bilder.grenzen;
+  if (!datei || !g) return;
+
+  karte.getSource("weichbild").updateImage({
+    url: datei,
+    coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
+                  [g[1][1], g[0][0]], [g[0][1], g[0][0]]]
+  });
+}
+
+// Kacheln am Gitter ausrichten, nicht am Punkt.
+//
+// Jede Zelle gehoert zu einem Feld des Waldrasters. Wird die Kachel
+// um den Punkt herum gezeichnet, sitzt sie schief im Feld und ragt in
+// die Nachbarzelle - die Punkte liegen naemlich nicht exakt in der
+// Feldmitte. Am Feld ausgerichtet fuegen sie sich lueckenlos.
+function feldgrenzen(z) {
+  const g = D.gitter;
+  if (!g) {
+    // Ohne Gitterangabe: um den Punkt herum, halber Abstand
+    const mitteLat = (D.gebiet.sued + D.gebiet.nord) / 2;
+    const dLat = D.raster_km / 111 / 2;
+    const dLon = D.raster_km /
+                 (111 * Math.cos(mitteLat * Math.PI / 180)) / 2;
+    return [z.lat - dLat, z.lon - dLon, z.lat + dLat, z.lon + dLon];
+  }
+
+  const zeile = Math.floor((z.lat - g.sued) / g.schritt_lat);
+  const spalte = Math.floor((z.lon - g.west) / g.schritt_lon);
+
+  return [
+    g.sued + zeile * g.schritt_lat,
+    g.west + spalte * g.schritt_lon,
+    g.sued + (zeile + 1) * g.schritt_lat,
+    g.west + (spalte + 1) * g.schritt_lon
+  ];
+}
+
+// Je Gitterfeld genau eine Kachel.
+//
+// In den Daten koennen zwei Zellen im selben Feld liegen - etwa
+// weil das Raster in mehreren Durchgaengen entstanden ist. Zeichnet
+// man beide, liegen zwei halbdurchsichtige Flaechen uebereinander
+// und das Feld erscheint doppelt so kraeftig.
+//
+// Deshalb wird hier zusammengefasst: Pro Feld bleibt die Zelle, die
+// der Feldmitte am naechsten liegt. Die uebrigen werden nicht
+// gezeichnet - anklickbar bleiben sie ueber die naechstgelegene.
+let _felder = null;
+
+function feldIndex(z) {
+  const g = D.gitter;
+  if (!g) return null;
+  return Math.floor((z.lat - g.sued) / g.schritt_lat) + ":" +
+         Math.floor((z.lon - g.west) / g.schritt_lon);
+}
+
+function eineProFeld() {
+  if (_felder) return _felder;
+
+  const gewaehlt = new Map();
+  D.zellen.forEach((z, i) => {
+    const feld = feldIndex(z);
+    if (feld === null) {
+      gewaehlt.set("x" + i, i);
+      return;
+    }
+    const vorher = gewaehlt.get(feld);
+    if (vorher === undefined) {
+      gewaehlt.set(feld, i);
+      return;
+    }
+    // Die Zelle naeher an der Feldmitte gewinnt
+    const abstand = k => {
+      const [s, w, n, o] = feldgrenzen(D.zellen[k]);
+      return Math.hypot(D.zellen[k].lat - (s + n) / 2,
+                        D.zellen[k].lon - (w + o) / 2);
+    };
+    if (abstand(i) < abstand(vorher)) gewaehlt.set(feld, i);
+  });
+
+  _felder = [...gewaehlt.values()];
+  const doppelt = D.zellen.length - _felder.length;
+  if (doppelt > 0) {
+    console.log(`${doppelt} Zellen liegen in einem bereits belegten ` +
+                `Feld und werden nicht gezeichnet.`);
+  }
+  return _felder;
+}
+
+function baueGeoJson() {
+  return {
+    type: "FeatureCollection",
+    features: eineProFeld().map(i => {
+      const z = D.zellen[i];
+      const [s, w, n, o] = feldgrenzen(z);
+      return {
+        type: "Feature",
+        id: i,
+        properties: { i: i, wert: z.scores[art][tag] ?? 0 },
+        geometry: {
+          type: "Polygon",
+          coordinates: [[[w, s], [o, s], [o, n], [w, n], [w, s]]]
+        }
+      };
+    })
+  };
+}
+
+function aktualisiere() {
+  if (typeof merkeEinstellungen === "function") merkeEinstellungen();
+  if (!karte.getSource("zellen")) return;
+  karte.getSource("zellen").setData(baueGeoJson());
+  zeigeWeichbild();
+  aktualisiereFunde();
+
+  // Arten nach Aussichten sortieren - was heute lohnt, steht links
+  const leiste = document.getElementById("arten");
+  const knoepfe = [...leiste.querySelectorAll(".art")];
+  const bewertet = knoepfe.map(b => {
+    const a = b.dataset.art;
+    const werte = D.zellen.map(z => z.scores[a][tag] ?? 0);
+    const schnitt = Math.round(
+      werte.reduce((s, w) => s + w, 0) / werte.length);
+    b.classList.toggle("aktiv", a === art);
+    b.querySelector(".wert").innerHTML = `<b>${schnitt}</b>/100`;
+    return { b, schnitt };
+  });
+  bewertet.sort((x, y) => y.schnitt - x.schnitt)
+    .forEach(({ b }) => leiste.appendChild(b));
+
+  if (window._zeigeGewaehlte) setTimeout(window._zeigeGewaehlte, 30);
+  const tn = document.getElementById("tagname");
+  if (tn) tn.textContent = tagname(tag);
+  const zurueck = document.getElementById("tagzurueck");
+  const vor = document.getElementById("tagvor");
+  if (zurueck) zurueck.disabled = tag <= 0;
+  if (vor) vor.disabled = tag >= D.tage.length - 1;
+
+  if (!document.getElementById("liste").hidden) baueListe();
+}
+
+// ---- Popup ----------------------------------------------------------
+function trendZeile(z) {
+  const liste = z.scores[art];
+  const jetzt = liste[0];
+  if (jetzt === null) return "";
+  const kuenftig = liste.slice(1).filter(w => w !== null);
+  if (!kuenftig.length) return "";
+
+  const best = Math.max(...kuenftig), tief = Math.min(...kuenftig);
+  if (best >= jetzt + 8) {
+    const i = liste.indexOf(best);
+    const d = new Date(D.tage[i].datum);
+    return `<div class="trend"><span style="color:#2e9e4f">▲</span>
+            steigt auf <b>${best}</b> am ${tagname(i)}</div>`;
+  }
+  if (tief <= jetzt - 8)
+    return `<div class="trend"><span style="color:#c0392b">▼</span>
+            fällt auf ${tief}</div>`;
+  return `<div class="trend"><span style="color:#888">▶</span>
+          bleibt etwa gleich</div>`;
+}
+
+function tageText(n) {
+  if (n === 0) return "heute";
+  if (n === 1) return "gestern";
+  return `vor ${n} Tagen`;
+}
+
+function regenzeilen(z) {
+  // Wann hat es zuletzt geregnet? Zwei Angaben, die verschiedene
+  // Fragen beantworten: der letzte Regen ueberhaupt, und das letzte
+  // Ereignis von mindestens 15 mm - das ist der Ausloeser fuer
+  // einen Schub, Nieselregen dagegen nicht.
+  const a = z.regen_zuletzt, b = z.regen_ereignis;
+  if (!a && !b) return "";
+
+  let zeilen = "";
+  if (a) {
+    zeilen += `<tr><td>Letzter Regen</td><td><b>${komma(a.mm)} mm</b>
+      ${tageText(a.vor)}</td></tr>`;
+  }
+  // Nur zeigen, wenn es ein anderer Tag war - sonst steht dasselbe
+  // zweimal da
+  if (b && (!a || b.datum !== a.datum)) {
+    zeilen += `<tr><td>Letztes gr&ouml;&szlig;eres Ereignis</td>
+      <td>${komma(b.mm)} mm ${tageText(b.vor)}</td></tr>`;
+  }
+
+  return `<h4>Regen</h4><table>${zeilen}</table>`;
+}
+
+function bremszeile(z) {
+  // Warum ist der Wert so niedrig? Ohne diese Angabe lässt sich
+  // eine 3 nicht deuten - sie kann an der Jahreszeit liegen, am
+  // Wald oder schlicht am Wetter.
+  const t = (z.teile || {})[art];
+  if (!t || !t.bremse) return "";
+  return `<div class="bremse">Gebremst durch
+    <b>${t.bremse.was}</b> &middot; ${t.bremse.warum}</div>`;
+}
+
+function fundknopf(z, klickOrt) {
+  // Nur wenn angemeldet - sonst waere der Knopf nur eine
+  // Enttaeuschung
+  if (typeof benutzer === "undefined" || !benutzer) return "";
+  const lat = klickOrt ? klickOrt.lat : z.lat;
+  const lon = klickOrt ? klickOrt.lng : z.lon;
+  const wert = z.scores[art][tag] ?? 0;
+  return `<a class="navi eintrag" onclick='fundBeginnen(${lat},
+    ${lon}, ${JSON.stringify(z.id)}, ${wert})'>
+    &#43; Fund eintragen</a>`;
+}
+
+function popupInhalt(z, klickOrt) {
+  const wert = z.scores[art][tag] ?? 0;
+  const k = z.kenn;
+
+  const andere = Object.keys(D.arten)
+    .map(a => [a, z.scores[a][tag] ?? 0])
+    .sort((x, y) => y[1] - x[1])
+    .map(([a, w]) => `<tr${a === art ? ' class="hier"' : ""}>
+      <td>${D.arten[a].name}</td>
+      <td style="color:${farbe(w)};font-weight:600">${w}</td></tr>`).join("");
+
+  const lage = [tagname(tag)];
+  if (z.hoehe !== null) lage.push(z.hoehe + " m");
+  lage.push(z.id);
+
+  const boden = z.boden
+    ? `<div>Boden: pH ${komma(z.boden.ph)} · Sand ${z.boden.sand} %
+       · Ton ${z.boden.ton} %</div>` : "";
+
+  return `<div class="pop">
+    <div class="titel">${z.titel}</div>
+    <div class="lage">${lage.join(" · ")}</div>
+    <div class="score">${D.arten[art].name}
+      <b>${wert}</b><span class="max">/100</span></div>
+    ${tag === 0 ? trendZeile(z) : ""}
+    ${bremszeile(z)}
+    <div class="knopfreihe">
+      ${fundknopf(z, klickOrt)}
+      ${navigationsknopf(klickOrt ? klickOrt.lat : z.lat,
+                         klickOrt ? klickOrt.lng : z.lon)}
+    </div>
+
+    <h4>Standort</h4>
+    <div>${z.bestand || "Bestand unbekannt"}</div>
+    ${z.waldanteil !== null
+      ? `<div style="color:var(--leise);font-size:11px">Waldanteil
+         ${Math.round(z.waldanteil * 100)} %</div>` : ""}
+    ${boden}
+
+    <h4>Wichtigste Werte</h4>
+    <table>
+      <tr><td>Bodenfeuchte</td><td>${komma(k.bf07 * 100)} %</td></tr>
+      <tr><td>Bodentemperatur</td><td>${komma(k.bt07)} °C</td></tr>
+      <tr><td>Wasserbilanz 14 Tage</td><td>${komma(k.bilanz_14)} mm</td></tr>
+      <tr><td>Niederschlag Tag 4–14</td><td>${komma(k.regen_reife)} mm</td></tr>
+      <tr><td>Regentage von 14</td><td>${k.regentage}</td></tr>
+    </table>
+    ${regenzeilen(z)}
+
+    <h4>Andere Arten hier</h4>
+    <table>${andere}</table>
+    <div class="klein" style="margin-top:4px">Die Zahlen gelten je
+      Art. Ein Wert sagt, wie nah diese Art an ihren besten
+      Bedingungen ist &ndash; nicht, wie viele Pilze dort
+      stehen.</div>
+
+  </div>`;
+}
+
+// ---- Belegte Funde --------------------------------------------------
+// Gemeldete Funde derselben Jahreszeit. Nicht "hier steht jetzt ein
+// Pilz", sondern "hier wurde um diese Zeit schon einmal einer
+// gefunden" - ueber alle Jahre hinweg.
+function baueFunde() {
+  if (!D.funde || !D.funde[art]) return { type: "FeatureCollection", features: [] };
+
+  const fenster = D.fund_fenster || 30;
+  const stichtag = new Date(D.tage[tag].datum);
+  const jahrestag = Math.floor(
+    (stichtag - new Date(stichtag.getFullYear(), 0, 0)) / 86400000);
+
+  const passt = t => {
+    const d = Math.abs(t - jahrestag);
+    return Math.min(d, 365 - d) <= fenster;
+  };
+
+  let punkte = D.funde[art].filter(f => passt(f.t));
+
+  if (nurNah && meinOrt) {
+    punkte = punkte.filter(f => abstandKm(
+      meinOrt[1], meinOrt[0], f.lat, f.lon) <= 1.0);
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: punkte.map(f => ({
+      type: "Feature",
+      properties: { d: f.d },
+      geometry: { type: "Point", coordinates: [f.lon, f.lat] }
+    }))
+  };
+}
+
+// Navigation zum Punkt. Apple Karten auf iPhone und Mac, sonst
+// Google Maps - beide oeffnen die App, wenn sie installiert ist.
+function navigationsknopf(lat, lon) {
+  const apple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+  const ziel = apple
+    ? `https://maps.apple.com/?daddr=${lat},${lon}&dirflg=d`
+    : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+  return `<a class="navi" href="${ziel}" target="_blank" rel="noopener">
+    &#10148; Route</a>`;
+}
+
+function abstandKm(lat1, lon1, lat2, lon2) {
+  const R = 6371, r = Math.PI / 180;
+  const dLat = (lat2 - lat1) * r, dLon = (lon2 - lon1) * r;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * r) * Math.cos(lat2 * r) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+let nurNah = false, meinOrt = null;
+
+function aktualisiereFunde() {
+  if (karte.getSource("funde")) {
+    karte.getSource("funde").setData(baueFunde());
+  }
+  const b = document.querySelector("[data-schalter=nah]");
+  if (b) b.hidden = !meinOrt;
+}
+
+// ---- Reliefebenen ---------------------------------------------------
+// Zwei Bildebenen je Revier: die Feuchtekarte zeigt Senken, die
+// Schummerung das Gelaende wie bei tiefstehender Sonne. Beide liegen
+// in 1-m-Aufloesung und sind nur fuer die Reviere da, in die man
+// tatsaechlich faehrt.
+let relief = [];
+
+function reliefEinbinden() {
+  if (!relief.length) return;
+
+  relief.forEach(g => {
+    Object.entries(g.dateien).forEach(([art, datei]) => {
+      const kennung = `relief_${g.gebiet}_${art}`;
+      karte.addSource(kennung, {
+        type: "image",
+        url: datei,
+        coordinates: [
+          [g.grenzen[0][1], g.grenzen[1][0]],
+          [g.grenzen[1][1], g.grenzen[1][0]],
+          [g.grenzen[1][1], g.grenzen[0][0]],
+          [g.grenzen[0][1], g.grenzen[0][0]]
+        ]
+      });
+      karte.addLayer({
+        id: kennung, type: "raster", source: kennung,
+        paint: { "raster-opacity": art === "schummerung" ? 0.55 : 0.75 },
+        layout: { visibility: "none" }
+      // Vor die Beschriftung einhaengen, damit Ortsnamen sichtbar
+      // bleiben
+      }, karte.getLayer("beschriftung") ? "beschriftung" : undefined);
+    });
+  });
+
+  const leiste = document.getElementById("ebenen");
+  leiste.innerHTML = relief.map(g => `
+    <button class="tag" data-relief="${g.gebiet}">${g.titel}</button>`)
+    .join("");
+  document.getElementById("gelaendezeile").hidden = false;
+
+  leiste.querySelectorAll("[data-relief]").forEach(b => b.onclick = () => {
+    const an = !b.classList.contains("aktiv");
+    // Immer nur ein Revier - sonst ueberlagern sich die Bilder
+    leiste.querySelectorAll("[data-relief]").forEach(x =>
+      x.classList.remove("aktiv"));
+    relief.forEach(g => Object.keys(g.dateien).forEach(art =>
+      karte.setLayoutProperty(`relief_${g.gebiet}_${art}`,
+        "visibility", "none")));
+
+    if (an) {
+      b.classList.add("aktiv");
+      const g = relief.find(x => x.gebiet === b.dataset.relief);
+      Object.keys(g.dateien).forEach(art =>
+        karte.setLayoutProperty(`relief_${g.gebiet}_${art}`,
+          "visibility", "visible"));
+      karte.fitBounds([[g.grenzen[0][1], g.grenzen[0][0]],
+                       [g.grenzen[1][1], g.grenzen[1][0]]],
+                      { padding: 30 });
+    }
+  });
+}
+
+// ---- Bestenliste ----------------------------------------------------
+function pfeilFuer(z, a) {
+  const liste = z.scores[a];
+  const jetzt = liste[0];
+  if (jetzt === null) return "";
+  const kuenftig = liste.slice(1).filter(w => w !== null);
+  if (!kuenftig.length) return "";
+  if (Math.max(...kuenftig) >= jetzt + 8)
+    return '<span style="color:#2e9e4f" title="wird besser">▲</span>';
+  if (Math.min(...kuenftig) <= jetzt - 8)
+    return '<span style="color:#c0392b" title="wird schlechter">▼</span>';
+  return "";
+}
+
+function baueListe() {
+  // Arten nach ihrer besten Flaeche sortieren - was heute lohnt,
+  // steht oben. Sonst muesste man sich durch sieben Abschnitte
+  // scrollen, um zu sehen, wo ueberhaupt etwas geht.
+  const bloecke = Object.entries(D.arten).map(([a, e]) => {
+    const beste = D.zellen
+      .map(z => [z, z.scores[a][tag]])
+      .filter(([, w]) => w !== null && w > 0)
+      .sort((x, y) => y[1] - x[1])
+      .slice(0, 12);
+    return { a, e, beste, spitze: beste.length ? beste[0][1] : -1 };
+  }).sort((x, y) => y.spitze - x.spitze);
+
+  const zeile = ([z, w], i, a) => `
+      <tr>
+        <td class="rang">${i + 1}</td>
+        <td><b>${z.titel}</b>
+            <div class="klein">${z.bestand || "Bestand unbekannt"}</div></td>
+        <td class="wert" style="color:${farbe(w)}">${w}
+            <div class="klein">${pfeilFuer(z, a)}</div></td>
+        <td class="hin"><button class="hin" data-lat="${z.lat}"
+            data-lon="${z.lon}" data-art="${a}">Zeigen</button></td>
+      </tr>`;
+
+  const teile = bloecke.map(({ a, e, beste }) => {
+    if (!beste.length)
+      return `<h2>${e.name}</h2><div class="leer">keine Werte</div>`;
+
+    const oben = beste.slice(0, 3).map((p, i) => zeile(p, i, a)).join("");
+    const rest = beste.slice(3).map((p, i) => zeile(p, i + 3, a)).join("");
+
+    return `<h2>${e.name}<span class="saison">Saison
+            ${komma(e.saison, 2)}</span></h2>
+      <table>${oben}</table>
+      ${rest ? `<details><summary>Weitere ${beste.length - 3} Gebiete
+        </summary><table>${rest}</table></details>` : ""}`;
+  });
+
+  const el = document.getElementById("liste");
+  el.innerHTML = `<div class="klein" style="margin-bottom:14px">
+      Sortiert nach Aussichten für
+      <b>${tagname(tag).toLowerCase()}</b>. Werte unter etwa 40
+      bedeuten geringe Chancen.</div>` + teile.join("");
+
+  el.querySelectorAll("button.hin").forEach(b => b.onclick = () => {
+    art = b.dataset.art;
+    zeigeAnsicht("karte");
+    aktualisiere();
+    karte.flyTo({ center: [+b.dataset.lon, +b.dataset.lat], zoom: 12 });
+    const z = D.zellen.find(x =>
+      x.lat === +b.dataset.lat && x.lon === +b.dataset.lon);
+    // Ueber zeigePopup, damit ein offenes Fenster geschlossen wird
+    // und der Inhalt oben beginnt. Aus der Liste heraus gibt es
+    // keinen Klickort - dann fuehrt die Navigation zur Zellmitte.
+    // Einen noch laufenden Zeitgeber abbrechen. Sonst erzeugt der
+    // erste Klick nach 700 ms ein Fenster, obwohl man inzwischen
+    // eine andere Zelle gewaehlt hat - und dann sind zwei offen.
+    if (window._popupZeit) clearTimeout(window._popupZeit);
+    if (offenesPopup) offenesPopup.remove();
+    if (z) {
+      window._popupZeit = setTimeout(() => {
+        window._popupZeit = null;
+        zeigePopup([z.lon, z.lat], popupInhalt(z));
+      }, 700);
+    }
+  });
+}
+
+function setzeDeckkraft() {
+  // Eine Stelle fuer beide Darstellungsarten - sonst geht der
+  // eingestellte Wert beim Umschalten verloren.
+  const deck = document.getElementById("deckregler");
+  if (!karte || !deck) return;
+  const wert = +deck.value / 100;
+  const stil = (document.querySelector("[data-stil].aktiv") || {})
+    .dataset || {};
+
+  if (karte.getLayer("weich")) {
+    karte.setPaintProperty("weich", "raster-opacity", wert);
+  }
+  if (karte.getLayer("flaechen")) {
+    karte.setPaintProperty("flaechen", "fill-opacity",
+      stil.stil === "hart" ? wert * 0.82 : 0);
+  }
+}
+
+function setzeStil(stil) {
+  if (!karte || !karte.getLayer("weich")) return;
+  karte.setLayoutProperty("weich", "visibility",
+    stil === "weich" ? "visible" : "none");
+  // Bei "nur Karte" bleiben die Klickflaechen unsichtbar -
+  // anklicken geht trotzdem
+  karte.setPaintProperty("flaechen", "fill-color",
+    stil === "hart"
+      ? ["interpolate", ["linear"], ["get", "wert"],
+         0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
+         50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
+         85, "rgb(130,220,70)", 100, "rgb(45,175,75)"]
+      : "#000");
+  setzeDeckkraft();
+}
+
+function zeigeAnsicht(welche) {
+  document.getElementById("karte").hidden = welche !== "karte";
+  document.getElementById("liste").hidden = welche !== "liste";
+  document.querySelectorAll(".um").forEach(b =>
+    b.classList.toggle("aktiv", b.dataset.ansicht === welche));
+  if (welche === "liste") baueListe();
+  else if (karte) karte.resize();
+}
+
+// ---- Aufbau ---------------------------------------------------------
+fetch("daten.json")
+  .then(r => r.json())
+  .then(daten => {
+    D = daten;
+
+    // Nicht immer Steinpilz zeigen, sondern die Art mit den besten
+    // Aussichten - im August ist das eine andere als im Oktober.
+    art = Object.keys(D.arten).reduce((beste, a) => {
+      const schnitt = liste => liste.reduce((s, x) => s + x, 0)
+                             / Math.max(1, liste.length);
+      const wert = a => schnitt(
+        D.zellen.map(z => z.scores[a][0] ?? 0));
+      return wert(a) > wert(beste) ? a : beste;
+    }, Object.keys(D.arten)[0]);
+
+    const d = new Date(D.stand);
+    const standEl = document.getElementById("stand");
+    standEl.textContent = "Stand " + d.toLocaleDateString("de-DE");
+
+    // Warnen, wenn die Wetterdaten alt sind. Ohne das sieht eine
+    // Karte mit fuenf Tage alten Werten genauso aus wie eine
+    // aktuelle - und man faehrt nach falschen Zahlen los.
+    if (D.gemessen_bis) {
+      const m = new Date(D.gemessen_bis);
+      const alter = Math.round((Date.now() - m) / 86400000);
+      if (alter >= 3) {
+        standEl.innerHTML = `<span class="veraltet">Daten vom
+          ${m.toLocaleDateString("de-DE")} &middot; ${alter} Tage
+          alt</span>`;
+      }
+    }
+
+    document.getElementById("arten").innerHTML = Object.entries(D.arten)
+      .map(([a, e]) => `<button class="art" data-art="${a}">${e.name}
+        <span class="wert"></span></button>`).join("");
+    const regler = document.getElementById("tagregler");
+    regler.max = D.tage.length - 1;
+    regler.oninput = () => { tag = +regler.value; aktualisiere(); };
+
+    const schiebe = richtung => {
+      const neu = Math.max(0, Math.min(D.tage.length - 1, tag + richtung));
+      if (neu === tag) return;
+      tag = neu;
+      regler.value = tag;
+      aktualisiere();
+    };
+    document.getElementById("tagzurueck").onclick = () => schiebe(-1);
+    document.getElementById("tagvor").onclick = () => schiebe(1);
+
+    // Auch mit den Pfeiltasten, solange kein Eingabefeld den Fokus hat
+    document.addEventListener("keydown", e => {
+      if (e.target.tagName === "INPUT"
+          && e.target.type !== "range") return;
+      if (e.key === "ArrowLeft") schiebe(-1);
+      if (e.key === "ArrowRight") schiebe(1);
+    });
+
+    document.querySelectorAll(".art").forEach(b =>
+      b.onclick = () => { art = b.dataset.art; aktualisiere(); });
+
+    // Mausrad waagerecht umsetzen - sonst laesst sich die Leiste am
+    // Rechner nicht durchblaettern.
+    ["arten", "baumleiste", "ebenen", "darstellung"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("wheel", e => {
+        if (el.scrollWidth <= el.clientWidth) return;
+        if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }, { passive: false });
+    });
+
+    // Die gewaehlte Art ins Bild ruecken, wenn sie ausserhalb liegt
+    const zeigeGewaehlte = () => {
+      const b = document.querySelector(".art.aktiv");
+      if (b && b.scrollIntoView) {
+        b.scrollIntoView({ block: "nearest", inline: "nearest",
+                           behavior: "smooth" });
+      }
+    };
+    window._zeigeGewaehlte = zeigeGewaehlte;
+
+    document.querySelectorAll(".um").forEach(b =>
+      b.onclick = () => zeigeAnsicht(b.dataset.ansicht));
+    const mehr = document.getElementById("mehrknopf");
+    const feld = document.getElementById("einstellungen");
+    mehr.onclick = () => {
+      const offen = feld.hidden;
+      feld.hidden = !offen;
+      mehr.classList.toggle("offen", offen);
+      mehr.lastChild.textContent = offen ? " Einstellungen schliessen"
+                                         : " Einstellungen";
+      if (karte) setTimeout(() => karte.resize(), 210);
+    };
+
+    const deck = document.getElementById("deckregler");
+    deck.oninput = () => {
+      document.getElementById("deckwert").textContent = deck.value + " %";
+      setzeDeckkraft();
+      if (typeof merkeEinstellungen === "function") merkeEinstellungen();
+    };
+
+    document.querySelectorAll("[data-schalter]").forEach(b =>
+      b.onclick = () => {
+        const was = b.dataset.schalter;
+        const an = !b.classList.contains("aktiv");
+        b.classList.toggle("aktiv", an);
+
+        if (was === "funde") {
+          // "eigene" sind die selbst eingetragenen Funde aus
+          // konto.js - sie gehoeren zum selben Schalter
+          ["funde", "funde_buendel", "funde_zahl", "eigene"]
+            .forEach(e => {
+              if (karte.getLayer(e)) {
+                karte.setLayoutProperty(e, "visibility",
+                  an ? "visible" : "none");
+              }
+            });
+        } else if (was === "nah") {
+          nurNah = an;
+          aktualisiereFunde();
+        }
+      });
+
+    document.querySelectorAll("[data-stil]").forEach(b =>
+      b.onclick = () => {
+        document.querySelectorAll("[data-stil]").forEach(x =>
+          x.classList.remove("aktiv"));
+        b.classList.add("aktiv");
+        setzeStil(b.dataset.stil);
+      if (typeof merkeEinstellungen === "function") merkeEinstellungen();
+      });
+
+    const g = D.gebiet;
+    karte = new maplibregl.Map({
+      container: "karte",
+      style: {
+        version: 8,
+        sources: {
+          // CARTO liefert die Grundkarte in zwei Teilen: Flaechen und
+          // Beschriftung getrennt. Damit koennen Strassennamen und
+          // Ortsschilder UEBER den Farbflaechen liegen statt darunter.
+          grund: {
+            type: "raster",
+            tiles: ["https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
+                    "https://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
+                    "https://c.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png"],
+            tileSize: 256,
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">' +
+              'OpenStreetMap</a>, © <a href="https://carto.com/">CARTO</a> · ' +
+              'Wetter <a href="https://open-meteo.com/">Open-Meteo</a> · ' +
+              'Baumarten <a href="https://atlas.thuenen.de/">Thünen-Institut</a>'
+          },
+          beschriftung: {
+            type: "raster",
+            tiles: ["https://a.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png",
+                    "https://b.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png",
+                    "https://c.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png"],
+            tileSize: 256
+          }
+        },
+        // Ohne glyphs kann MapLibre keine Beschriftung zeichnen -
+        // die Zahl im Fundbuendel braucht sie.
+        glyphs: "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+        layers: [{ id: "grund", type: "raster", source: "grund" }]
+      },
+      bounds: [[g.west, g.sued], [g.ost, g.nord]],
+      fitBoundsOptions: { padding: 20 }
+    });
+
+    karte.addControl(new maplibregl.NavigationControl({ showCompass: false }));
+    const orten = new maplibregl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true, timeout: 12000 },
+      trackUserLocation: true,
+      showUserLocation: true
+    });
+    karte.addControl(orten);
+
+    orten.on("geolocate", e => {
+      meinOrt = [e.coords.longitude, e.coords.latitude];
+      const b = document.querySelector("[data-schalter=nah]");
+      if (b) b.hidden = false;
+      if (nurNah) aktualisiereFunde();
+    });
+
+    // Ohne Rueckmeldung bleibt unklar, warum nichts passiert.
+    orten.on("error", e => {
+      const gruende = {
+        1: "Die Seite darf deinen Standort nicht abrufen. In den " +
+           "Browsereinstellungen für diese Seite freigeben.",
+        2: "Standort nicht ermittelbar. Ortungsdienste eingeschaltet?",
+        3: "Zeitüberschreitung. Unter freiem Himmel nochmal versuchen."
+      };
+      melde(gruende[e && e.code] ||
+            "Standort konnte nicht ermittelt werden.");
+    });
+    // Der Massstab sitzt sonst genau auf der Legende
+    karte.addControl(new maplibregl.ScaleControl({ maxWidth: 90 }),
+                     "top-left");
+
+    karte.on("load", () => {
+      // Zwei Quellen: Rechtecke fuers Anklicken, Punkte fuer die
+      // weiche Darstellung.
+      karte.addSource("zellen", { type: "geojson", data: baueGeoJson() });
+
+      // Die weiche Darstellung kommt als fertiges Bild. Der Browser
+      // kann sie nicht selbst erzeugen: uebereinandergelegte halb-
+      // durchsichtige Flaechen addieren sich auf, statt sich zu
+      // mitteln - in der Zellmitte staende dann ein dunkler Fleck.
+      // Gerechnet wird sie beim taeglichen Bauvorgang, mit demselben
+      // gewichteten Mittel wie in der oertlichen Karte.
+      // Die Ecken muessen von Anfang an gueltig sein - vier
+      // identische Punkte ergeben eine entartete Flaeche, und
+      // MapLibre rechnet daraus Unendlich.
+      karte.addSource("weichbild", {
+        type: "image",
+        url: LEERBILD,
+        coordinates: [
+          [D.gebiet.west, D.gebiet.nord],
+          [D.gebiet.ost, D.gebiet.nord],
+          [D.gebiet.ost, D.gebiet.sued],
+          [D.gebiet.west, D.gebiet.sued]
+        ]
+      });
+      karte.addLayer({
+        id: "weich", type: "raster", source: "weichbild",
+        // Voreinstellung ist die Rasteransicht - sie zeigt genau,
+        // welche Zelle welchen Wert hat, ohne dass benachbarte
+        // Werte ineinanderlaufen
+        layout: { visibility: "none" },
+        paint: { "raster-opacity": 0.88, "raster-fade-duration": 120 }
+      });
+
+      // Unsichtbare Klickflaechen darueber
+      karte.addLayer({
+        id: "flaechen", type: "fill", source: "zellen",
+        paint: {
+          "fill-color": ["interpolate", ["linear"], ["get", "wert"],
+            0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
+            50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
+            85, "rgb(130,220,70)", 100, "rgb(45,175,75)"],
+          "fill-opacity": 0.72
+        }
+      });
+
+      // Strassen und Ortsnamen ueber die Farbflaechen legen
+      karte.addLayer({ id: "beschriftung", type: "raster",
+                       source: "beschriftung" });
+
+      // Belegte Funde ganz oben - sie sollen nichts verdecken, aber
+      // auch von nichts verdeckt werden
+      // Funde gebuendelt: bei kleinem Massstab liegen hunderte
+      // Punkte uebereinander. MapLibre fasst sie zusammen und loest
+      // sie beim Hineinzoomen wieder auf.
+      karte.addSource("funde", {
+        type: "geojson", data: baueFunde(),
+        cluster: true, clusterMaxZoom: 12, clusterRadius: 45
+      });
+
+      karte.addLayer({
+        id: "funde_buendel", type: "circle", source: "funde",
+        filter: ["has", "point_count"],
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": "#8e5fb5",
+          "circle-radius": ["step", ["get", "point_count"],
+            15, 10, 20, 40, 26],
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "rgba(181,126,220,.45)",
+          "circle-opacity": 0.85
+        }
+      });
+
+      karte.addLayer({
+        id: "funde_zahl", type: "symbol", source: "funde",
+        filter: ["has", "point_count"],
+        layout: {
+          visibility: "none",
+          "text-field": ["get", "point_count_abbreviated"],
+          "text-size": 12,
+          "text-font": ["Open Sans Regular"],
+          "text-allow-overlap": true
+        },
+        paint: { "text-color": "#ffffff" }
+      });
+
+      // Einzelpunkte: grosszuegiger Radius, damit sie sich auf dem
+      // Telefon treffen lassen
+      karte.addLayer({
+        id: "funde", type: "circle", source: "funde",
+        filter: ["!", ["has", "point_count"]],
+        layout: { visibility: "none" },
+        paint: {
+          "circle-radius": ["interpolate", ["linear"], ["zoom"],
+            10, 7, 13, 10, 16, 13],
+          "circle-color": "#b57edc",
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "rgba(42,26,53,.8)",
+          "circle-opacity": 0.92
+        }
+      });
+
+      // Tippen auf ein Buendel zoomt hinein
+      karte.on("click", "funde_buendel", e => {
+        const b = e.features[0];
+        karte.getSource("funde").getClusterExpansionZoom(
+          b.properties.cluster_id).then(z =>
+            karte.easeTo({ center: b.geometry.coordinates,
+                           zoom: Math.min(z + 0.5, 15) }))
+          .catch(() => karte.easeTo({
+            center: b.geometry.coordinates, zoom: karte.getZoom() + 2 }));
+      });
+      karte.on("mouseenter", "funde_buendel",
+        () => karte.getCanvas().style.cursor = "pointer");
+      karte.on("mouseleave", "funde_buendel",
+        () => karte.getCanvas().style.cursor = "");
+
+      karte.on("click", "funde", e => {
+        if (offenesPopup) {
+          offenesPopup.remove();
+          return;
+        }
+        e.originalEvent.stopPropagation();
+        const f = e.features[0];
+        zeigePopup(f.geometry.coordinates,
+          `<div class="pop"><b>Belegter Fund</b>
+            <div class="lage">${D.arten[art].name} &middot;
+            ${f.properties.d}</div>
+            ${navigationsknopf(f.geometry.coordinates[1],
+                               f.geometry.coordinates[0])}</div>`);
+      });
+      karte.on("mouseenter", "funde",
+        () => karte.getCanvas().style.cursor = "pointer");
+      karte.on("mouseleave", "funde",
+        () => karte.getCanvas().style.cursor = "");
+
+      karte.on("click", "flaechen", e => {
+        // Liegt an dieser Stelle ein Fund oder ein Buendel? Dann hat
+        // der seinen eigenen Handler - die Zellflaeche darf den Tipp
+        // nicht abfangen.
+        const drueber = karte.queryRenderedFeatures(e.point, {
+          layers: ["funde", "funde_buendel"].filter(l => karte.getLayer(l))
+        });
+        if (drueber.length) return;
+
+        // Ein zweiter Klick soll erst schliessen, nicht sofort ein
+        // neues Fenster oeffnen
+        if (window._popupZeit) {
+          clearTimeout(window._popupZeit);
+          window._popupZeit = null;
+        }
+        if (offenesPopup) {
+          offenesPopup.remove();
+          return;
+        }
+        const z = D.zellen[e.features[0].properties.i];
+        // Die Navigation soll zur angetippten Stelle fuehren, nicht
+        // zur Zellmitte - bei 2 km Kantenlaenge sind das bis zu
+        // 1,4 km Unterschied.
+        zeigePopup(e.lngLat, popupInhalt(z, e.lngLat));
+      });
+      karte.on("mouseenter", "flaechen",
+        () => karte.getCanvas().style.cursor = "pointer");
+      karte.on("mouseleave", "flaechen",
+        () => karte.getCanvas().style.cursor = "");
+
+      const stufen = [[95, "sehr gut"], [80, "gut"], [60, "möglich"],
+                      [40, "schwach"], [15, "kaum"]];
+      const box = document.createElement("div");
+      box.className = "legende";
+      box.innerHTML = stufen.map(([w, t]) =>
+        `<div><i style="background:${farbe(w)}"></i>${w}+ ${t}</div>`)
+        .join("")
+        + '<div class="fundlegende">'
+        + '<div><i style="background:#b57edc"></i>belegte Funde</div>'
+        + '<div><i style="background:#5fb763"></i>eigene Funde</div>'
+        + '<div><i style="background:transparent;'
+        + 'border:2px solid #9aa0a6"></i>nichts gefunden</div>'
+        + '<div><i style="background:#5fb763;border-radius:1px;'
+        + 'height:3px;margin-bottom:3px"></i>Route &#9654; '
+        + 'Laufrichtung</div></div>';
+      document.getElementById("karte").appendChild(box);
+
+      // Ruhiger Hinweis am unteren Rand statt eines Kastens beim Start
+      const fuss = document.createElement("div");
+      fuss.className = "fuss";
+      fuss.innerHTML = 'Zeigt Bedingungen, keine Pilze &ndash; ' +
+        'Bestimmung immer selbst pr&uuml;fen. ' +
+        '<a href="info.html">Wie wird gerechnet?</a>';
+      document.getElementById("karte").appendChild(fuss);
+
+      if (!sicher) {
+        melde("Ohne verschlüsselte Verbindung (https) gibt der Browser " +
+              "den Standort nicht frei.", 9000);
+      } else if (!navigator.geolocation) {
+        melde("Dieser Browser kennt keine Standortbestimmung.");
+      }
+
+      fetch("wald.json")
+        .then(r => r.ok ? r.json() : null)
+        .then(w => {
+          if (!w || !w.ebenen) return;
+          const g = w.grenzen;
+
+          w.ebenen.forEach(e => {
+            const kennung = "wald_" + e.schluessel;
+            karte.addSource(kennung, {
+              type: "image", url: e.datei,
+              coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
+                            [g[1][1], g[0][0]], [g[0][1], g[0][0]]]
+            });
+            // Unter die Farbflaechen, damit die Bewertung oben bleibt
+            karte.addLayer({
+              id: kennung, type: "raster", source: kennung,
+              layout: { visibility: "none" },
+              paint: { "raster-opacity": 0.55 }
+            }, "weich");
+          });
+
+          const leiste = document.getElementById("baumleiste");
+          leiste.innerHTML = w.ebenen.map(e => `<button class="tag"
+              data-baum="${e.schluessel}">${e.name}</button>`).join("");
+          document.getElementById("baumzeile").hidden = false;
+
+          leiste.querySelectorAll("[data-baum]").forEach(b =>
+            b.onclick = () => {
+              const an = !b.classList.contains("aktiv");
+              // Immer nur eine Baumart - sonst ueberlagern sich die
+              // Masken und man sieht nur noch eine Flaeche
+              leiste.querySelectorAll("[data-baum]").forEach(x =>
+                x.classList.remove("aktiv"));
+              w.ebenen.forEach(e => karte.setLayoutProperty(
+                "wald_" + e.schluessel, "visibility", "none"));
+              if (an) {
+                b.classList.add("aktiv");
+                karte.setLayoutProperty("wald_" + b.dataset.baum,
+                  "visibility", "visible");
+              }
+            });
+        })
+        .catch(() => {});
+
+      fetch("karten.json")
+        .then(r => r.ok ? r.json() : null)
+        .then(b => { bilder = b; zeigeWeichbild(); })
+        .catch(() => {});
+
+      fetch("relief.json")
+        .then(r => r.ok ? r.json() : [])
+        .then(r => { relief = r; reliefEinbinden(); })
+        .catch(() => {});
+
+      setzeDeckkraft();
+      if (typeof kontoStarten === "function" && !window.OHNE_KONTO) {
+        kontoStarten();
+      }
+      document.getElementById("laedt").remove();
+      aktualisiere();
+    });
+  })
+  .catch(e => {
+    document.getElementById("laedt").textContent =
+      "Daten konnten nicht geladen werden: " + e.message;
+  });
+</script>
+<script src="konto.js"></script>
+</body>
+</html>

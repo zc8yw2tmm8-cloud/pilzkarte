@@ -1,6 +1,10 @@
 name: Seite bauen
 
-# Laeuft nach dem taeglichen Sammeln und veroeffentlicht die Karte.
+# Nach JEDEM Sammellauf neu bauen, nicht nur einmal taeglich.
+#
+# taeglich.yml holt viermal am Tag die Vorhersage. Ohne diese
+# Verkettung stuenden die neuen Wetterdaten zwar im Repository, die
+# Karte zeigte aber weiter den Stand vom Morgen.
 on:
   workflow_run:
     workflows: ["Wetterdaten sammeln"]
@@ -12,24 +16,26 @@ permissions:
   pages: write
   id-token: write
 
+# Nicht zwei Bauvorgaenge gleichzeitig
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
   bauen:
-    # Nur wenn das Sammeln erfolgreich war - sonst wuerde die Seite
-    # mit halben Daten veroeffentlicht.
+    # Nur wenn das Sammeln geklappt hat - sonst wuerde die Karte mit
+    # halben Daten neu gebaut
     if: >
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Projekt holen
         uses: actions/checkout@v4
         with:
+          # Den Stand nehmen, den das Sammeln geschrieben hat
           ref: main
 
       - name: Python einrichten
@@ -41,11 +47,10 @@ jobs:
       - name: Pakete installieren
         run: pip install -r requirements.txt
 
-      - name: Daten fuer die Seite erzeugen
-        run: python daten_export.py
-
-      - name: Kartenbilder erzeugen
-        run: python web_bilder.py
+      - name: Daten erzeugen
+        run: |
+          python daten_export.py
+          python web_bilder.py
 
       - name: Seiten vorbereiten
         uses: actions/configure-pages@v5
@@ -56,8 +61,9 @@ jobs:
           path: web
 
       - name: Veroeffentlichen
-        id: veroeffentlichen
+        id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Adresse anzeigen
-        run: echo "Die Karte liegt unter ${{ steps.veroeffentlichen.outputs.page_url }}"
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
