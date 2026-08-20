@@ -92,6 +92,15 @@ MERKMALE = {
         ("cluster: true", "Fundpunkte gebuendelt"),
         ('data-stil="hart">Raster', "Raster als Voreinstellung"),
     ],
+    "abhaengigkeiten.py": [
+        ("nach_konstante", "Konstantenvergleich"),
+    ],
+    "web/konto.js": [
+        ("zeigeNamenswahl", "Benutzername waehlen"),
+        ("routeBearbeiten", "Routen bearbeiten"),
+        ("merkeEinstellungen", "Einstellungen merken"),
+        ("pfeilbildAnlegen", "Laufrichtung"),
+    ],
     "web/info.html": [
         ("Sechsmal danebengelegen", "Erklaerseite neu"),
         ("artwahl", "Beispiel zum Durchklicken"),
@@ -99,8 +108,70 @@ MERKMALE = {
 }
 
 
+
+
+# ------------------------------------------------------------
+# Ist in jeder Datei auch das drin, was draufsteht?
+#
+# Zweimal passiert: index.html und info.html vertauscht, danach
+# konto.js und konto.css. Beide Male hiessen die Dateien bis auf die
+# Endung gleich, der Browser hat beim Speichern den letzten Namen
+# vorgeschlagen - und der Fehler kam erst Stunden spaeter als
+# unverstaendliche Meldung heraus.
+#
+# Je Datei: was drin sein MUSS und was auf keinen Fall.
+TYPEN = {
+    "web/index.html": (["maplibre-gl", "<title>Pilzkarte<"],
+                       ["So funktioniert die Pilzkarte"]),
+    "web/info.html": (["So funktioniert die Pilzkarte"],
+                      ["maplibre-gl.js"]),
+    "web/konto.js": (["function kontoStarten", "async function"],
+                     ["#kontoleiste {"]),
+    "web/konto.css": (["#kontoleiste", "{"],
+                      ["function ", "=>"]),
+    "web/konto_konfig.js": (["SUPABASE_URL", "SUPABASE_KEY"],
+                            ["xxxxxxxxxxxx", "service_role"]),
+    "web/manifest.json": (["\"icons\"", "\"name\""], ["<html"]),
+}
+
+
+def pruefe_typen():
+    for datei, (muss, darf_nicht) in TYPEN.items():
+        pfad = datei.replace("/", os.sep)
+        if not os.path.exists(pfad):
+            continue
+
+        with open(pfad, "r", encoding="utf-8", errors="replace") as f:
+            inhalt = f.read()
+
+        fehlt = [m for m in muss if m not in inhalt]
+        drin = [d for d in darf_nicht if d in inhalt]
+
+        if drin:
+            melde(datei, f"enthaelt {drin[0]!r} - vertauscht?")
+        elif fehlt:
+            melde(datei, f"vermisst {fehlt[0]!r} - falsche Datei?")
+
+
+PROBLEME = []
+
+
+def melde(datei, text):
+    PROBLEME.append((datei, text))
+
+
 def main():
     print("Pruefe, ob alle Dateien den neuesten Stand haben\n")
+
+    pruefe_typen()
+
+    if PROBLEME:
+        print("=" * 58)
+        print("VERTAUSCHTE ODER FALSCHE DATEIEN")
+        print("=" * 58)
+        for datei, text in PROBLEME:
+            print(f"  {datei}: {text}")
+        print()
 
     fehlend_gesamt = 0
     fehlende_dateien = []
