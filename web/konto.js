@@ -22,40 +22,67 @@ async function kontoStarten() {
 
   sb.auth.onAuthStateChange((_, sitzung) => {
     benutzer = sitzung ? sitzung.user : null;
-    zeigeKontostand();
+    kontoDatenLaden();
   });
 
   document.getElementById("kontoleiste").hidden = false;
-  zeigeKontostand();
+  kontoDatenLaden();
 }
 
 function zeigeKontostand() {
+  // NUR anzeigen. Keine Datenbankabfragen, keine Ladefunktionen.
+  //
+  // Vorher stand hier ein Aufruf von pruefeMitleser(), und
+  // pruefeMitleser() rief am Ende zeigeKontostand() - ein
+  // Ringaufruf, der endlos lief und bei jeder Runde die Datenbank
+  // fragte. Die Konsole war voll und die Seite kam nie zur Ruhe.
   const el = document.getElementById("kontostand");
   if (!el) return;
 
   if (benutzer) {
-    // Ein Knopf statt dreier - der Rest steht im Menue dahinter
     let name = anzeigename || (benutzer.email || "").split("@")[0];
     if (name.length > 12) name = name.slice(0, 11) + "\u2026";
     el.innerHTML = `<button class="tag an" onclick="zeigeKontomenue()"
       title="${benutzer.email}">&#9679; ${name}</button>`;
-    if (karte) ladeEigeneFunde();
-    zeigeRoutenknopf();
-    zeigeRoutenschalter();
-    ladeRouten();
-    pruefeMitleser().then(() => {
-      setTimeout(() => stelleWiederHer(ladeEinstellungen()), 250);
-    });
   } else {
     el.innerHTML = `<button class="tag" onclick="zeigeAnmeldung()">
         anmelden</button>`;
-    zeigeRoutenknopf();
+  }
+
+  zeigeRoutenknopf();
+  zeigeRoutenschalter();
+  zeigeMitleserknopf();
+}
+
+
+// Alles, was Daten braucht, steht hier - und wird genau einmal je
+// An- oder Abmeldung aufgerufen.
+async function kontoDatenLaden() {
+  if (!benutzer) {
     istMitleser = false;
     fremdeSichtbar = false;
-    zeigeMitleserknopf();
-    zeigeRoutenschalter();
+    anzeigename = null;
+    alleRouten = [];
+    zeigeKontostand();
+    return;
+  }
+
+  await pruefeMitleser();
+  zeigeKontostand();
+
+  if (karte) {
+    ladeEigeneFunde();
+    ladeRouten();
+  }
+
+  setTimeout(() => stelleWiederHer(ladeEinstellungen()), 250);
+
+  // Beim ersten Anmelden nach einem Namen fragen
+  if (!anzeigename) {
+    setTimeout(() => zeigeNamenswahl(true), 500);
   }
 }
+
 
 function zeigeKontomenue() {
   kasten(`
@@ -742,13 +769,8 @@ async function pruefeMitleser() {
   if (data && data.einstellungen) {
     benutzer.einstellungen = data.einstellungen;
   }
-  zeigeKontostand();
-
-  // Beim ersten Anmelden gleich nach einem Namen fragen
-  if (!anzeigename) {
-    setTimeout(() => zeigeNamenswahl(true), 400);
-  }
-  zeigeMitleserknopf();
+  // KEIN zeigeKontostand() hier - das ruft sonst wieder hierher
+  // zurueck. Die Anzeige uebernimmt kontoDatenLaden().
 }
 
 function zeigeMitleserknopf() {
@@ -1169,32 +1191,6 @@ let routenSichtbar = false;
 // (nach Klick im Tagebuch) oder alle - deshalb der Speicher.
 let alleRouten = [];
 let gezeigteRoute = null;
-
-function pfeilbildAnlegen() {
-  if (!karte || karte.hasImage("laufpfeil")) return;
-
-  // Ein kleines Dreieck auf durchsichtigem Grund
-  const n = 24;
-  const c = document.createElement("canvas");
-  c.width = c.height = n;
-  const g = c.getContext("2d");
-
-  g.beginPath();
-  g.moveTo(n * 0.30, n * 0.18);
-  g.lineTo(n * 0.80, n * 0.50);
-  g.lineTo(n * 0.30, n * 0.82);
-  g.closePath();
-
-  g.fillStyle = "#eaf6ea";
-  g.fill();
-  g.strokeStyle = "#1a3320";
-  g.lineWidth = 2;
-  g.stroke();
-
-  const bild = g.getImageData(0, 0, n, n);
-  karte.addImage("laufpfeil",
-    { width: n, height: n, data: bild.data }, { pixelRatio: 2 });
-}
 
 function pfeilBildAnlegen() {
   if (!karte || karte.hasImage("routenpfeil")) return;
