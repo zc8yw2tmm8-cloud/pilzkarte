@@ -63,6 +63,7 @@ async function kontoDatenLaden() {
     fremdeSichtbar = false;
     anzeigename = null;
     alleRouten = [];
+    wiederhergestellt = false;
     zeigeKontostand();
     return;
   }
@@ -642,8 +643,14 @@ function merkeEinstellungen() {
   }, 1200);
 }
 
+let wiederhergestellt = false;
+
 function stelleWiederHer(e) {
   if (!e || !karte) return;
+  // Nur einmal je Sitzung - sonst klickt es die Knoepfe bei jedem
+  // Aufruf erneut durch
+  if (wiederhergestellt) return;
+  wiederhergestellt = true;
 
   const druecke = (wahl, wert) => {
     if (!wert) return;
@@ -712,19 +719,32 @@ function ladeAnsicht() {
   }
 }
 
+let letzteAnsicht = null;
+
 async function setzeAnsicht(neuHell, speichern) {
   hell = neuHell;
   document.body.classList.toggle("hell", hell);
 
-  if (karte) {
+  // Die Kacheln nur wechseln, wenn sich wirklich etwas aendert.
+  //
+  // setTiles laedt die ganze Grundkarte neu. Wird es mehrmals kurz
+  // hintereinander gerufen, bricht MapLibre den jeweils vorigen
+  // Ladevorgang ab und meldet AbortError - die Konsole fuellt sich,
+  // ohne dass etwas kaputt waere.
+  if (karte && letzteAnsicht !== hell) {
+    letzteAnsicht = hell;
     const teil = hell ? "light" : "dark";
     ["grund", "beschriftung"].forEach(quelle => {
       const q = karte.getSource(quelle);
-      if (!q) return;
+      if (!q || typeof q.setTiles !== "function") return;
       const endung = quelle === "grund" ? "nolabels" : "only_labels";
-      q.setTiles(["a", "b", "c"].map(x =>
-        `https://${x}.basemaps.cartocdn.com/${teil}_${endung}/` +
-        `{z}/{x}/{y}.png`));
+      try {
+        q.setTiles(["a", "b", "c"].map(x =>
+          `https://${x}.basemaps.cartocdn.com/${teil}_${endung}/` +
+          `{z}/{x}/{y}.png`));
+      } catch (e) {
+        // Ein abgebrochener Ladevorgang ist kein Fehler
+      }
     });
   }
 
