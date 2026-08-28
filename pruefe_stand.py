@@ -14,8 +14,17 @@ Datei absichtlich nie ausgetauscht. Aber es ist der schnellste Weg,
 um zu sehen, wo man nachschauen sollte.
 """
 import os
+import re
 
-# Datei -> Merkmale, die in der neuesten Fassung stehen muessen
+# Datei -> Merkmale, die in der neuesten Fassung stehen muessen.
+#
+# WICHTIG: Als Merkmal taugen nur Namen von Funktionen, Konstanten
+# oder Textstellen - NIEMALS eingestellte Zahlenwerte. Die werden
+# absichtlich nachjustiert, und dann meldet die Pruefung etwas als
+# fehlend, das in Wirklichkeit bewusst geaendert wurde.
+#
+# Passiert bei STREUUNG_KM: dort stand "= 1.4" als Merkmal, waehrend
+# der Wert laengst auf 1.7 stand.
 MERKMALE = {
     "karte.py": [
         ("gueltige_punkte", "Filter auf waldpunkte.csv"),
@@ -65,7 +74,7 @@ MERKMALE = {
     "weichzeichnen.py": [
         ("_GEOMETRIE", "Geometrie wird wiederverwendet"),
         ("BILDORDNER", "Zielordner einstellbar"),
-        ("STREUUNG_KM = 1.4", "Streuung fuer 2-km-Raster"),
+        ("VOLL_KM", "Streuungsgrenzen vorhanden"),
     ],
     "web_bilder.py": [
         ("z[\"scores\"][art][i] or 0", "alle Zellen je Bild"),
@@ -99,11 +108,13 @@ MERKMALE = {
         ("zeigeNamenswahl", "Benutzername waehlen"),
         ("routeBearbeiten", "Routen bearbeiten"),
         ("merkeEinstellungen", "Einstellungen merken"),
-        ("pfeilbildAnlegen", "Laufrichtung"),
+        ("pfeilBildAnlegen", "Laufrichtung"),
     ],
     "web/info.html": [
-        ("Sechsmal danebengelegen", "Erklaerseite neu"),
-        ("artwahl", "Beispiel zum Durchklicken"),
+        ("So funktioniert die Pilzkarte", "neue Erklaerseite"),
+        ("So entsteht ein Wert", "Rechenbeispiel"),
+        ("datenstand", "Wetterstand oben"),
+        ("Iss niemals einen Pilz", "Warnhinweis"),
     ],
 }
 
@@ -129,10 +140,52 @@ TYPEN = {
                      ["#kontoleiste {"]),
     "web/konto.css": (["#kontoleiste", "{"],
                       ["function ", "=>"]),
+    # Bei konto_konfig.js reicht die Textsuche nicht: Das Wort
+    # "service_role" steht dort als Warnung im Kommentar. Geprueft
+    # wird deshalb weiter unten, was IM SCHLUESSEL steht.
     "web/konto_konfig.js": (["SUPABASE_URL", "SUPABASE_KEY"],
-                            ["xxxxxxxxxxxx", "service_role"]),
+                            ["xxxxxxxxxxxx"]),
     "web/manifest.json": (["\"icons\"", "\"name\""], ["<html"]),
 }
+
+
+def pruefe_schluessel():
+    """
+    Steht in konto_konfig.js der richtige Schluessel?
+
+    Der anon-Schluessel darf oeffentlich sein, der service_role
+    nicht - der umgeht alle Zeilenrechte. Beide sehen gleich aus;
+    der Unterschied steht im mittleren Teil, base64-verpackt.
+    """
+    pfad = os.path.join("web", "konto_konfig.js")
+    if not os.path.exists(pfad):
+        return
+
+    import base64
+    with open(pfad, "r", encoding="utf-8", errors="replace") as f:
+        text = f.read()
+
+    treffer = re.search(r'SUPABASE_KEY\s*=\s*"([^"]+)"', text)
+    if not treffer:
+        melde("web/konto_konfig.js", "kein SUPABASE_KEY gefunden")
+        return
+
+    teile = treffer.group(1).split(".")
+    if len(teile) != 3:
+        melde("web/konto_konfig.js", "Schluessel sieht nicht aus wie "
+                                     "ein Zugangsmerkmal")
+        return
+
+    try:
+        mitte = teile[1] + "=" * (-len(teile[1]) % 4)
+        inhalt = base64.urlsafe_b64decode(mitte).decode("utf-8")
+    except Exception:
+        return
+
+    if "service_role" in inhalt:
+        melde("web/konto_konfig.js",
+              "SERVICE_ROLE-Schluessel! Der umgeht alle Rechte und "
+              "darf nicht ins Netz. Den anon-Schluessel nehmen.")
 
 
 def pruefe_typen():
@@ -164,6 +217,7 @@ def main():
     print("Pruefe, ob alle Dateien den neuesten Stand haben\n")
 
     pruefe_typen()
+    pruefe_schluessel()
 
     if PROBLEME:
         print("=" * 58)
