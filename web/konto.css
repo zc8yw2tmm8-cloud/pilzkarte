@@ -144,3 +144,7 @@ button.stift:hover { color: var(--akzent);
 /* Rueckmeldung bei der Namenspruefung */
 .klein.fehler { color: #e8674d; }
 .klein.frei { color: var(--akzent); font-weight: 600; }
+
+/* Zahl der Funde einer Route */
+.fundzahl { color: var(--akzent); font-weight: 700;
+            margin-left: 4px; }

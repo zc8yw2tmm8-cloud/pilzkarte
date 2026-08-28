@@ -12,10 +12,19 @@
 <meta name="theme-color" content="#15181c">
 <title>So funktioniert die Pilzkarte</title>
 <style>
+  /* Helle Ansicht - dieselbe Wahl wie auf der Karte. Gespeichert
+     wird sie im Browser, damit beide Seiten sie kennen, ohne dass
+     die Infoseite das Konto braucht. */
+
   :root {
     --grund: #15181c; --flaeche: #1e2228; --text: #e6e6e6;
     --leise: #9aa0a6; --linie: #2f353d; --akzent: #5fb763;
     --warn: #e8a33d;
+  }
+  body.hell {
+    --grund: #f4f2ee; --flaeche: #ffffff; --text: #1c1f22;
+    --leise: #5f6469; --linie: #d9d5cd; --akzent: #2f7a35;
+    --warn: #b4761e;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--grund); color: var(--text);
@@ -449,5 +458,17 @@ fetch("daten.json").then(a => a.json()).then(d => {
 });
 </script>
 
+<script>
+// Dieselbe Einstellung wie auf der Karte uebernehmen.
+//
+// konto.js legt sie unter "pilzkarte_hell" ab. Die Infoseite kennt
+// kein Konto - der Browserspeicher reicht hier, weil die Wahl beim
+// Anmelden ohnehin von dort kommt.
+try {
+  if (localStorage.getItem("pilzkarte_hell") === "1") {
+    document.body.classList.add("hell");
+  }
+} catch (e) {}
+</script>
 </body>
 </html>

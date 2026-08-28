@@ -20,9 +20,16 @@ async function kontoStarten() {
   const { data } = await sb.auth.getSession();
   benutzer = data.session ? data.session.user : null;
 
-  sb.auth.onAuthStateChange((_, sitzung) => {
+  sb.auth.onAuthStateChange((art, sitzung) => {
     benutzer = sitzung ? sitzung.user : null;
     kontoDatenLaden();
+
+    // Kommt jemand ueber den Link aus der Zuruecksetzen-Mail,
+    // meldet Supabase diesen Fall - dann gleich nach dem neuen
+    // Passwort fragen.
+    if (art === "PASSWORD_RECOVERY") {
+      setTimeout(zeigeNeuesPasswort, 300);
+    }
   });
 
   document.getElementById("kontoleiste").hidden = false;
@@ -111,12 +118,96 @@ function zeigeAnmeldung() {
     <button class="voll" onclick="anmelden()">Anmelden</button>
     <button class="voll leer" onclick="zeigeRegistrierung()">
       Noch kein Konto? Hier anlegen</button>
+    <button class="voll leer" onclick="zeigePasswortVergessen()">
+      Passwort vergessen</button>
     <p class="klein" id="anmeldehinweis"></p>
   `);
 
   // Mit Enter abschicken
   const feld = document.getElementById("passwort");
   if (feld) feld.onkeydown = e => { if (e.key === "Enter") anmelden(); };
+}
+
+function zeigePasswortVergessen() {
+  kasten(`
+    <h3>Passwort zurücksetzen</h3>
+    <p class="klein">Du bekommst eine E-Mail mit einem Link. Darüber
+    lässt sich ein neues Passwort setzen.</p>
+    <input type="email" id="epost" placeholder="deine@email.de"
+           autocomplete="email" inputmode="email">
+    <button class="voll" onclick="passwortZuruecksetzen()">
+      Link schicken</button>
+    <button class="voll leer" onclick="zeigeAnmeldung()">Zurück</button>
+    <p class="klein" id="anmeldehinweis"></p>
+  `);
+  const feld = document.getElementById("epost");
+  if (feld) feld.onkeydown = e => {
+    if (e.key === "Enter") passwortZuruecksetzen();
+  };
+}
+
+async function passwortZuruecksetzen() {
+  const adresse = (document.getElementById("epost").value || "").trim();
+  const hinweis = document.getElementById("anmeldehinweis");
+  if (!adresse) {
+    hinweis.textContent = "Bitte E-Mail eintragen.";
+    hinweis.className = "klein fehler";
+    return;
+  }
+
+  hinweis.textContent = "Wird verschickt ...";
+  hinweis.className = "klein";
+
+  const { error } = await sb.auth.resetPasswordForEmail(adresse, {
+    redirectTo: window.location.href.split("#")[0]
+  });
+
+  if (error) {
+    hinweis.textContent = fehlertext(error.message);
+    hinweis.className = "klein fehler";
+    return;
+  }
+  hinweis.innerHTML = "Schau in dein Postfach. Der Link führt "
+    + "hierher zurück, dann kannst du ein neues Passwort setzen.";
+  hinweis.className = "klein frei";
+}
+
+function zeigeNeuesPasswort() {
+  kasten(`
+    <h3>Neues Passwort setzen</h3>
+    <input type="password" id="passwort" autocomplete="new-password"
+           placeholder="Neues Passwort, mindestens 8 Zeichen">
+    <button class="voll" onclick="neuesPasswortSpeichern()">
+      Speichern</button>
+    <p class="klein" id="anmeldehinweis"></p>
+  `);
+  const feld = document.getElementById("passwort");
+  if (feld) {
+    feld.focus();
+    feld.onkeydown = e => {
+      if (e.key === "Enter") neuesPasswortSpeichern();
+    };
+  }
+}
+
+async function neuesPasswortSpeichern() {
+  const neu = document.getElementById("passwort").value;
+  const hinweis = document.getElementById("anmeldehinweis");
+
+  if (neu.length < 8) {
+    hinweis.textContent = "Mindestens 8 Zeichen.";
+    hinweis.className = "klein fehler";
+    return;
+  }
+
+  const { error } = await sb.auth.updateUser({ password: neu });
+  if (error) {
+    hinweis.textContent = fehlertext(error.message);
+    hinweis.className = "klein fehler";
+    return;
+  }
+  kastenZu();
+  melde("Passwort geändert.");
 }
 
 function zeigeRegistrierung() {
@@ -170,8 +261,14 @@ function fehlertext(meldung) {
     return "Das Passwort ist zu kurz.";
   }
   if (m.includes("email not confirmed")) {
-    return "Die Adresse ist noch nicht bestätigt. In Supabase unter "
-         + "Authentication → Providers die Bestätigung abschalten.";
+    return "Die Adresse ist noch nicht bestätigt. Schau in dein "
+         + "Postfach - dort liegt eine E-Mail mit einem Link.";
+  }
+  if (m.includes("rate limit") || m.includes("too many")) {
+    return "Zu viele Versuche. Bitte ein paar Minuten warten.";
+  }
+  if (m.includes("user not found")) {
+    return "Für diese Adresse gibt es kein Konto.";
   }
   return meldung;
 }
@@ -1133,8 +1230,12 @@ function fundeSichtbar() {
 async function ladeEigeneFunde() {
   if (!sb || !benutzer || !karte) return;
 
+  // NUR die eigenen. Als Mitleser darf man alle Funde lesen -
+  // ohne diesen Filter erschienen die Funde der anderen gruen,
+  // noch bevor man "alle Nutzer" gedrueckt hat.
   const { data, error } = await sb.from("fund")
     .select("id, art, gefunden_am, nullfund, anzahl, notiz, lat, lon")
+    .eq("benutzer", benutzer.id)
     .order("gefunden_am", { ascending: false })
     .limit(500);
 
@@ -1611,16 +1712,40 @@ async function loesche(tabelle, id, beschreibung) {
 
 // ---- Tagebuch -------------------------------------------------------
 
+function fundeZurRoute(route, funde) {
+  // Wie viele Funde gehoeren zu dieser Route?
+  //
+  // Nicht nur die waehrend der Aufzeichnung eingetragenen: Wer
+  // abends nachtraegt, soll sie hier trotzdem wiederfinden.
+  // Massstab ist deshalb der Ort - alles, was am selben Tag im
+  // Umkreis von 50 m um den Weg liegt.
+  if (!Array.isArray(route.punkte) || !route.punkte.length) return 0;
+
+  const tag = new Date(route.begonnen).toISOString().slice(0, 10);
+  const UMKREIS = 0.05;   // 50 m
+
+  return (funde || []).filter(f => {
+    if (f.nullfund) return false;
+    if (f.lat == null || f.lon == null) return false;
+    if ((f.gefunden_am || "").slice(0, 10) !== tag) return false;
+    return route.punkte.some(p =>
+      abstandKm(p.lat, p.lon, f.lat, f.lon) <= UMKREIS);
+  }).length;
+}
+
+
 async function zeigeTagebuch() {
   kasten('<h3>Tagebuch</h3><p class="klein">Wird geladen ...</p>');
 
   const [routen, funde, zahlen] = await Promise.all([
     sb.from("route")
       .select("id, titel, begonnen, laenge_km, dauer_min, notiz, "
-              + "start_lat, start_lon")
+              + "start_lat, start_lon, punkte")
+      .eq("benutzer", benutzer.id)
       .order("begonnen", { ascending: false }).limit(30),
     sb.from("fund")
       .select("id, art, gefunden_am, nullfund, anzahl, notiz, lat, lon")
+      .eq("benutzer", benutzer.id)
       .order("gefunden_am", { ascending: false }).limit(30),
     sb.rpc("meine_zahlen")
   ]);
@@ -1628,6 +1753,9 @@ async function zeigeTagebuch() {
   const z = (zahlen.data && zahlen.data[0]) || {};
 
   const routenListe = (routen.data || []).map(r => {
+    const anzahl = fundeZurRoute(r, funde.data);
+    const marke = anzahl
+      ? `<span class="fundzahl">+${anzahl}</span>` : "";
     const knopf = (r.start_lat != null && r.start_lon != null)
       ? `<button class="zeigen" onclick="zeigeRouteAufKarte(
            '${r.id}', ${r.start_lat}, ${r.start_lon})">
@@ -1647,7 +1775,7 @@ async function zeigeTagebuch() {
       </div>
       <div class="klein">${new Date(r.begonnen)
         .toLocaleDateString("de-DE")} &middot; ${r.laenge_km || "?"} km
-        &middot; ${r.dauer_min || "?"} min</div>
+        &middot; ${r.dauer_min || "?"} min ${marke}</div>
       ${r.notiz ? `<div class="klein">${r.notiz}</div>` : ""}
     </div>`;
   }).join("") || '<p class="klein">Noch keine Routen.</p>';
@@ -1657,7 +1785,10 @@ async function zeigeTagebuch() {
       ? `<button class="zeigen" onclick="zeigeFundAufKarte(
            ${f.lat}, ${f.lon})">Auf der Karte</button>`
       : "";
-    const name = f.nullfund ? "nichts gefunden" : f.art;
+    // f.art ist der Schluessel ("steinpilz"), nicht der Name
+    const name = f.nullfund
+      ? "nichts gefunden"
+      : ((D.arten[f.art] || {}).name || f.art);
     const datum = new Date(f.gefunden_am).toLocaleDateString("de-DE");
     return `<div class="eintrag">
       <div class="kopfzeile">

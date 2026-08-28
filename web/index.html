@@ -31,6 +31,12 @@
   body.hell .legende { background: rgba(255,255,255,.93); }
   body.hell .fuss { background: rgba(255,255,255,.85); }
   body.hell .stand { background: rgba(255,255,255,.8); }
+  /* Der Navigationsknopf war auch in der hellen Ansicht fast
+     schwarz auf dunkel - unlesbar. */
+  body.hell .navi:not(.eintrag) { background: #eceae4;
+                                  color: #1c1f22;
+                                  border-color: #c9c4b8; }
+  body.hell .navi:not(.eintrag):hover { border-color: #8a8578; }
   body.hell .maplibregl-popup-tip {
     border-top-color: #ffffff !important;
     border-bottom-color: #ffffff !important; }
@@ -327,18 +333,18 @@
     <span id="tagname">Heute</span>
   </div>
 
+  <div class="regler">
+    <span class="marke">Deckkraft</span>
+    <input type="range" id="deckregler" min="15" max="100" value="88"
+           step="5">
+    <span id="deckwert">88 %</span>
+  </div>
+
   <button class="mehr" id="mehrknopf">
     <span class="pfeil">&#9662;</span> Einstellungen
   </button>
 
   <div id="einstellungen" hidden>
-    <div class="regler">
-      <span class="marke">Deckkraft</span>
-      <input type="range" id="deckregler" min="15" max="100" value="88"
-             step="5">
-      <span id="deckwert">88 %</span>
-    </div>
-
     <div class="zeile">
       <span class="marke">Ansicht</span>
       <div class="tagleiste" id="darstellung">
@@ -1383,8 +1389,12 @@ fetch("daten.json")
         // Liegt an dieser Stelle ein Fund oder ein Buendel? Dann hat
         // der seinen eigenen Handler - die Zellflaeche darf den Tipp
         // nicht abfangen.
+        // Alle Fundebenen pruefen, auch die eigenen und die
+        // fremden aus konto.js - sonst oeffnen sich beim Tippen auf
+        // einen Fund zwei Fenster gleichzeitig.
         const drueber = karte.queryRenderedFeatures(e.point, {
-          layers: ["funde", "funde_buendel"].filter(l => karte.getLayer(l))
+          layers: ["funde", "funde_buendel", "eigene", "fremde_funde",
+                   "routen"].filter(l => karte.getLayer(l))
         });
         if (drueber.length) return;
 
@@ -1454,12 +1464,17 @@ fetch("daten.json")
               coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
                             [g[1][1], g[0][0]], [g[0][1], g[0][0]]]
             });
-            // Unter die Farbflaechen, damit die Bewertung oben bleibt
+            // UEBER die Farbflaechen, direkt unter die Beschriftung.
+            // Frueher lagen sie darunter und waren bei kraeftiger
+            // Deckkraft kaum zu sehen - dabei sind sie gerade dann
+            // nuetzlich, wenn man wissen will, welcher Wald hinter
+            // einem guten Wert steckt.
             karte.addLayer({
               id: kennung, type: "raster", source: kennung,
               layout: { visibility: "none" },
-              paint: { "raster-opacity": 0.55 }
-            }, "weich");
+              paint: { "raster-opacity": 0.5 }
+            }, karte.getLayer("beschriftung")
+                 ? "beschriftung" : undefined);
           });
 
           const leiste = document.getElementById("baumleiste");
