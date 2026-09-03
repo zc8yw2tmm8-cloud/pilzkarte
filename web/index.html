@@ -116,7 +116,17 @@
   /* Pfeile links und rechts der Artenleiste - am Rechner der
      bequemere Weg, am Telefon wischt man. */
   .artenzeile { display: flex; align-items: center; gap: 6px; }
-  .artenzeile .leiste { flex: 1; min-width: 0; }
+  .artenzeile .leiste { flex: 0 1 auto; min-width: 0; }
+
+  /* Nur die drei aussichtsreichsten Arten stehen als Knopf da, der
+     Rest im Ausklappmenue. Bei elf Arten war die Leiste sonst
+     laenger als der Bildschirm. */
+  .art.versteckt { display: none; }
+  #artwahl { flex: 1 1 auto; min-width: 90px; max-width: 190px;
+             background: var(--grund); color: var(--text);
+             border: 1px solid var(--linie); border-radius: 20px;
+             padding: 8px 10px; font: inherit; font-size: 13px;
+             min-height: 38px; cursor: pointer; }
   @media (max-width: 700px) {
     .artenzeile .pfeilknopf { display: none; }
   }
@@ -184,6 +194,18 @@
                     color: var(--leise); }
   .zeile .tagleiste { margin-top: 0; flex: 1; min-width: 0; }
 
+  /* Hell/dunkel gehoert nicht ins Ausklappmenue - man will es
+     umschalten koennen, ohne erst aufzuklappen. */
+  .mehrzeile { display: flex; align-items: center; }
+  .mehrzeile .mehr { flex: 1; }
+  .hellknopf { flex: 0 0 auto; border: 1px solid var(--linie);
+               background: transparent; color: var(--leise);
+               width: 34px; height: 34px; border-radius: 17px;
+               cursor: pointer; font-size: 15px; line-height: 1;
+               padding: 0; }
+  .hellknopf:hover { border-color: var(--akzent);
+                     color: var(--akzent); }
+
   .mehr { margin-top: 7px; background: transparent; border: 0;
           color: var(--leise); font-size: 12px; cursor: pointer;
           padding: 5px 0; display: flex; align-items: center;
@@ -247,6 +269,19 @@
                        font-variant-numeric: tabular-nums;
                        padding-left: 10px; padding-right: 2px; }
   .pop tr.hier td { font-weight: 700; }
+
+  /* Werte farblich einordnen - gemessen an den Punktbaendern der
+     gewaehlten Art, nicht an festen Schwellen. */
+  .pop td.gut { color: #5fb763; font-weight: 600; }
+  .pop td.mittel { color: #e8c34a; }
+  .pop td.schwach { color: #e8934a; }
+  .pop td.kaum { color: #d9604f; }
+  .pop td.regen { color: #6aa9e0; }
+  body.hell .pop td.gut { color: #2f7a35; }
+  body.hell .pop td.mittel { color: #a67c12; }
+  body.hell .pop td.schwach { color: #b4601e; }
+  body.hell .pop td.kaum { color: #b3382b; }
+  body.hell .pop td.regen { color: #2c6ba3; }
   .knopfreihe { display: flex; gap: 6px; margin: 8px 0 4px; }
   .knopfreihe .navi { margin-top: 0; flex: 1; text-align: center;
                       padding: 9px 8px; font-size: 12.5px; }
@@ -320,6 +355,7 @@
     <button class="pfeilknopf" id="artzurueck"
             title="vorige Art">&#9664;</button>
     <div class="leiste" id="arten"></div>
+    <select id="artwahl" title="weitere Arten"></select>
     <button class="pfeilknopf" id="artvor"
             title="nächste Art">&#9654;</button>
   </div>
@@ -340,9 +376,15 @@
     <span id="deckwert">88 %</span>
   </div>
 
-  <button class="mehr" id="mehrknopf">
-    <span class="pfeil">&#9662;</span> Einstellungen
-  </button>
+  <div class="mehrzeile">
+    <button class="mehr" id="mehrknopf">
+      <span class="pfeil">&#9662;</span> Einstellungen
+    </button>
+    <button class="hellknopf" data-ansicht-hell
+            title="Hell oder dunkel"
+            onclick="if(typeof ansichtUmschalten==='function')
+                     ansichtUmschalten()">&#9789;</button>
+  </div>
 
   <div id="einstellungen" hidden>
     <div class="zeile">
@@ -353,9 +395,7 @@
         <button class="tag" data-stil="aus">nur Karte</button>
         <button class="tag" data-schalter="funde">&#9679; Funde</button>
         <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
-        <button class="tag" data-ansicht-hell
-                onclick="if(typeof ansichtUmschalten==='function')
-                         ansichtUmschalten()">hell</button>
+
       </div>
     </div>
 
@@ -630,6 +670,31 @@ function aktualisiere() {
   bewertet.sort((x, y) => y.schnitt - x.schnitt)
     .forEach(({ b }) => leiste.appendChild(b));
 
+  // Die besten drei als Knopf, alles Weitere im Ausklappmenue.
+  // Die gewaehlte Art bleibt immer sichtbar, auch wenn sie heute
+  // nicht unter den ersten dreien ist.
+  bewertet.forEach(({ b }, i) => {
+    b.classList.toggle("versteckt",
+                       i >= 3 && b.dataset.art !== art);
+  });
+
+  const wahl = document.getElementById("artwahl");
+  if (wahl) {
+    const sichtbar = bewertet
+      .filter(({ b }) => !b.classList.contains("versteckt"))
+      .map(({ b }) => b.dataset.art);
+
+    wahl.innerHTML = '<option value="">weitere Arten …</option>'
+      + bewertet
+          .filter(({ b }) => !sichtbar.includes(b.dataset.art))
+          .map(({ b, schnitt }) => {
+            const a = b.dataset.art;
+            return `<option value="${a}">${D.arten[a].name}` +
+                   ` — ${schnitt}</option>`;
+          }).join("");
+    wahl.value = "";
+  }
+
   if (window._zeigeGewaehlte) setTimeout(window._zeigeGewaehlte, 30);
   const tn = document.getElementById("tagname");
   if (tn) tn.textContent = tagname(tag);
@@ -679,14 +744,14 @@ function regenzeilen(z) {
 
   let zeilen = "";
   if (a) {
-    zeilen += `<tr><td>Letzter Regen</td><td><b>${komma(a.mm)} mm</b>
-      ${tageText(a.vor)}</td></tr>`;
+    zeilen += `<tr><td>Letzter Regen</td><td class="regen">
+      <b>${komma(a.mm)} mm</b> ${tageText(a.vor)}</td></tr>`;
   }
   // Nur zeigen, wenn es ein anderer Tag war - sonst steht dasselbe
   // zweimal da
   if (b && (!a || b.datum !== a.datum)) {
     zeilen += `<tr><td>Letztes gr&ouml;&szlig;eres Ereignis</td>
-      <td>${komma(b.mm)} mm ${tageText(b.vor)}</td></tr>`;
+      <td class="regen">${komma(b.mm)} mm ${tageText(b.vor)}</td></tr>`;
   }
 
   return `<h4>Regen</h4><table>${zeilen}</table>`;
@@ -712,6 +777,35 @@ function fundknopf(z, klickOrt) {
   return `<a class="navi eintrag" onclick='fundBeginnen(${lat},
     ${lon}, ${JSON.stringify(z.id)}, ${wert})'>
     &#43; Fund eintragen</a>`;
+}
+
+function wertzeile(titel, feld, wert, text) {
+  // Wie gut ist dieser Wert FUER DIESE ART?
+  //
+  // Die Zahl allein sagt nichts - 12 Grad Bodentemperatur sind fuer
+  // den Steinpilz gut und fuer den Sommersteinpilz zu kalt. Deshalb
+  // wird an den kalibrierten Punktbaendern gemessen: Wie viel von
+  // der moeglichen Punktzahl bringt dieser Wert?
+  const e = D.arten[art] || {};
+  const baender = (e.baender || {})[feld];
+  const hoechst = (e.hoechstpunkte || {})[feld];
+
+  let farbe = "";
+  if (baender && hoechst && wert !== null && wert !== undefined) {
+    let punkte = 0;
+    baender.forEach(([von, bis, p]) => {
+      const passt = (von === null || wert >= von)
+                 && (bis === null || wert < bis);
+      if (passt && p > punkte) punkte = p;
+    });
+    const anteil = punkte / hoechst;
+    farbe = anteil >= 0.75 ? "gut"
+          : anteil >= 0.4 ? "mittel"
+          : anteil > 0 ? "schwach" : "kaum";
+  }
+
+  return `<tr><td>${titel}</td>
+          <td class="${farbe}">${text}</td></tr>`;
 }
 
 function popupInhalt(z, klickOrt) {
@@ -755,11 +849,16 @@ function popupInhalt(z, klickOrt) {
 
     <h4>Wichtigste Werte</h4>
     <table>
-      <tr><td>Bodenfeuchte</td><td>${komma(k.bf07 * 100)} %</td></tr>
-      <tr><td>Bodentemperatur</td><td>${komma(k.bt07)} °C</td></tr>
-      <tr><td>Wasserbilanz 14 Tage</td><td>${komma(k.bilanz_14)} mm</td></tr>
-      <tr><td>Niederschlag Tag 4–14</td><td>${komma(k.regen_reife)} mm</td></tr>
-      <tr><td>Regentage von 14</td><td>${k.regentage}</td></tr>
+      ${wertzeile("Bodenfeuchte", "bf07", k.bf07,
+                  komma(k.bf07 * 100) + " %")}
+      ${wertzeile("Bodentemperatur", "bt07", k.bt07,
+                  komma(k.bt07) + " °C")}
+      ${wertzeile("Wasserbilanz 14 Tage", "bilanz_14", k.bilanz_14,
+                  komma(k.bilanz_14) + " mm")}
+      ${wertzeile("Niederschlag Tag 4–14", "regen_reife",
+                  k.regen_reife, komma(k.regen_reife) + " mm")}
+      ${wertzeile("Regentage von 14", "regentage", k.regentage,
+                  String(k.regentage))}
     </table>
     ${regenzeilen(z)}
 
@@ -1082,6 +1181,13 @@ fetch("daten.json")
 
     document.querySelectorAll(".art").forEach(b =>
       b.onclick = () => { art = b.dataset.art; aktualisiere(); });
+
+    const wahl = document.getElementById("artwahl");
+    if (wahl) wahl.onchange = () => {
+      if (!wahl.value) return;
+      art = wahl.value;
+      aktualisiere();
+    };
 
     // Mit Pfeilen und Tastatur durch die Arten blaettern. Die
     // Reihenfolge ist die der Leiste, also nach Aussichten sortiert.

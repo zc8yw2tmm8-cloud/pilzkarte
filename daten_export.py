@@ -59,6 +59,45 @@ def runde(wert, stellen=2):
     return None if wert is None else round(wert, stellen)
 
 
+# Lesbare Namen der Wettergroessen fuer die Bremse-Meldung
+GROESSEN_NAMEN = {
+    "bf07": "Bodenfeuchte", "bt07": "Bodentemperatur",
+    "bilanz_14": "Wasserbilanz der letzten 14 Tage",
+    "bilanz_60": "Wasserbilanz der letzten 60 Tage",
+    "regen_reife": "Regen vor 4 bis 14 Tagen",
+    "regen_frisch": "Regen der letzten 3 Tage",
+    "regentage": "Zahl der Regentage",
+    "temp": "Lufttemperatur",
+}
+
+
+def schwaechste_groesse(art, einzeln):
+    """
+    Welche Wettergroesse kostet die meisten Punkte?
+
+    "Gebremst durch Wetter" allein hilft niemandem weiter. Hier wird
+    nachgesehen, welche einzelne Groesse am weitesten von ihrem
+    Bestwert entfernt ist - dann steht im Popup "Bodenfeuchte zu
+    niedrig" statt einer Aufzaehlung von Moeglichkeiten.
+    """
+    e = artenmodul.ARTEN.get(art)
+    if not e:
+        return None
+
+    schlimmste, groesster_verlust = None, 0
+    for feld in artenmodul.MOEGLICHE_FELDER:
+        if not e.get(feld) or feld.startswith("abzug"):
+            continue
+        hoechst = max(b[2] for b in e[feld])
+        verlust = hoechst - einzeln.get(feld, 0)
+        if verlust > groesster_verlust:
+            groesster_verlust, schlimmste = verlust, feld
+
+    if schlimmste is None or groesster_verlust < 4:
+        return None
+    return GROESSEN_NAMEN.get(schlimmste, schlimmste)
+
+
 def letzter_regen(reihe, stichtag, mindest_mm=1.0):
     """
     Der letzte Tag mit nennenswertem Regen und wie viel es war.
@@ -145,6 +184,12 @@ def main():
                 if i == 0:
                     gebremst = artenmodul.bremse(wetter, saison, wald,
                                                  boden_f)
+                    # Beim Wetter genauer werden: welche Groesse?
+                    if gebremst and gebremst[0] == "Wetter":
+                        genau = schwaechste_groesse(art, einzeln)
+                        if genau:
+                            gebremst = (gebremst[0], genau,
+                                        gebremst[2])
                     teile[art] = {
                         "wetter": wetter, "saison": saison,
                         "bestand": wald, "boden": boden_f,
