@@ -1,9 +1,6 @@
 name: Wetterdaten sammeln
 
 # Viermal taeglich, jeweils kurz nach den ICON-D2-Laeufen des DWD.
-# Der Vortag wird nur beim ersten Lauf geholt - er aendert sich nicht
-# mehr. Die Vorhersage dagegen jedes Mal: sie wird alle drei Stunden
-# neu gerechnet, und ein Regengebiet kann anders ziehen als gedacht.
 #
 # Krumme Minuten, weil GitHub geplante Laeufe zur vollen Stunde
 # haeufiger verschiebt oder ausfallen laesst.
@@ -43,27 +40,32 @@ jobs:
       - name: Pakete installieren
         run: pip install -r requirements.txt
 
-      # Nur im Fruehlauf. Spaeter am Tag ist der Vortag laengst da,
-      # und das Skript wuerde ohnehin "nichts zu tun" melden.
+      # BEI JEDEM LAUF, nicht nur im Fruehlauf.
+      #
+      # Vorher stand hier eine Bedingung auf den Zeitplan:
+      #   if: github.event.schedule == '17 4 * * *'
+      # Die hat nicht zuverlaessig gegriffen - der Schritt wurde
+      # uebersprungen, und dann kamen tagelang nur Vorhersagen
+      # herein, keine Messwerte.
+      #
+      # sammeln.py prueft ohnehin selbst, was schon da ist, und
+      # meldet "nichts zu tun", wenn nichts fehlt. Viermal laufen
+      # kostet also fast nichts - und wenn der DWD einmal spaeter
+      # liefert, holt es der naechste Lauf desselben Tages nach.
       - name: Vortag sammeln
-        if: >
-          github.event_name == 'workflow_dispatch' ||
-          github.event.schedule == '17 4 * * *'
         run: python sammeln.py
 
-      # Bei jedem Lauf - das ist der Grund fuer die vier Termine
       - name: Vorhersage holen
         run: python prognose.py
 
-      # Fehlende Tage nachholen, falls ein Lauf ausgefallen ist.
-      # Nur sonntags frueh, weil es rund 1000 Abrufe kostet.
+      # Fehlende Tage nachholen, falls Laeufe ausgefallen sind.
+      # Nur sonntags, weil es rund 1000 Abrufe kostet.
       - name: Luecken schliessen
-        if: github.event.schedule == '17 4 * * *'
         run: |
-          if [ "$(date +%u)" = "7" ]; then
+          if [ "$(date +%u)" = "7" ] && [ "$(date +%H)" -lt "8" ]; then
             python nachfuellen.py
           else
-            echo "Nur sonntags - heute uebersprungen"
+            echo "Nur sonntags frueh - heute uebersprungen"
           fi
 
       - name: Ergebnisse zurueckschreiben

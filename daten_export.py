@@ -46,13 +46,57 @@ def gitter_angaben():
     schritt_lat = k.RASTER_KM / 111.0
     mitte = (sued + nord) / 2
     schritt_lon = k.RASTER_KM / (111.0 * math.cos(math.radians(mitte)))
+    # NICHT runden. Der Browser rechnet sonst mit einem minimal
+    # anderen Schritt als die Skripte, und Punkte nahe einer
+    # Feldgrenze landen in verschiedenen Feldern - auf der Karte
+    # sieht man dann Loecher und doppelte Kacheln.
     return {"sued": sued, "west": west,
-            "schritt_lat": round(schritt_lat, 8),
-            "schritt_lon": round(schritt_lon, 8)}
+            "schritt_lat": schritt_lat,
+            "schritt_lon": schritt_lon}
 
 
 def runde(wert, stellen=2):
     return None if wert is None else round(wert, stellen)
+
+
+def letzter_regen(reihe, stichtag, mindest_mm=1.0):
+    """
+    Der letzte Tag mit nennenswertem Regen und wie viel es war.
+
+    Unter 1 mm ist Nieselregen - der erreicht den Waldboden unter
+    dem Kronendach oft gar nicht.
+    """
+    beste = None
+    for r in reihe:
+        if r.get("tag") is None or r["tag"] > stichtag:
+            continue
+        regen = r.get("regen")
+        if regen is None or regen < mindest_mm:
+            continue
+        if beste is None or r["tag"] > beste["tag"]:
+            beste = r
+
+    if beste is None:
+        return None
+
+    return {"datum": beste["tag"].strftime("%d.%m.%Y"),
+            "mm": round(beste["regen"], 1),
+            "vor": (stichtag - beste["tag"]).days}
+
+
+def regenereignis(ereignisse, stichtag):
+    """
+    Das letzte Regenereignis - mindestens 15 mm in drei Tagen.
+
+    Das ist der Ausloeser fuer einen Schub, nicht jeder Nieselregen.
+    """
+    vergangen = [e for e in ereignisse if e["tag"] <= stichtag]
+    if not vergangen:
+        return None
+    letztes = vergangen[-1]
+    return {"datum": letztes["tag"].strftime("%d.%m.%Y"),
+            "mm": letztes["mm"],
+            "vor": (stichtag - letztes["tag"]).days}
 
 
 def main():
@@ -99,6 +143,8 @@ def main():
                     artenmodul.score(kenn, art, tag, wt["typ"], bd, bst)
                 werte.append(end)
                 if i == 0:
+                    gebremst = artenmodul.bremse(wetter, saison, wald,
+                                                 boden_f)
                     teile[art] = {
                         "wetter": wetter, "saison": saison,
                         "bestand": wald, "boden": boden_f,
@@ -106,6 +152,12 @@ def main():
                         # grossen Teil der Datei aus und sagen nichts
                         "einzeln": {f: p for f, p in einzeln.items()
                                     if p},
+                        # Was den Wert am staerksten drueckt - ohne
+                        # das ist eine niedrige Zahl nicht zu deuten
+                        "bremse": (None if gebremst is None else
+                                   {"was": gebremst[0],
+                                    "warum": gebremst[1],
+                                    "wert": gebremst[2]}),
                     }
             scores[art] = werte
 
@@ -129,13 +181,18 @@ def main():
                 for a, w in oben)
             waldanteil = bst.get("waldanteil")
 
-        schub, _ = k.schub_hinweis("steinpilz", ereignisse.get(ort, []),
-                                   bezugstage[0])
+        # Wann hat es zuletzt geregnet, und wie viel?
+        regen_zuletzt = letzter_regen(reihen[ort], bezugstage[0])
+        regen_ereignis = regenereignis(ereignisse.get(ort, []),
+                                       bezugstage[0])
 
         zellen.append({
             "id": ort,
-            "lat": round(lat, 5),
-            "lon": round(lon, 5),
+            # Sieben Stellen sind auf 11 cm genau. Fuenf waeren zu
+            # grob: Bei 1 m Genauigkeit kippten zwoelf Punkte ueber
+            # eine Feldgrenze ins Nachbarfeld.
+            "lat": round(lat, 7),
+            "lon": round(lon, 7),
             "titel": titel,
             "hoehe": None if hoehen.get(ort) is None
                      else round(hoehen[ort]),
@@ -158,6 +215,8 @@ def main():
                 "frosttage": kenn_heute.get("frosttage"),
                 "prognose_tage": kenn_heute.get("prognose_tage"),
             },
+            "regen_zuletzt": regen_zuletzt,
+            "regen_ereignis": regen_ereignis,
             "scores": scores,
             "teile": teile,
         })
