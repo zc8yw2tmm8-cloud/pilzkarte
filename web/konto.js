@@ -830,15 +830,19 @@ async function setzeAnsicht(neuHell, speichern) {
   // ohne dass etwas kaputt waere.
   if (karte && letzteAnsicht !== hell) {
     letzteAnsicht = hell;
-    const teil = hell ? "light" : "dark";
+    // Esri Grey Canvas, hell oder dunkel. Muss zu den Quellen in
+    // index.html passen - dort steht dieselbe Adresse.
+    const basis = "https://services.arcgisonline.com/ArcGIS/rest/"
+                + "services/Canvas/World_";
+    const teil = hell ? "Light_Gray" : "Dark_Gray";
+
     ["grund", "beschriftung"].forEach(quelle => {
       const q = karte.getSource(quelle);
       if (!q || typeof q.setTiles !== "function") return;
-      const endung = quelle === "grund" ? "nolabels" : "only_labels";
+      const rolle = quelle === "grund" ? "Base" : "Reference";
       try {
-        q.setTiles(["a", "b", "c"].map(x =>
-          `https://${x}.basemaps.cartocdn.com/${teil}_${endung}/` +
-          `{z}/{x}/{y}.png`));
+        q.setTiles([`${basis}${teil}_${rolle}/MapServer/`
+                    + `tile/{z}/{y}/{x}`]);
       } catch (e) {
         // Ein abgebrochener Ladevorgang ist kein Fehler
       }
@@ -905,6 +909,8 @@ function zeigeMitleserknopf() {
   b.className = "tag";
   b.dataset.schalter = "fremde";
   b.innerHTML = "&#9679; alle Nutzer";
+  b.title = "Funde und Routen der anderen Nutzer einblenden "
+          + "(orange). Nur fuer Mitleser.";
   b.onclick = () => {
     fremdeSichtbar = !fremdeSichtbar;
     b.classList.toggle("aktiv", fremdeSichtbar);

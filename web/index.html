@@ -405,6 +405,9 @@ function farbe(wert) {
 const komma = (z, n = 1) =>
   z === null || z === undefined ? "–" : z.toFixed(n).replace(".", ",");
 
+const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/" +
+             "services/Canvas/";
+
 let D = null, art = null, tag = 0, karte = null;
 let offenesPopup = null;
 
@@ -1191,22 +1194,33 @@ fetch("daten.json")
           // CARTO liefert die Grundkarte in zwei Teilen: Flaechen und
           // Beschriftung getrennt. Damit koennen Strassennamen und
           // Ortsschilder UEBER den Farbflaechen liegen statt darunter.
+          // Esri Grey Canvas statt CARTO.
+          //
+          // CARTO hat am 28.08.2026 begonnen, Kachelabrufe ohne
+          // Schluessel mit einem Wasserzeichen zu versehen - und
+          // laesst die Rasterkarten ohnehin auslaufen. Ein
+          // kostenloser Schluessel waere moeglich, aber dann
+          // stuenden wir beim naechsten Schritt wieder hier.
+          //
+          // Esri liefert wie CARTO zwei getrennte Teile: Flaechen
+          // und Beschriftung. Genau das braucht die Karte, damit
+          // Ortsnamen UEBER den Farbflaechen liegen.
+          //
+          // Achtung: Esri ordnet die Kacheln {z}/{y}/{x}, nicht
+          // {z}/{x}/{y} wie die meisten anderen.
           grund: {
             type: "raster",
-            tiles: ["https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
-                    "https://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
-                    "https://c.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png"],
+            tiles: [ESRI + "World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"],
             tileSize: 256,
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">' +
-              'OpenStreetMap</a>, © <a href="https://carto.com/">CARTO</a> · ' +
+            attribution: 'Karte © <a href="https://www.esri.com/">Esri</a>, ' +
+              'HERE, Garmin, © <a href="https://www.openstreetmap.org/copyright">' +
+              'OpenStreetMap</a> · ' +
               'Wetter <a href="https://open-meteo.com/">Open-Meteo</a> · ' +
               'Baumarten <a href="https://atlas.thuenen.de/">Thünen-Institut</a>'
           },
           beschriftung: {
             type: "raster",
-            tiles: ["https://a.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png",
-                    "https://b.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png",
-                    "https://c.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png"],
+            tiles: [ESRI + "World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"],
             tileSize: 256
           }
         },
