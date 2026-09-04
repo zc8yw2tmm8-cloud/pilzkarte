@@ -849,8 +849,17 @@ async function setzeAnsicht(neuHell, speichern) {
     });
   }
 
+  // Das Symbol bleibt ein Symbol - vorher wurde es hier durch das
+  // Wort "hell" oder "dunkel" ersetzt, und der runde Knopf sah
+  // danach aus wie ein verrutschtes Textfeld.
   const knopf = document.querySelector("[data-ansicht-hell]");
-  if (knopf) knopf.textContent = hell ? "dunkel" : "hell";
+  if (knopf) {
+    // Gezeigt wird, wohin es geht: Sonne heisst "auf hell
+    // umschalten", Mond heisst "auf dunkel".
+    knopf.innerHTML = hell ? "\u263D" : "\u2600";
+    knopf.title = hell ? "Auf dunkel umschalten"
+                       : "Auf hell umschalten";
+  }
 
   if (!speichern) return;
 

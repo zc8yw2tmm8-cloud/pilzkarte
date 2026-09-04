@@ -390,9 +390,9 @@ try {
       <span class="pfeil">&#9662;</span> Einstellungen
     </button>
     <button class="hellknopf" data-ansicht-hell
-            title="Hell oder dunkel"
+            title="Auf hell umschalten"
             onclick="if(typeof ansichtUmschalten==='function')
-                     ansichtUmschalten()">&#9789;</button>
+                     ansichtUmschalten()">&#9728;</button>
   </div>
 
   <div id="einstellungen" hidden>
@@ -1390,6 +1390,33 @@ fetch("daten.json")
       showUserHeading: true
     });
     karte.addControl(orten);
+
+    // Blickrichtung braucht den Kompass, und iOS gibt ihn erst nach
+    // ausdruecklicher Erlaubnis frei. Die laesst sich nur aus einer
+    // echten Nutzerhandlung heraus erfragen - deshalb beim ersten
+    // Druck auf den Standortknopf.
+    let sensorGefragt = false;
+    const sensorErlauben = () => {
+      if (sensorGefragt) return;
+      sensorGefragt = true;
+
+      const D0 = window.DeviceOrientationEvent;
+      if (D0 && typeof D0.requestPermission === "function") {
+        D0.requestPermission().then(antwort => {
+          if (antwort !== "granted") {
+            melde("Ohne Zugriff auf den Kompass zeigt die Karte "
+                  + "keine Blickrichtung.", 6000);
+          }
+        }).catch(() => {});
+      }
+    };
+
+    // Der Knopf entsteht erst, wenn die Steuerung eingehaengt ist
+    setTimeout(() => {
+      const b = document.querySelector(
+        ".maplibregl-ctrl-geolocate");
+      if (b) b.addEventListener("click", sensorErlauben);
+    }, 300);
 
     orten.on("geolocate", e => {
       meinOrt = [e.coords.longitude, e.coords.latitude];
