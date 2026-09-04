@@ -23,7 +23,7 @@
     --warn: #e8a33d;
   }
   /* Helle Ansicht - dieselben Bausteine, andere Werte. */
-  body.hell {
+  html.hell-start body, body.hell {
     --grund: #f4f2ee; --flaeche: #ffffff; --text: #1c1f22;
     --leise: #5f6469; --linie: #d9d5cd; --akzent: #2f7a35;
     --warn: #b4761e;
@@ -339,6 +339,15 @@
   }
 </style>
 </head>
+<script>
+// Ganz frueh, vor dem Zeichnen: Wer zuletzt hell gewaehlt hat, soll
+// die Seite nicht erst dunkel sehen.
+try {
+  if (localStorage.getItem("pilzkarte_hell") === "1") {
+    document.documentElement.classList.add("hell-start");
+  }
+} catch (e) {}
+</script>
 <body>
 
 <header>
@@ -447,6 +456,23 @@ const komma = (z, n = 1) =>
 
 const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/" +
              "services/Canvas/";
+
+// Gespeicherte Ansicht SOFORT lesen, noch bevor die Karte entsteht.
+//
+// Vorher wurden die Einstellungen erst nach dem Anmelden angewandt -
+// man sah die Karte kurz in der Grundeinstellung und dann springen.
+// Der Browserspeicher steht dagegen sofort bereit.
+const START = (() => {
+  try {
+    const t = localStorage.getItem("pilzkarte_einstellungen");
+    return t ? JSON.parse(t) : {};
+  } catch (e) {
+    return {};
+  }
+})();
+
+// Hell oder dunkel noch vor dem ersten Bild setzen
+if (START.hell) document.documentElement.classList.add("hell-start");
 
 let D = null, art = null, tag = 0, karte = null;
 let offenesPopup = null;
@@ -1127,8 +1153,11 @@ fetch("daten.json")
   .then(daten => {
     D = daten;
 
-    // Nicht immer Steinpilz zeigen, sondern die Art mit den besten
+    // Zuletzt gewaehlte Art bevorzugen, sonst die mit den besten
     // Aussichten - im August ist das eine andere als im Oktober.
+    if (START.art && D.arten[START.art]) {
+      art = START.art;
+    } else {
     art = Object.keys(D.arten).reduce((beste, a) => {
       const schnitt = liste => liste.reduce((s, x) => s + x, 0)
                              / Math.max(1, liste.length);
@@ -1136,6 +1165,7 @@ fetch("daten.json")
         D.zellen.map(z => z.scores[a][0] ?? 0));
       return wert(a) > wert(beste) ? a : beste;
     }, Object.keys(D.arten)[0]);
+    }
 
     const d = new Date(D.stand);
     const standEl = document.getElementById("stand");
@@ -1318,6 +1348,7 @@ fetch("daten.json")
             type: "raster",
             tiles: [ESRI + "World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"],
             tileSize: 256,
+            maxzoom: 15,
             attribution: 'Karte © <a href="https://www.esri.com/">Esri</a>, ' +
               'HERE, Garmin, © <a href="https://www.openstreetmap.org/copyright">' +
               'OpenStreetMap</a> · ' +
@@ -1327,7 +1358,8 @@ fetch("daten.json")
           beschriftung: {
             type: "raster",
             tiles: [ESRI + "World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"],
-            tileSize: 256
+            tileSize: 256,
+            maxzoom: 15
           }
         },
         // Ohne glyphs kann MapLibre keine Beschriftung zeichnen -
@@ -1336,14 +1368,26 @@ fetch("daten.json")
         layers: [{ id: "grund", type: "raster", source: "grund" }]
       },
       bounds: [[g.west, g.sued], [g.ost, g.nord]],
-      fitBoundsOptions: { padding: 20 }
+      fitBoundsOptions: { padding: 20 },
+
+      // Nicht weiter als Stufe 15 hineinzoomen.
+      //
+      // Zwei Gruende: Esri Grey Canvas hat oberhalb keine Kacheln
+      // mehr und zeigt "Map data not yet available". Und die Daten
+      // liegen ohnehin in 2-km-Feldern vor - genauer wird die
+      // Aussage nicht, egal wie nah man herangeht.
+      maxZoom: 15
     });
 
     karte.addControl(new maplibregl.NavigationControl({ showCompass: false }));
     const orten = new maplibregl.GeolocateControl({
       positionOptions: { enableHighAccuracy: true, timeout: 12000 },
       trackUserLocation: true,
-      showUserLocation: true
+      showUserLocation: true,
+      // Blickrichtung als Kegel, wie in den Karten-Apps. Braucht
+      // den Kompass des Geraets - am Rechner passiert nichts,
+      // auf dem Telefon fragt iOS beim ersten Mal um Erlaubnis.
+      showUserHeading: true
     });
     karte.addControl(orten);
 
@@ -1479,7 +1523,8 @@ fetch("daten.json")
             karte.easeTo({ center: b.geometry.coordinates,
                            zoom: Math.min(z + 0.5, 15) }))
           .catch(() => karte.easeTo({
-            center: b.geometry.coordinates, zoom: karte.getZoom() + 2 }));
+            center: b.geometry.coordinates,
+            zoom: Math.min(karte.getZoom() + 2, 15) }));
       });
       karte.on("mouseenter", "funde_buendel",
         () => karte.getCanvas().style.cursor = "pointer");
@@ -1629,6 +1674,21 @@ fetch("daten.json")
         .then(r => r.ok ? r.json() : [])
         .then(r => { relief = r; reliefEinbinden(); })
         .catch(() => {});
+
+      // Gespeicherte Werte anwenden, bevor das erste Bild steht
+      if (typeof START.deckkraft === "number") {
+        const dr = document.getElementById("deckregler");
+        if (dr) {
+          dr.value = START.deckkraft;
+          const dw = document.getElementById("deckwert");
+          if (dw) dw.textContent = START.deckkraft + " %";
+        }
+      }
+      if (START.stil) {
+        const sb = document.querySelector(`[data-stil="${START.stil}"]`);
+        if (sb && !sb.classList.contains("aktiv")) sb.click();
+      }
+      if (START.hell) document.body.classList.add("hell");
 
       setzeDeckkraft();
       if (typeof kontoStarten === "function" && !window.OHNE_KONTO) {
