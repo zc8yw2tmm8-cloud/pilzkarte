@@ -109,6 +109,9 @@ async function kontoDatenLaden() {
   }
 
   setTimeout(() => stelleWiederHer(ladeEinstellungen()), 250);
+  // Falls nichts wiederherzustellen ist, muss trotzdem gespeichert
+  // werden koennen
+  setTimeout(() => { einstellungenBereit = true; }, 3000);
 
   // Beim ersten Anmelden nach einem Namen fragen
   if (!anzeigename) {
@@ -765,7 +768,10 @@ function sammleEinstellungen() {
 let sichernZeit = null;
 
 function merkeEinstellungen() {
-  if (!einstellungenBereit) return;
+  // Ohne Anmeldung laeuft stelleWiederHer nie, und damit wurde
+  // einstellungenBereit nie gesetzt - dann hat diese Funktion gar
+  // nichts geschrieben, auch nicht in den Browserspeicher.
+  if (!einstellungenBereit && benutzer) return;
 
   // Nicht bei jedem Klick schreiben - erst wenn Ruhe eingekehrt ist
   clearTimeout(sichernZeit);
@@ -820,6 +826,10 @@ function stelleWiederHer(e, versuch) {
       localStorage.setItem("pilzkarte_lieblinge",
                            JSON.stringify(lieblinge));
     } catch (x) {}
+    // Ohne das bleibt die Reihenfolge stehen, wie sie war - die
+    // zurueckgeholten Vorgemerkten wuerden erst beim naechsten
+    // Klick nach oben ruecken.
+    if (typeof aktualisiere === "function") aktualisiere();
   }
 
   if (e.art && D.arten[e.art]) {
@@ -933,8 +943,20 @@ async function setzeAnsicht(neuHell, speichern) {
   } catch (e) {}
 
   if (sb && benutzer) {
+    // ALLE Einstellungen schreiben, nicht nur "hell".
+    //
+    // Vorher stand hier update({ einstellungen: { hell: hell } }) -
+    // das ersetzt das ganze Objekt. Jedes Umschalten zwischen hell
+    // und dunkel loeschte damit die vorgemerkten Arten, die
+    // gewaehlte Art, die Deckkraft und die Waldebene aus dem
+    // Profil.
+    const alles = sammleEinstellungen();
+    try {
+      localStorage.setItem("pilzkarte_einstellungen",
+                           JSON.stringify(alles));
+    } catch (e) {}
     await sb.from("profile")
-      .update({ einstellungen: { hell: hell } })
+      .update({ einstellungen: alles })
       .eq("id", benutzer.id);
   }
 }
