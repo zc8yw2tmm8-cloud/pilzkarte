@@ -57,21 +57,54 @@
 
   /* Der Einstellungsblock gehoert nach unten links, nicht in die
      Mitte des Bildes. Er wandert in Schritt 3 ins Ebenenblatt. */
-  /* Mittig und oberhalb der Legende - vorher lag der Block links
-     unten und verdeckte sie. */
-  #einstellungen { position: absolute; left: 50%;
-                   transform: translateX(-50%);
-                   bottom: 34px;
-                   width: min(420px, calc(100vw - 20px));
+  /* Einstellungen: am Rechner eine Spalte links, auf dem Telefon
+     ein Blatt von unten.
+     Am Rechner ist links Platz, den man nicht verschenken sollte -
+     dort steht der Block offen da und laesst sich einklappen. Auf
+     dem Telefon waere er im Weg, deshalb erscheint er erst auf
+     Druck und dann von unten, wo der Daumen ist. */
+  #einstellungen { position: absolute; left: 10px; top: 106px;
+                   width: min(360px, 32vw);
+                   max-height: calc(100vh - 200px);
+                   overflow-y: auto;
                    background: rgba(30,34,40,.94);
                    border: 1px solid var(--linie);
-                   border-radius: 12px; padding: 10px 12px;
-                   max-height: 46vh; overflow-y: auto; }
+                   border-radius: 12px; padding: 12px 14px 14px; }
+
+  /* Die Knoepfe brechen um, statt seitlich zu verschwinden.
+     Vorher war die Leiste scrollbar - am Rechner sieht man dann
+     nicht, dass es weitergeht, und findet Eiche oder Fichte nie. */
+  #einstellungen .tagleiste { flex-wrap: wrap; overflow: visible; }
+  #einstellungen .zeile { display: block; }
+  #einstellungen .zeile > .marke { display: block; margin-bottom: 5px;
+                                   flex: none; }
+  #einstellungen .regler .marke { flex: 0 0 62px; }
+
+  .blockkopf { display: flex; align-items: center; gap: 8px;
+               margin-bottom: 10px; padding-bottom: 8px;
+               border-bottom: 1px solid var(--linie);
+               font-size: 12px; color: var(--leise);
+               text-transform: uppercase; letter-spacing: .05em; }
+  .blockkopf button { margin-left: auto; background: transparent;
+                      border: 0; color: var(--leise); font-size: 20px;
+                      line-height: 1; cursor: pointer; padding: 0 4px; }
+  .blockkopf button:hover { color: var(--akzent); }
+  /* Im Blatt hat die Ueberschrift schon einen Titel */
+  .blatt-inhalt .blockkopf { display: none; }
+  #einstellungen.zu { display: none; }
   #einstellungen .zeile { margin-top: 6px; }
   #einstellungen .regler { margin-top: 0; }
   body.hell #einstellungen { background: rgba(255,255,255,.95); }
 
-  .pille { position: absolute; top: 10px; left: 50%;
+  /* Im Blatt braucht er keine eigene Umrandung */
+  .blatt-inhalt #einstellungen { position: static; width: auto;
+                                 max-height: none; background: none;
+                                 border: 0; padding: 0; }
+
+  /* Pille und Tageschips gelten fuer beide Ansichten - in der
+     Bestenliste will man ebenso die Art wechseln und durch die
+     Tage blaettern. Deshalb liegen sie ueber der Liste. */
+  .pille { position: absolute; top: 10px; left: 50%; z-index: 7;
            transform: translateX(-50%);
            width: min(520px, calc(100vw - 20px));
            display: flex; align-items: center; gap: 9px;
@@ -87,7 +120,7 @@
   .pille:hover { border-color: var(--akzent); }
   .pille, .tagchips { max-width: none; }
 
-  .tagchips { position: absolute; top: 60px; left: 50%;
+  .tagchips { position: absolute; top: 60px; left: 50%; z-index: 7;
               transform: translateX(-50%);
               width: min(520px, calc(100vw - 20px));
               display: flex; gap: 6px; overflow-x: auto;
@@ -107,6 +140,68 @@
 
   body.hell .pille, body.hell .tagchips button {
     background: rgba(255,255,255,.94); }
+
+  /* ===== Knopfsaeule rechts ===== */
+  .saeule { position: absolute; right: 10px; top: 312px;
+            display: flex; flex-direction: column; gap: 7px;
+            z-index: 6; }
+
+  /* Die eingebauten Knoepfe von MapLibre - Zoom, Standort,
+     Routenaufzeichnung - lagen unter der Pille und waren auf dem
+     Telefon nicht erreichbar. Sie kommen in dieselbe Saeule und
+     bekommen dasselbe Aussehen. */
+  .maplibregl-ctrl-top-right { top: 152px !important;
+                               right: 0 !important; }
+  .maplibregl-ctrl-top-right .maplibregl-ctrl {
+    margin: 0 10px 7px 0 !important; background: none !important;
+    box-shadow: none !important; }
+  .maplibregl-ctrl-top-right button {
+    width: 40px !important; height: 40px !important;
+    border-radius: 20px !important;
+    background: rgba(30,34,40,.94) !important;
+    border: 1px solid var(--linie) !important;
+    margin-bottom: 7px !important; }
+  .maplibregl-ctrl-top-right button + button { border-top: 1px solid
+    var(--linie) !important; }
+  .maplibregl-ctrl-top-right button span {
+    filter: invert(1) brightness(1.4); }
+  body.hell .maplibregl-ctrl-top-right button {
+    background: rgba(255,255,255,.94) !important; }
+  body.hell .maplibregl-ctrl-top-right button span { filter: none; }
+  .rund { width: 40px; height: 40px; border-radius: 20px;
+          background: rgba(30,34,40,.94); border: 1px solid var(--linie);
+          color: var(--text); display: flex; align-items: center;
+          justify-content: center; font-size: 16px; cursor: pointer;
+          text-decoration: none; }
+  .rund:hover { border-color: var(--akzent); color: var(--akzent); }
+  .rund.aktiv { border-color: var(--akzent); color: var(--akzent);
+                background: rgba(95,183,99,.14); }
+  body.hell .rund { background: rgba(255,255,255,.94); }
+
+  /* Auf dem Telefon ist der Block NUR im Blatt zu sehen.
+     Beide Regeln haben dieselbe Genauigkeit - die zweite gewinnt,
+     weil sie spaeter steht. Deshalb muessen sie in dieser
+     Reihenfolge und moeglichst weit unten stehen. */
+  @media (max-width: 700px) {
+    header #einstellungen { display: none; }
+    .blatt-inhalt #einstellungen { display: block; }
+
+    /* Auf dem Telefon zoomt man mit zwei Fingern - die Knoepfe
+       nehmen nur Platz weg und ruecken alles andere nach unten. */
+    .maplibregl-ctrl-zoom-in,
+    .maplibregl-ctrl-zoom-out { display: none !important; }
+    .saeule { top: 210px; }
+  }
+
+  /* ===== Bestenliste =====
+     Dort bleibt nur die Tagesauswahl. Sie rueckt nach oben, weil
+     Pille und Einstellungen wegfallen - sonst klaffte eine Luecke
+     und der erste Eintrag der Liste verschwaende darunter. */
+  body.inliste .pille,
+  body.inliste #einstellungen,
+  body.inliste .saeule { display: none !important; }
+  body.inliste .tagchips { top: 10px; }
+  body.inliste #liste { padding-top: 58px; }
 
   /* ===== Reiterleiste unten =====
      Am unteren Rand, weil man dort mit dem Daumen hinkommt. Reiter
@@ -129,7 +224,7 @@
   body.hell .reiter { background: #ffffff; }
 
   /* Alles Schwebende muss ueber der Leiste bleiben */
-  #einstellungen { bottom: 62px !important; }
+
   .fuss { bottom: 52px !important; }
   .blatt-huelle .blatt-inhalt { margin-bottom: 52px; }
 
@@ -144,19 +239,37 @@
                   overflow-y: auto; overscroll-behavior: contain; }
   .griff { width: 36px; height: 4px; background: var(--linie);
            border-radius: 2px; margin: 0 auto 12px; }
+
+  /* Auf dem Telefon ist nicht ersichtlich, wie man das Blatt wieder
+     schliesst - der Griff allein reicht als Hinweis nicht. */
+  .blatt-inhalt { position: relative; }
+  .blattzu { position: absolute; right: 10px; top: 6px;
+             background: transparent; border: 0; color: var(--leise);
+             font-size: 26px; line-height: 1; cursor: pointer;
+             padding: 4px 10px; }
+  .blattzu:hover { color: var(--akzent); }
   .blatt-inhalt h3 { margin: 0 0 4px; font-size: 16px; }
   .blatt-inhalt .klein { color: var(--leise); font-size: 12px;
                          margin-bottom: 10px; }
 
   .artenliste { display: flex; flex-direction: column; gap: 2px; }
   .artzeile { display: flex; align-items: center; width: 100%;
-              background: transparent; border: 0; color: var(--text);
-              padding: 12px 10px; border-radius: 8px; cursor: pointer;
-              font: inherit; font-size: 14px; text-align: left;
+              border-radius: 8px;
               border-bottom: 1px solid var(--linie); }
+  .artname { display: flex; align-items: center; flex: 1;
+             background: transparent; border: 0; color: var(--text);
+             padding: 12px 10px 12px 4px; cursor: pointer;
+             font: inherit; font-size: 14px; text-align: left; }
+  .stern { background: transparent; border: 0; cursor: pointer;
+           color: var(--leise); font-size: 17px; line-height: 1;
+           padding: 10px 6px 10px 8px; }
+  .stern.an { color: #e8c34a; }
+  #liste h2 .stern { font-size: 15px; padding: 0 6px 0 0;
+                     vertical-align: baseline; }
+  .stern:hover { color: #e8c34a; }
   .artzeile:last-child { border-bottom: 0; }
-  .artzeile b { margin-left: auto; color: var(--akzent);
-                font-size: 16px; }
+  .artname b { margin-left: auto; color: var(--akzent);
+               font-size: 16px; }
   .artzeile.aktiv { background: rgba(95,183,99,.12); }
   .artzeile:hover { background: rgba(255,255,255,.05); }
 
@@ -223,9 +336,9 @@
   a.um { text-decoration: none; display: flex; align-items: center;
          justify-content: center; min-width: 32px; }
 
-  #liste { position: absolute; inset: 0; z-index: 6;
+  #liste { position: absolute; inset: 0; z-index: 4;
            background: var(--grund); overflow-y: auto;
-           padding: 104px 12px 12px 12px 60px;
+           padding: 104px 12px 64px 12px 60px;
            -webkit-overflow-scrolling: touch; }
   #liste h2 { font-size: 15px; margin: 20px 0 6px;
               border-bottom: 1px solid var(--linie); padding-bottom: 4px;
@@ -354,8 +467,6 @@
   .mehr .pfeil { display: inline-block; transition: transform .18s; }
   .mehr.offen .pfeil { transform: rotate(180deg); }
   .mehr.offen { color: var(--akzent); }
-  #einstellungen[hidden] { display: none; }
-  #einstellungen { padding-bottom: 2px; }
 
   .tagleiste { display: flex; gap: 4px; margin-top: 6px;
                overflow-x: auto; scrollbar-width: none; }
@@ -497,6 +608,16 @@ try {
 
   <div class="tagchips" id="tage"></div>
 
+  <div class="saeule">
+    <button class="rund" id="ebenenknopf"
+            title="Ebenen und Darstellung">&#9636;</button>
+    <a class="rund" href="info.html" title="Wie wird gerechnet?">?</a>
+  </div>
+
+  <!-- Platzhalter: Auf dem Telefon wandert der Einstellungsblock
+       ins Blatt und danach wieder hierher zurueck. -->
+  <span id="einstellungenplatz" hidden></span>
+
   <span id="kontoleiste" hidden><span id="kontostand"></span></span>
   <!-- Bleibt fuer konto.js vorhanden, wird aber nicht mehr
        eingeblendet - der Zugang steht jetzt unten in der
@@ -518,6 +639,11 @@ try {
   </div>
 
   <div id="einstellungen">
+    <div class="blockkopf">
+      <span>Ebenen und Darstellung</span>
+      <button id="blockzu" title="Einklappen">&times;</button>
+    </div>
+
     <div class="regler">
       <span class="marke">Deckkraft</span>
       <input type="range" id="deckregler" min="15" max="100" value="88"
@@ -664,11 +790,15 @@ function zeigePopup(ort, inhalt) {
     if (!kasten) return;
     const r = kasten.getBoundingClientRect();
     const c = karte.getContainer().getBoundingClientRect();
+    // Die Raender, die von schwebenden Elementen belegt sind, zaehlen
+    // als besetzt - sonst schiebt sich das Fenster unter die
+    // Einstellungsspalte oder unter die Reiterleiste.
+    const f = freierBereich();
     let dx = 0, dy = 0;
-    if (r.bottom > c.bottom - 10) dy = r.bottom - c.bottom + 20;
-    if (r.top < c.top + 10) dy = r.top - c.top - 20;
-    if (r.right > c.right - 10) dx = r.right - c.right + 20;
-    if (r.left < c.left + 10) dx = r.left - c.left - 20;
+    if (r.bottom > c.bottom - f.bottom) dy = r.bottom - c.bottom + f.bottom;
+    if (r.top < c.top + f.top) dy = r.top - c.top - f.top;
+    if (r.right > c.right - f.right) dx = r.right - c.right + f.right;
+    if (r.left < c.left + f.left) dx = r.left - c.left - f.left;
     if (dx || dy) karte.panBy([dx, dy], { duration: 260 });
   }, 60);
 }
@@ -832,7 +962,7 @@ function aktualisiere() {
     b.querySelector(".wert").innerHTML = `<b>${schnitt}</b>/100`;
     return { b, schnitt };
   });
-  bewertet.sort((x, y) => y.schnitt - x.schnitt)
+  nachLieblingen(bewertet)
     .forEach(({ b }) => leiste.appendChild(b));
 
   // Die besten drei als Knopf, alles Weitere im Ausklappmenue.
@@ -991,21 +1121,68 @@ function wertzeile(titel, feld, wert, text) {
           <td class="${farbe}">${text}</td></tr>`;
 }
 
+// Lieblingsarten stehen immer oben - in der Liste und in der
+// Artenwahl. Wer im September auf Steinpilze aus ist, will nicht
+// jedes Mal suchen, nur weil heute der Schwefelporling vorn liegt.
+let lieblinge = (() => {
+  try {
+    const t = localStorage.getItem("pilzkarte_lieblinge");
+    return t ? JSON.parse(t) : [];
+  } catch (e) {
+    return [];
+  }
+})();
+
+function istLiebling(a) {
+  return lieblinge.includes(a);
+}
+
+function lieblingUmschalten(a) {
+  if (istLiebling(a)) {
+    lieblinge = lieblinge.filter(x => x !== a);
+  } else {
+    lieblinge.push(a);
+  }
+  try {
+    localStorage.setItem("pilzkarte_lieblinge",
+                         JSON.stringify(lieblinge));
+  } catch (e) {}
+  if (typeof merkeEinstellungen === "function") merkeEinstellungen();
+}
+
+function nachLieblingen(liste) {
+  // Erst die Lieblinge, dann der Rest - innerhalb beider Gruppen
+  // weiter nach Aussichten.
+  return liste.slice().sort((x, y) => {
+    const lx = istLiebling(x.a) ? 1 : 0;
+    const ly = istLiebling(y.a) ? 1 : 0;
+    if (lx !== ly) return ly - lx;
+    return y.schnitt - x.schnitt;
+  });
+}
+
 function zeigeArtenwahl() {
+  blattZu();
   // Alle Arten als Liste, nach Aussichten sortiert. Ersetzt die
   // Knopfleiste, die bei elf Arten laenger war als der Bildschirm.
-  const sortiert = Object.keys(D.arten).map(a => {
+  const sortiert = nachLieblingen(Object.keys(D.arten).map(a => {
     const werte = D.zellen.map(z => z.scores[a][tag] ?? 0);
     return { a, schnitt: Math.round(
       werte.reduce((x, y) => x + y, 0) / Math.max(1, werte.length)) };
-  }).sort((x, y) => y.schnitt - x.schnitt);
+  }));
 
   const zeilen = sortiert.map(({ a, schnitt }) => `
-    <button class="artzeile ${a === art ? "aktiv" : ""}"
-            data-wahl="${a}">
-      <span>${D.arten[a].name}</span>
-      <b>${schnitt}</b>
-    </button>`).join("");
+    <div class="artzeile ${a === art ? "aktiv" : ""}">
+      <button class="stern ${istLiebling(a) ? "an" : ""}"
+              data-stern="${a}"
+              title="${istLiebling(a) ? "Nicht mehr vormerken"
+                                      : "Vormerken"}">
+        ${istLiebling(a) ? "&#9733;" : "&#9734;"}</button>
+      <button class="artname" data-wahl="${a}">
+        <span>${D.arten[a].name}</span>
+        <b>${schnitt}</b>
+      </button>
+    </div>`).join("");
 
   blatt(`<h3>Art wählen</h3>
     <p class="klein">Sortiert nach Aussichten für
@@ -1018,6 +1195,38 @@ function zeigeArtenwahl() {
       blattZu();
       aktualisiere();
     });
+
+  // Der Stern schliesst das Blatt nicht - man merkt oft mehrere
+  // Arten hintereinander vor.
+  document.querySelectorAll("[data-stern]").forEach(b =>
+    b.onclick = e => {
+      e.stopPropagation();
+      lieblingUmschalten(b.dataset.stern);
+      zeigeArtenwahl();
+    });
+}
+
+function amRechner() {
+  return window.matchMedia("(min-width: 701px)").matches;
+}
+
+function zeigeEbenen() {
+  const block = document.getElementById("einstellungen");
+  if (!block) return;
+
+  if (amRechner()) {
+    block.classList.toggle("zu");
+    const knopf = document.getElementById("ebenenknopf");
+    if (knopf) {
+      knopf.classList.toggle("aktiv", !block.classList.contains("zu"));
+    }
+    return;
+  }
+
+  // Auf dem Telefon: in ein Blatt umziehen
+  blatt('<h3>Ebenen und Darstellung</h3>');
+  const ziel = document.querySelector(".blatt-inhalt");
+  if (ziel) ziel.appendChild(block);
 }
 
 function blatt(inhalt) {
@@ -1030,11 +1239,23 @@ function blatt(inhalt) {
     document.body.appendChild(el);
   }
   el.innerHTML = `<div class="blatt-inhalt">
-    <div class="griff"></div>${inhalt}</div>`;
+    <div class="griff"></div>
+    <button class="blattzu" title="Schliessen"
+            onclick="blattZu()">&times;</button>
+    ${inhalt}</div>`;
   el.hidden = false;
 }
 
 function blattZu() {
+  // Den Einstellungsblock zurueck in die Kopfzeile holen, bevor das
+  // Blatt verschwindet - sonst waere er beim naechsten Mal weg.
+  const block = document.getElementById("einstellungen");
+  const platz = document.getElementById("einstellungenplatz");
+  if (block && platz && block.parentElement
+      && block.parentElement.classList.contains("blatt-inhalt")) {
+    platz.parentElement.insertBefore(block, platz);
+  }
+
   const el = document.getElementById("blatt");
   if (el) el.hidden = true;
 }
@@ -1252,7 +1473,13 @@ function baueListe() {
       .sort((x, y) => y[1] - x[1])
       .slice(0, 12);
     return { a, e, beste, spitze: beste.length ? beste[0][1] : -1 };
-  }).sort((x, y) => y.spitze - x.spitze);
+  }).sort((x, y) => {
+    // Vorgemerkte Arten zuerst, dann nach dem besten Wert
+    const lx = istLiebling(x.a) ? 1 : 0;
+    const ly = istLiebling(y.a) ? 1 : 0;
+    if (lx !== ly) return ly - lx;
+    return y.spitze - x.spitze;
+  });
 
   const zeile = ([z, w], i, a) => `
       <tr>
@@ -1266,13 +1493,17 @@ function baueListe() {
       </tr>`;
 
   const teile = bloecke.map(({ a, e, beste }) => {
+    const stern = `<button class="stern ${istLiebling(a) ? "an" : ""}"
+        data-stern="${a}">${istLiebling(a) ? "&#9733;"
+                                           : "&#9734;"}</button>`;
     if (!beste.length)
-      return `<h2>${e.name}</h2><div class="leer">keine Werte</div>`;
+      return `<h2>${stern}${e.name}</h2>
+              <div class="leer">keine Werte</div>`;
 
     const oben = beste.slice(0, 3).map((p, i) => zeile(p, i, a)).join("");
     const rest = beste.slice(3).map((p, i) => zeile(p, i + 3, a)).join("");
 
-    return `<h2>${e.name}<span class="saison">Saison
+    return `<h2>${stern}${e.name}<span class="saison">Saison
             ${komma(e.saison, 2)}</span></h2>
       <table>${oben}</table>
       ${rest ? `<details><summary>Weitere ${beste.length - 3} Gebiete
@@ -1280,16 +1511,24 @@ function baueListe() {
   });
 
   const el = document.getElementById("liste");
-  el.innerHTML = `<div class="klein" style="margin-bottom:14px">
-      Sortiert nach Aussichten für
-      <b>${tagname(tag).toLowerCase()}</b>. Werte unter etwa 40
-      bedeuten geringe Chancen.</div>` + teile.join("");
+  el.innerHTML = teile.join("");
+
+  el.querySelectorAll("[data-stern]").forEach(b =>
+    b.onclick = () => {
+      lieblingUmschalten(b.dataset.stern);
+      baueListe();
+    });
 
   el.querySelectorAll("button.hin").forEach(b => b.onclick = () => {
     art = b.dataset.art;
     zeigeAnsicht("karte");
     aktualisiere();
-    karte.flyTo({ center: [+b.dataset.lon, +b.dataset.lat], zoom: 12 });
+    // Nicht stur zentrieren: Am Rechner liegt links die
+    // Einstellungsspalte und wuerde das Fenster verdecken, wenn
+    // der Ort dort landet. padding schiebt den Ausschnitt so, dass
+    // die Zelle in dem Bereich liegt, der tatsaechlich frei ist.
+    karte.flyTo({ center: [+b.dataset.lon, +b.dataset.lat],
+                  zoom: 12, padding: freierBereich() });
     const z = D.zellen.find(x =>
       x.lat === +b.dataset.lat && x.lon === +b.dataset.lon);
     // Ueber zeigePopup, damit ein offenes Fenster geschlossen wird
@@ -1343,13 +1582,58 @@ function setzeStil(stil) {
   setzeDeckkraft();
 }
 
+function freierBereich() {
+  // Welche Raender sind von schwebenden Elementen belegt?
+  //
+  // Oben Pille und Tageschips, unten die Reiterleiste, rechts die
+  // Knopfsaeule - und am Rechner links die Einstellungsspalte,
+  // sofern sie aufgeklappt ist.
+  const block = document.getElementById("einstellungen");
+  const offen = block && !block.classList.contains("zu")
+             && getComputedStyle(block).display !== "none";
+
+  const breit = window.matchMedia("(min-width: 701px)").matches;
+
+  return {
+    top: 110,
+    bottom: 70,
+    left: (breit && offen) ? 330 : 20,
+    right: 70
+  };
+}
+
 function zeigeAnsicht(welche) {
-  document.getElementById("karte").hidden = welche !== "karte";
-  document.getElementById("liste").hidden = welche !== "liste";
-  document.querySelectorAll(".um").forEach(b =>
-    b.classList.toggle("aktiv", b.dataset.ansicht === welche));
-  if (welche === "liste") baueListe();
-  else if (karte) karte.resize();
+  // EINE Stelle fuer den Wechsel zwischen Karte und Bestenliste.
+  //
+  // Vorher gab es zwei: diese hier und den Code an der
+  // Reiterleiste. Der Sprung aus der Bestenliste lief ueber die
+  // alte - und liess dadurch den Reiter unten auf "Beste Gebiete"
+  // stehen, waehrend die Karte schon zu sehen war.
+  const karteAn = welche === "karte";
+
+  document.getElementById("karte").hidden = !karteAn;
+  const liste = document.getElementById("liste");
+  if (liste) liste.hidden = karteAn;
+
+  document.body.classList.toggle("inliste", !karteAn);
+
+  // Reiterleiste unten
+  document.querySelectorAll(".reiter button").forEach(b =>
+    b.classList.toggle("an", b.dataset.ansicht === welche));
+
+  // Kartenknoepfe nur bei der Karte
+  const saeule = document.querySelector(".saeule");
+  if (saeule) saeule.hidden = !karteAn;
+  const strg = document.querySelector(".maplibregl-ctrl-top-right");
+  if (strg) strg.style.display = karteAn ? "" : "none";
+
+  blattZu();
+
+  if (!karteAn) {
+    baueListe();
+  } else if (karte) {
+    setTimeout(() => karte.resize(), 60);
+  }
 }
 
 // ---- Aufbau ---------------------------------------------------------
@@ -1403,6 +1687,11 @@ fetch("daten.json")
           const r = document.getElementById("tagregler");
           if (r) r.value = tag;
           aktualisiere();
+          // In der Bestenliste muss die Liste selbst neu gebaut
+          // werden - aktualisiere() betrifft nur die Karte.
+          if (document.body.classList.contains("inliste")) {
+            baueListe();
+          }
         });
     }
 
@@ -1450,16 +1739,19 @@ fetch("daten.json")
           return;
         }
 
-        // Karte oder Bestenliste
-        document.querySelectorAll(".reiter button").forEach(x =>
-          x.classList.toggle("an", x === b));
-        const karteAn = wohin === "karte";
-        document.getElementById("karte").hidden = !karteAn;
-        const liste = document.getElementById("liste");
-        if (liste) liste.hidden = karteAn;
-        if (karteAn && karte) setTimeout(() => karte.resize(), 60);
-        else if (!karteAn) baueListe();
+        // Karte oder Bestenliste - immer ueber zeigeAnsicht, damit
+        // Reiter, Knopfsaeule und die Klasse "inliste" mitgehen.
+        zeigeAnsicht(wohin);
       });
+
+    // Ebenenknopf: am Rechner ein- und ausklappen, auf dem Telefon
+    // als Blatt von unten. Es ist derselbe Block - er wandert nur
+    // hin und her, damit die Einstellungen nirgends doppelt sind.
+    const eb = document.getElementById("ebenenknopf");
+    if (eb) eb.onclick = () => zeigeEbenen();
+
+    const bz = document.getElementById("blockzu");
+    if (bz) bz.onclick = () => zeigeEbenen();
 
     const pille = document.getElementById("artpille");
     if (pille) pille.onclick = () => zeigeArtenwahl();
