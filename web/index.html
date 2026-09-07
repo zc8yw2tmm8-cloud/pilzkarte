@@ -155,17 +155,25 @@
      bekommen dasselbe Aussehen. */
   .maplibregl-ctrl-top-right { top: 152px !important;
                                right: 0 !important; }
+  /* Alle Gruppen in der Ecke gleich: kein eigener Hintergrund,
+     kein Rahmen, immer 7 Pixel Abstand. So sehen die eingebauten
+     Knoepfe von MapLibre aus wie die eigenen. */
   .maplibregl-ctrl-top-right .maplibregl-ctrl {
-    margin: 0 10px 7px 0 !important; background: none !important;
-    box-shadow: none !important; }
+    margin: 0 10px 0 0 !important; background: none !important;
+    box-shadow: none !important; border: 0 !important;
+    display: flex !important; flex-direction: column !important;
+    gap: 7px !important; }
+  .maplibregl-ctrl-top-right {
+    display: flex !important; flex-direction: column !important;
+    gap: 7px !important; align-items: flex-end !important; }
   .maplibregl-ctrl-top-right button {
     width: 40px !important; height: 40px !important;
     border-radius: 20px !important;
     background: rgba(30,34,40,.94) !important;
     border: 1px solid var(--linie) !important;
-    margin-bottom: 7px !important; }
-  .maplibregl-ctrl-top-right button + button { border-top: 1px solid
-    var(--linie) !important; }
+    margin: 0 !important; }
+  .maplibregl-ctrl-top-right button + button {
+    border-top: 1px solid var(--linie) !important; }
   .maplibregl-ctrl-top-right button span {
     filter: invert(1) brightness(1.4); }
   body.hell .maplibregl-ctrl-top-right button {
@@ -1744,19 +1752,6 @@ fetch("daten.json")
     // Ebenenknopf: am Rechner ein- und ausklappen, auf dem Telefon
     // als Blatt von unten. Es ist derselbe Block - er wandert nur
     // hin und her, damit die Einstellungen nirgends doppelt sind.
-    // Die eigene Knopfsaeule zu den Kartenknoepfen umhaengen.
-    // MapLibre haengt seine eigenen (Zoom, Standort, Route) oben
-    // rechts ein; liegen unsere in derselben Leiste, schieben sie
-    // sich gegenseitig nach unten statt sich zu verdecken.
-    const saeule = document.querySelector(".saeule");
-    const ecke = document.querySelector(".maplibregl-ctrl-top-right");
-    if (saeule && ecke) {
-      const huelle = document.createElement("div");
-      huelle.className = "maplibregl-ctrl";
-      huelle.appendChild(saeule);
-      ecke.appendChild(huelle);
-    }
-
     const eb = document.getElementById("ebenenknopf");
     if (eb) eb.onclick = () => zeigeEbenen();
 
@@ -1998,6 +1993,21 @@ fetch("daten.json")
             "Standort konnte nicht ermittelt werden.");
     });
     // Der Massstab sitzt sonst genau auf der Legende
+    // Die eigene Knopfsaeule zu den Kartenknoepfen umhaengen.
+    //
+    // MUSS nach addControl stehen: Vorher gibt es die Leiste
+    // .maplibregl-ctrl-top-right noch gar nicht, und das Umhaengen
+    // lief ins Leere - die Saeule blieb ohne Position oben links
+    // liegen.
+    const saeule = document.querySelector(".saeule");
+    const ecke = document.querySelector(".maplibregl-ctrl-top-right");
+    if (saeule && ecke) {
+      const huelle = document.createElement("div");
+      huelle.className = "maplibregl-ctrl";
+      huelle.appendChild(saeule);
+      ecke.appendChild(huelle);
+    }
+
     karte.addControl(new maplibregl.ScaleControl({ maxWidth: 90 }),
                      "top-left");
 
