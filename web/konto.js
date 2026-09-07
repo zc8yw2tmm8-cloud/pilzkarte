@@ -37,6 +37,22 @@ async function kontoStarten() {
 }
 
 function zeigeKontostand() {
+  // Neuer Aufbau: Der Zugang steht in der Reiterleiste unten, nicht
+  // mehr oben rechts. Dort ist er mit dem Daumen erreichbar und
+  // steht bei den anderen Zielen.
+  const reiterName = document.getElementById("reitername");
+  const reiterTagebuch = document.getElementById("reitertagebuch");
+  if (reiterName) {
+    if (benutzer) {
+      let n = anzeigename || (benutzer.email || "").split("@")[0];
+      if (n.length > 10) n = n.slice(0, 9) + "\u2026";
+      reiterName.textContent = n;
+    } else {
+      reiterName.textContent = "Anmelden";
+    }
+  }
+  if (reiterTagebuch) reiterTagebuch.hidden = !benutzer;
+
   // NUR anzeigen. Keine Datenbankabfragen, keine Ladefunktionen.
   //
   // Vorher stand hier ein Aufruf von pruefeMitleser(), und

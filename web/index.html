@@ -28,7 +28,6 @@
     --leise: #5f6469; --linie: #d9d5cd; --akzent: #2f7a35;
     --warn: #b4761e;
   }
-  body.hell .legende { background: rgba(255,255,255,.93); }
   body.hell .fuss { background: rgba(255,255,255,.85); }
   body.hell .stand { background: rgba(255,255,255,.8); }
   /* Der Navigationsknopf war auch in der hellen Ansicht fast
@@ -104,11 +103,35 @@
                            border-color: var(--akzent);
                            font-weight: 600; }
 
-  #kontoleiste { position: absolute; top: 104px; left: 10px;
-                 display: flex; gap: 4px; }
+  #kontoleiste { display: none !important; }
 
   body.hell .pille, body.hell .tagchips button {
     background: rgba(255,255,255,.94); }
+
+  /* ===== Reiterleiste unten =====
+     Am unteren Rand, weil man dort mit dem Daumen hinkommt. Reiter
+     oben sind auf dem Telefon nur mit Umgreifen erreichbar. */
+  .reiter { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+            display: flex; background: var(--flaeche);
+            border-top: 1px solid var(--linie);
+            padding-bottom: env(safe-area-inset-bottom); }
+  .reiter button { flex: 1; display: flex; flex-direction: column;
+                   align-items: center; justify-content: center;
+                   gap: 2px; background: transparent; border: 0;
+                   color: var(--leise); font: inherit; font-size: 10px;
+                   padding: 7px 4px 8px; cursor: pointer;
+                   min-height: 52px; }
+  .reiter button.an { color: var(--akzent); }
+  .reiter button[hidden] { display: none; }
+  .reiter i { font-style: normal; font-size: 17px; line-height: 1; }
+  .reiter span { white-space: nowrap; overflow: hidden;
+                 text-overflow: ellipsis; max-width: 100%; }
+  body.hell .reiter { background: #ffffff; }
+
+  /* Alles Schwebende muss ueber der Leiste bleiben */
+  #einstellungen { bottom: 62px !important; }
+  .fuss { bottom: 52px !important; }
+  .blatt-huelle .blatt-inhalt { margin-bottom: 52px; }
 
   /* ===== Blatt von unten ===== */
   .blatt-huelle { position: fixed; inset: 0; z-index: 30;
@@ -143,7 +166,6 @@
      Einstellungsblock die Legende doch verdecken. Deshalb rueckt
      die Legende dann nach oben. */
   @media (max-width: 700px) {
-    #einstellungen ~ .legende, .legende { bottom: auto; top: 146px; }
     .pille { padding: 9px 13px; }
     .pille b { font-size: 13.5px; }
     .tagchips { top: 56px; }
@@ -429,17 +451,6 @@
           pointer-events: none; }
   .fuss a { color: var(--leise); pointer-events: auto; }
 
-  .legende { position: absolute; bottom: 30px; left: 10px;
-             z-index: 3;
-             background: rgba(24,28,33,.93); padding: 8px 10px;
-             border-radius: 8px; font-size: 11px; line-height: 1.5;
-             pointer-events: none; }
-  .legende .fundlegende { margin-top: 5px; padding-top: 5px;
-                          border-top: 1px solid var(--linie); }
-  .legende i { display: inline-block; width: 12px; height: 12px;
-               border-radius: 2px; margin-right: 5px;
-               vertical-align: -2px; }
-
   .meldung { position: fixed; left: 50%; bottom: 24px;
              transform: translateX(-50%); z-index: 30;
              background: rgba(30,34,40,.96); color: var(--text);
@@ -455,8 +466,6 @@
   @media (max-width: 700px) {
     h1 { display: none; }
     .kopfzeile { margin-bottom: 5px; }
-    .legende { bottom: 26px; left: 8px; font-size: 10px;
-               padding: 5px 7px; line-height: 1.4; }
     .fuss { z-index: 4; font-size: 9.5px; padding: 3px 8px; }
     .pop { max-height: 46vh; }
   }
@@ -489,6 +498,9 @@ try {
   <div class="tagchips" id="tage"></div>
 
   <span id="kontoleiste" hidden><span id="kontostand"></span></span>
+  <!-- Bleibt fuer konto.js vorhanden, wird aber nicht mehr
+       eingeblendet - der Zugang steht jetzt unten in der
+       Reiterleiste. -->
 
   <!-- Bleibt vorhanden, wandert aber ins Ebenenblatt -->
   <div class="artenzeile" hidden>
@@ -537,6 +549,17 @@ try {
   </div>
 
 </header>
+
+<nav class="reiter" id="reiter">
+  <button data-ansicht="karte" class="an">
+    <i>&#9636;</i><span>Karte</span></button>
+  <button data-ansicht="liste">
+    <i>&#9733;</i><span>Beste Gebiete</span></button>
+  <button data-ansicht="tagebuch" hidden id="reitertagebuch">
+    <i>&#9998;</i><span>Tagebuch</span></button>
+  <button data-ansicht="konto" id="reiterkonto">
+    <i>&#9679;</i><span id="reitername">Anmelden</span></button>
+</nav>
 
 <div id="karte">
   <div class="stand" id="stand"></div>
@@ -1407,6 +1430,36 @@ fetch("daten.json")
 
     document.querySelectorAll(".art").forEach(b =>
       b.onclick = () => { art = b.dataset.art; aktualisiere(); });
+
+    // Reiterleiste unten
+    document.querySelectorAll(".reiter button").forEach(b =>
+      b.onclick = () => {
+        const wohin = b.dataset.ansicht;
+
+        if (wohin === "konto") {
+          // Anmelden oder Kontomenue - je nachdem
+          if (typeof benutzer !== "undefined" && benutzer) {
+            if (typeof zeigeKontomenue === "function") zeigeKontomenue();
+          } else if (typeof zeigeAnmeldung === "function") {
+            zeigeAnmeldung();
+          }
+          return;
+        }
+        if (wohin === "tagebuch") {
+          if (typeof zeigeTagebuch === "function") zeigeTagebuch();
+          return;
+        }
+
+        // Karte oder Bestenliste
+        document.querySelectorAll(".reiter button").forEach(x =>
+          x.classList.toggle("an", x === b));
+        const karteAn = wohin === "karte";
+        document.getElementById("karte").hidden = !karteAn;
+        const liste = document.getElementById("liste");
+        if (liste) liste.hidden = karteAn;
+        if (karteAn && karte) setTimeout(() => karte.resize(), 60);
+        else if (!karteAn) baueListe();
+      });
 
     const pille = document.getElementById("artpille");
     if (pille) pille.onclick = () => zeigeArtenwahl();
