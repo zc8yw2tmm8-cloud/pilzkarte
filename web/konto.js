@@ -758,8 +758,22 @@ function merkeEinstellungen() {
 
 let wiederhergestellt = false;
 
-function stelleWiederHer(e) {
+function stelleWiederHer(e, versuch) {
   if (!e || !karte) return;
+
+  // Wald- und Gelaendeknoepfe entstehen erst, wenn wald.json und
+  // relief.json geladen sind. Beim ersten Versuch gibt es sie oft
+  // noch nicht - dann greift der Klick ins Leere und die zuletzt
+  // gewaehlte Waldebene bleibt aus.
+  versuch = versuch || 0;
+  const fehltNoch = (e.baum && !document.querySelector(
+                       `[data-baum="${e.baum}"]`))
+                 || (e.relief && !document.querySelector(
+                       `[data-relief="${e.relief}"]`));
+  if (fehltNoch && versuch < 20) {
+    setTimeout(() => stelleWiederHer(e, versuch + 1), 250);
+    return;
+  }
   // Nur einmal je Sitzung - sonst klickt es die Knoepfe bei jedem
   // Aufruf erneut durch
   if (wiederhergestellt) return;

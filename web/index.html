@@ -450,15 +450,6 @@
 
   /* Hell/dunkel gehoert nicht ins Ausklappmenue - man will es
      umschalten koennen, ohne erst aufzuklappen. */
-  .mehrzeile { display: flex; align-items: center; }
-  .mehrzeile .mehr { flex: 1; }
-  .hellknopf { flex: 0 0 auto; border: 1px solid var(--linie);
-               background: transparent; color: var(--leise);
-               width: 34px; height: 34px; border-radius: 17px;
-               cursor: pointer; font-size: 15px; line-height: 1;
-               padding: 0; }
-  .hellknopf:hover { border-color: var(--akzent);
-                     color: var(--akzent); }
 
   .mehr { margin-top: 7px; background: transparent; border: 0;
           color: var(--leise); font-size: 12px; cursor: pointer;
@@ -611,6 +602,10 @@ try {
   <div class="saeule">
     <button class="rund" id="ebenenknopf"
             title="Ebenen und Darstellung">&#9636;</button>
+    <button class="rund" data-ansicht-hell
+            title="Auf hell umschalten"
+            onclick="if(typeof ansichtUmschalten==='function')
+                     ansichtUmschalten()">&#9728;</button>
     <a class="rund" href="info.html" title="Wie wird gerechnet?">?</a>
   </div>
 
@@ -2216,6 +2211,9 @@ fetch("daten.json")
               const an = !b.classList.contains("aktiv");
               // Immer nur eine Baumart - sonst ueberlagern sich die
               // Masken und man sieht nur noch eine Flaeche
+              if (typeof merkeEinstellungen === "function") {
+                merkeEinstellungen();
+              }
               leiste.querySelectorAll("[data-baum]").forEach(x =>
                 x.classList.remove("aktiv"));
               w.ebenen.forEach(e => karte.setLayoutProperty(
