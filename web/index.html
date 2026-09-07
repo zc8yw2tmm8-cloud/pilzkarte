@@ -2162,22 +2162,8 @@ fetch("daten.json")
       karte.on("mouseleave", "flaechen",
         () => karte.getCanvas().style.cursor = "");
 
-      const stufen = [[95, "sehr gut"], [80, "gut"], [60, "möglich"],
-                      [40, "schwach"], [15, "kaum"]];
-      const box = document.createElement("div");
-      box.className = "legende";
-      box.innerHTML = stufen.map(([w, t]) =>
-        `<div><i style="background:${farbe(w)}"></i>${w}+ ${t}</div>`)
-        .join("")
-        + '<div class="fundlegende">'
-        + '<div><i style="background:#b57edc"></i>belegte Funde</div>'
-        + '<div><i style="background:#5fb763"></i>eigene Funde</div>'
-        + '<div><i style="background:transparent;'
-        + 'border:2px solid #9aa0a6"></i>nichts gefunden</div>'
-        + '<div><i style="background:#5fb763;border-radius:1px;'
-        + 'height:3px;margin-bottom:3px"></i>Route &#9654; '
-        + 'Laufrichtung</div></div>';
-      document.getElementById("karte").appendChild(box);
+      // Die Legende ist entfallen - die Farbskala erklaert sich
+      // von selbst, und die Fundpunkte stehen mit Namen im Popup.
 
       // Ruhiger Hinweis am unteren Rand statt eines Kastens beim Start
       const fuss = document.createElement("div");
