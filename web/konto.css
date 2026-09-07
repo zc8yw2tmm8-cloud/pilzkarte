@@ -185,4 +185,4 @@ button.stift:hover { color: var(--akzent);
 .avatarfeld.aktiv span { color: var(--akzent); }
 
 /* Im Reiter unten */
-.reiter #reiterkonto .avatar { width: 26px; height: 26px; }
+.reiter #reiterkonto .avatar { width: 32px; height: 32px; }

@@ -47,7 +47,7 @@ function zeigeKontostand() {
   const reiterBild = document.querySelector("#reiterkonto i");
   if (reiterBild) {
     reiterBild.innerHTML = (benutzer && avatar)
-      ? avatarBild(avatar, 26) : "\u25CF";
+      ? avatarBild(avatar, 32) : "\u25CF";
   }
 
   if (reiterName) {
