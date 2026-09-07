@@ -142,9 +142,12 @@
     background: rgba(255,255,255,.94); }
 
   /* ===== Knopfsaeule rechts ===== */
-  .saeule { position: absolute; right: 10px; top: 312px;
-            display: flex; flex-direction: column; gap: 7px;
-            z-index: 6; }
+  /* Die eigenen Knoepfe haengen in derselben Leiste wie die von
+     MapLibre - dann ordnen sie sich von selbst untereinander.
+     Vorher stand hier ein fester Abstand von oben, und sobald ein
+     Knopf dazukam (etwa die Routenaufzeichnung nach dem Anmelden),
+     lagen sie uebereinander. */
+  .saeule { display: flex; flex-direction: column; gap: 7px; }
 
   /* Die eingebauten Knoepfe von MapLibre - Zoom, Standort,
      Routenaufzeichnung - lagen unter der Pille und waren auf dem
@@ -190,7 +193,7 @@
        nehmen nur Platz weg und ruecken alles andere nach unten. */
     .maplibregl-ctrl-zoom-in,
     .maplibregl-ctrl-zoom-out { display: none !important; }
-    .saeule { top: 210px; }
+
   }
 
   /* ===== Bestenliste =====
@@ -198,8 +201,7 @@
      Pille und Einstellungen wegfallen - sonst klaffte eine Luecke
      und der erste Eintrag der Liste verschwaende darunter. */
   body.inliste .pille,
-  body.inliste #einstellungen,
-  body.inliste .saeule { display: none !important; }
+  body.inliste #einstellungen { display: none !important; }
   body.inliste .tagchips { top: 10px; }
   body.inliste #liste { padding-top: 58px; }
 
@@ -1617,8 +1619,8 @@ function zeigeAnsicht(welche) {
     b.classList.toggle("an", b.dataset.ansicht === welche));
 
   // Kartenknoepfe nur bei der Karte
-  const saeule = document.querySelector(".saeule");
-  if (saeule) saeule.hidden = !karteAn;
+  // Die Saeule haengt inzwischen in der Kartensteuerung - es
+  // genuegt, diese auszublenden.
   const strg = document.querySelector(".maplibregl-ctrl-top-right");
   if (strg) strg.style.display = karteAn ? "" : "none";
 
@@ -1742,6 +1744,19 @@ fetch("daten.json")
     // Ebenenknopf: am Rechner ein- und ausklappen, auf dem Telefon
     // als Blatt von unten. Es ist derselbe Block - er wandert nur
     // hin und her, damit die Einstellungen nirgends doppelt sind.
+    // Die eigene Knopfsaeule zu den Kartenknoepfen umhaengen.
+    // MapLibre haengt seine eigenen (Zoom, Standort, Route) oben
+    // rechts ein; liegen unsere in derselben Leiste, schieben sie
+    // sich gegenseitig nach unten statt sich zu verdecken.
+    const saeule = document.querySelector(".saeule");
+    const ecke = document.querySelector(".maplibregl-ctrl-top-right");
+    if (saeule && ecke) {
+      const huelle = document.createElement("div");
+      huelle.className = "maplibregl-ctrl";
+      huelle.appendChild(saeule);
+      ecke.appendChild(huelle);
+    }
+
     const eb = document.getElementById("ebenenknopf");
     if (eb) eb.onclick = () => zeigeEbenen();
 
