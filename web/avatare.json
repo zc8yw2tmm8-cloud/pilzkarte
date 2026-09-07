@@ -1,0 +1,12 @@
+[
+  { "datei": "steinpilz.png", "name": "Steinpilz" },
+  { "datei": "marone.png", "name": "Marone" },
+  { "datei": "pfifferling.png", "name": "Pfifferling" },
+  { "datei": "birkenpilz.png", "name": "Birkenpilz" },
+  { "datei": "parasol.png", "name": "Parasol" },
+  { "datei": "hexenroehrling.png", "name": "Flockenstieliger Hexenröhrling" },
+  { "datei": "netzhexe.png", "name": "Netzstieliger Hexenröhrling" },
+  { "datei": "schwefelporling.png", "name": "Schwefelporling" },
+  { "datei": "reizker.png", "name": "Edelreizker" },
+  { "datei": "krauseglucke.png", "name": "Krause Glucke" }
+]

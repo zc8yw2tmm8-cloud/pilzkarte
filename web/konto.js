@@ -42,6 +42,14 @@ function zeigeKontostand() {
   // steht bei den anderen Zielen.
   const reiterName = document.getElementById("reitername");
   const reiterTagebuch = document.getElementById("reitertagebuch");
+
+  // Bild statt Punkt im Reiter, sofern eines gewaehlt ist
+  const reiterBild = document.querySelector("#reiterkonto i");
+  if (reiterBild) {
+    reiterBild.innerHTML = (benutzer && avatar)
+      ? avatarBild(avatar, 26) : "\u25CF";
+  }
+
   if (reiterName) {
     if (benutzer) {
       let n = anzeigename || (benutzer.email || "").split("@")[0];
@@ -85,6 +93,7 @@ async function kontoDatenLaden() {
     istMitleser = false;
     fremdeSichtbar = false;
     anzeigename = null;
+    avatar = null;
     alleRouten = [];
     wiederhergestellt = false;
     zeigeKontostand();
@@ -110,10 +119,19 @@ async function kontoDatenLaden() {
 
 function zeigeKontomenue() {
   kasten(`
-    <h3>${anzeigename || "ohne Namen"}
-      <button class="stift" title="Name ändern"
-        onclick="zeigeNamenswahl(false)">${STIFT}</button></h3>
-    <p class="klein">${benutzer.email}</p>
+    <div class="kontokopf">
+      <button class="avatarknopf" onclick="zeigeAvatarwahl()"
+              title="Bild ändern">
+        ${avatar ? avatarBild(avatar, 52)
+                 : '<span class="ohnebild">?</span>'}
+      </button>
+      <div>
+        <h3>${anzeigename || "ohne Namen"}
+          <button class="stift" title="Name ändern"
+            onclick="zeigeNamenswahl(false)">${STIFT}</button></h3>
+        <p class="klein">${benutzer.email}</p>
+      </div>
+    </div>
     <button class="voll" onclick="zeigeTagebuch()">Tagebuch</button>
     <button class="voll leer" onclick="kastenZu(); routeUmschalten()">
       ${aufzeichnung ? "Aufzeichnung beenden" : "Route aufzeichnen"}
@@ -922,10 +940,11 @@ async function pruefeMitleser() {
     return;
   }
   const { data } = await sb.from("profile")
-    .select("mitleser, einstellungen, anzeigename")
+    .select("mitleser, einstellungen, anzeigename, avatar")
     .eq("id", benutzer.id).single();
   istMitleser = !!(data && data.mitleser);
   anzeigename = data && data.anzeigename ? data.anzeigename : null;
+  avatar = data && data.avatar ? data.avatar : null;
   if (data && data.einstellungen) {
     benutzer.einstellungen = data.einstellungen;
   }
@@ -1174,6 +1193,77 @@ async function namenSpeichern() {
   kastenZu();
   zeigeKontostand();
   melde("Name gespeichert.");
+}
+
+
+// ---- Bild fuers Profil ----------------------------------------------
+//
+// Eine feste Auswahl, kein Hochladen. Die Bilder liegen in
+// web/avatare/, welche es gibt, steht in avatare.json - neue
+// hinzuzufuegen heisst also: Datei ablegen, eine Zeile ergaenzen.
+
+let avatar = null;
+let avatarliste = null;
+
+async function ladeAvatarliste() {
+  if (avatarliste) return avatarliste;
+  try {
+    const a = await fetch("avatare/avatare.json");
+    avatarliste = a.ok ? await a.json() : [];
+  } catch (e) {
+    avatarliste = [];
+  }
+  return avatarliste;
+}
+
+function avatarBild(datei, groesse) {
+  if (!datei) return "";
+  return `<img src="avatare/${datei}" alt=""
+    width="${groesse}" height="${groesse}" class="avatar">`;
+}
+
+async function zeigeAvatarwahl() {
+  const liste = await ladeAvatarliste();
+
+  if (!liste.length) {
+    kasten(`<h3>Bild wählen</h3>
+      <p class="klein">Noch keine Bilder vorhanden.</p>
+      <button class="voll leer" onclick="zeigeKontomenue()">
+        Zurück</button>`);
+    return;
+  }
+
+  const felder = liste.map(e => `
+    <button class="avatarfeld ${avatar === e.datei ? "aktiv" : ""}"
+            data-avatar="${e.datei}" title="${e.name}">
+      ${avatarBild(e.datei, 64)}
+      <span>${e.name}</span>
+    </button>`).join("");
+
+  kasten(`<h3>Bild wählen</h3>
+    <div class="avatarraster">${felder}</div>
+    ${avatar ? `<button class="voll leer"
+       onclick="avatarSpeichern(null)">Kein Bild</button>` : ""}
+    <button class="voll leer" onclick="zeigeKontomenue()">
+      Zurück</button>`);
+
+  document.querySelectorAll("[data-avatar]").forEach(b =>
+    b.onclick = () => avatarSpeichern(b.dataset.avatar));
+}
+
+async function avatarSpeichern(datei) {
+  if (!sb || !benutzer) return;
+
+  const { error } = await sb.from("profile")
+    .update({ avatar: datei }).eq("id", benutzer.id);
+
+  if (error) {
+    melde("Konnte nicht speichern: " + error.message);
+    return;
+  }
+  avatar = datei;
+  kastenZu();
+  zeigeKontostand();
 }
 
 // ---- Fund eintragen -------------------------------------------------

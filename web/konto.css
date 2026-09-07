@@ -148,3 +148,41 @@ button.stift:hover { color: var(--akzent);
 /* Zahl der Funde einer Route */
 .fundzahl { color: var(--akzent); font-weight: 700;
             margin-left: 4px; }
+
+/* ---- Bild fuers Profil ---- */
+
+.avatar { border-radius: 50%; vertical-align: middle;
+          object-fit: cover; }
+
+/* Kopfzeile im Kontomenue: Bild links, Name rechts */
+.kontokopf { display: flex; align-items: center; gap: 12px;
+             margin-bottom: 12px; }
+.kontokopf h3 { margin: 0; }
+.kontokopf p { margin: 2px 0 0; }
+.avatarknopf { flex: 0 0 auto; width: 56px; height: 56px;
+               border-radius: 28px; border: 1px solid var(--linie);
+               background: var(--grund); cursor: pointer;
+               display: flex; align-items: center;
+               justify-content: center; padding: 0; }
+.avatarknopf:hover { border-color: var(--akzent); }
+.ohnebild { color: var(--leise); font-size: 20px; }
+
+/* Auswahl als Raster - waechst mit der Zahl der Bilder mit */
+.avatarraster { display: grid;
+                grid-template-columns: repeat(auto-fill,
+                                              minmax(84px, 1fr));
+                gap: 8px; margin: 10px 0 14px; }
+.avatarfeld { display: flex; flex-direction: column;
+              align-items: center; gap: 5px;
+              background: transparent; border: 1px solid transparent;
+              border-radius: 10px; padding: 9px 4px; cursor: pointer;
+              color: var(--text); font: inherit; font-size: 11px; }
+.avatarfeld:hover { border-color: var(--linie);
+                    background: rgba(255,255,255,.04); }
+.avatarfeld.aktiv { border-color: var(--akzent);
+                    background: rgba(95,183,99,.12); }
+.avatarfeld span { color: var(--leise); }
+.avatarfeld.aktiv span { color: var(--akzent); }
+
+/* Im Reiter unten */
+.reiter #reiterkonto .avatar { width: 26px; height: 26px; }
