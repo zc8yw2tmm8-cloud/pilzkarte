@@ -41,22 +41,139 @@
     border-top-color: #ffffff !important;
     border-bottom-color: #ffffff !important; }
 
+
+  /* ===== Schwebende Bedienung ===== */
+
+  header { position: absolute; inset: 0; z-index: 5;
+           pointer-events: none; padding: 10px; }
+  /* Nur die Elemente selbst nehmen Tipps an, nicht der ganze
+     Bereich - sonst waere die Karte darunter nicht bedienbar. */
+  header > * { pointer-events: auto; }
+
+  /* Die alten Bedienelemente sind noch im HTML, weil ihr Code sie
+     braucht - sie duerfen aber nicht mehr erscheinen. Ohne diese
+     Zeile gewinnt ihr display:flex gegen das hidden-Merkmal, und
+     alles liegt uebereinander. */
+  header [hidden], header [hidden] * { display: none !important; }
+
+  /* Der Einstellungsblock gehoert nach unten links, nicht in die
+     Mitte des Bildes. Er wandert in Schritt 3 ins Ebenenblatt. */
+  /* Mittig und oberhalb der Legende - vorher lag der Block links
+     unten und verdeckte sie. */
+  #einstellungen { position: absolute; left: 50%;
+                   transform: translateX(-50%);
+                   bottom: 34px;
+                   width: min(420px, calc(100vw - 20px));
+                   background: rgba(30,34,40,.94);
+                   border: 1px solid var(--linie);
+                   border-radius: 12px; padding: 10px 12px;
+                   max-height: 46vh; overflow-y: auto; }
+  #einstellungen .zeile { margin-top: 6px; }
+  #einstellungen .regler { margin-top: 0; }
+  body.hell #einstellungen { background: rgba(255,255,255,.95); }
+
+  .pille { position: absolute; top: 10px; left: 50%;
+           transform: translateX(-50%);
+           width: min(520px, calc(100vw - 20px));
+           display: flex; align-items: center; gap: 9px;
+           background: rgba(30,34,40,.94);
+           border: 1px solid var(--linie); border-radius: 22px;
+           padding: 10px 15px; cursor: pointer;
+           backdrop-filter: blur(6px); max-width: 520px; }
+  .pille b { font-size: 14.5px; }
+  .pille .wert { color: var(--akzent); font-weight: 700;
+                 font-size: 16px; }
+  .pille .pfeil { margin-left: auto; color: var(--leise);
+                  font-size: 12px; }
+  .pille:hover { border-color: var(--akzent); }
+  .pille, .tagchips { max-width: none; }
+
+  .tagchips { position: absolute; top: 60px; left: 50%;
+              transform: translateX(-50%);
+              width: min(520px, calc(100vw - 20px));
+              display: flex; gap: 6px; overflow-x: auto;
+              scrollbar-width: none; padding-bottom: 2px;
+              max-width: 520px; }
+  .tagchips::-webkit-scrollbar { display: none; }
+  .tagchips button { flex: 0 0 auto; background: rgba(30,34,40,.9);
+                     border: 1px solid var(--linie); color: var(--text);
+                     border-radius: 15px; padding: 6px 12px;
+                     font: inherit; font-size: 12px; cursor: pointer;
+                     white-space: nowrap; min-height: 32px; }
+  .tagchips button.aktiv { background: var(--akzent); color: #10130f;
+                           border-color: var(--akzent);
+                           font-weight: 600; }
+
+  #kontoleiste { position: absolute; top: 104px; left: 10px;
+                 display: flex; gap: 4px; }
+
+  body.hell .pille, body.hell .tagchips button {
+    background: rgba(255,255,255,.94); }
+
+  /* ===== Blatt von unten ===== */
+  .blatt-huelle { position: fixed; inset: 0; z-index: 30;
+                  background: rgba(0,0,0,.5); display: flex;
+                  align-items: flex-end; justify-content: center; }
+  .blatt-huelle[hidden] { display: none; }
+  .blatt-inhalt { background: var(--flaeche); width: 100%;
+                  max-width: 520px; border-radius: 16px 16px 0 0;
+                  padding: 8px 16px 20px; max-height: 78vh;
+                  overflow-y: auto; overscroll-behavior: contain; }
+  .griff { width: 36px; height: 4px; background: var(--linie);
+           border-radius: 2px; margin: 0 auto 12px; }
+  .blatt-inhalt h3 { margin: 0 0 4px; font-size: 16px; }
+  .blatt-inhalt .klein { color: var(--leise); font-size: 12px;
+                         margin-bottom: 10px; }
+
+  .artenliste { display: flex; flex-direction: column; gap: 2px; }
+  .artzeile { display: flex; align-items: center; width: 100%;
+              background: transparent; border: 0; color: var(--text);
+              padding: 12px 10px; border-radius: 8px; cursor: pointer;
+              font: inherit; font-size: 14px; text-align: left;
+              border-bottom: 1px solid var(--linie); }
+  .artzeile:last-child { border-bottom: 0; }
+  .artzeile b { margin-left: auto; color: var(--akzent);
+                font-size: 16px; }
+  .artzeile.aktiv { background: rgba(95,183,99,.12); }
+  .artzeile:hover { background: rgba(255,255,255,.05); }
+
+  body.hell .blatt-inhalt { background: #ffffff; }
+
+  /* Auf dem Telefon ist die Breite knapp - dort wuerde der
+     Einstellungsblock die Legende doch verdecken. Deshalb rueckt
+     die Legende dann nach oben. */
+  @media (max-width: 700px) {
+    #einstellungen ~ .legende, .legende { bottom: auto; top: 146px; }
+    .pille { padding: 9px 13px; }
+    .pille b { font-size: 13.5px; }
+    .tagchips { top: 56px; }
+    #kontoleiste { top: 98px; }
+  }
+
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; margin: 0; }
+  html { height: 100%; }
   body { font: 15px/1.45 system-ui, -apple-system, sans-serif;
          background: var(--grund); color: var(--text);
-         display: flex; flex-direction: column;
+         /* Bezugspunkt fuer alles, was darueber schwebt */
+         position: relative; height: 100vh; height: 100dvh;
+         overflow: hidden;
          -webkit-text-size-adjust: 100%; }
 
-  header { background: var(--flaeche); border-bottom: 1px solid var(--linie);
-           padding: 8px 10px 6px; flex: 0 0 auto; }
+  /* Die alte Kopfzeilenregel stand hier und hat die neue weiter
+     oben ueberschrieben - mit Hintergrund und ohne "absolute".
+     Dadurch belegte der Kopfbereich weiterhin Platz, und fuer die
+     Karte blieben nur 229 Pixel. */
   .kopfzeile { display: flex; align-items: center; gap: 8px;
                flex-wrap: wrap; margin-bottom: 7px; }
   .kopfzeile .umschalter { flex: 0 1 auto; min-width: 0; }
   h1 { font-size: 15px; font-weight: 600; margin: 0; }
   /* Der Stand gehoert auf die Karte, nicht in die Kopfzeile -
      dort ist der Platz knapp, und hier stoert er nicht. */
-  .stand { position: absolute; top: 44px; left: 10px; z-index: 2;
+  /* Der Stand lag unter der Pille und wurde von ihr verdeckt.
+     Rechts oben, unterhalb der Zoomknoepfe, stoert er nichts. */
+  .stand { position: absolute; top: 106px; right: 10px; z-index: 3;
+           left: auto;
            font-size: 10.5px; color: var(--leise);
            background: rgba(21,24,28,.75); padding: 2px 6px;
            border-radius: 4px; pointer-events: none; }
@@ -84,7 +201,9 @@
   a.um { text-decoration: none; display: flex; align-items: center;
          justify-content: center; min-width: 32px; }
 
-  #liste { flex: 1 1 auto; overflow-y: auto; padding: 12px 12px 60px;
+  #liste { position: absolute; inset: 0; z-index: 6;
+           background: var(--grund); overflow-y: auto;
+           padding: 104px 12px 12px 12px 60px;
            -webkit-overflow-scrolling: touch; }
   #liste h2 { font-size: 15px; margin: 20px 0 6px;
               border-bottom: 1px solid var(--linie); padding-bottom: 4px;
@@ -231,7 +350,10 @@
   #darstellung .tag { font-size: 11px; padding: 4px 9px;
                       min-height: 28px; }
 
-  #karte { flex: 1 1 auto; min-height: 0; }
+  /* Die Karte fuellt das ganze Fenster. Der Kopfbereich schwebt
+     darueber, statt Platz zu belegen - deshalb braucht die Karte
+     hier volle Hoehe, nicht nur den Rest. */
+  #karte { position: absolute; inset: 0; z-index: 1; }
   #karte[hidden], #liste[hidden] { display: none; }
 
   .maplibregl-popup-content {
@@ -301,13 +423,14 @@
   .navi.eintrag { background: var(--akzent); color: #10130f;
                   border-color: var(--akzent); cursor: pointer; }
 
-  .fuss { position: absolute; bottom: 0; left: 0; right: 0;
+  .fuss { z-index: 4; position: absolute; bottom: 0; left: 0; right: 0;
           background: rgba(24,28,33,.82); color: var(--leise);
           font-size: 10.5px; padding: 4px 10px; text-align: center;
           pointer-events: none; }
   .fuss a { color: var(--leise); pointer-events: auto; }
 
   .legende { position: absolute; bottom: 30px; left: 10px;
+             z-index: 3;
              background: rgba(24,28,33,.93); padding: 8px 10px;
              border-radius: 8px; font-size: 11px; line-height: 1.5;
              pointer-events: none; }
@@ -334,7 +457,7 @@
     .kopfzeile { margin-bottom: 5px; }
     .legende { bottom: 26px; left: 8px; font-size: 10px;
                padding: 5px 7px; line-height: 1.4; }
-    .fuss { font-size: 9.5px; padding: 3px 8px; }
+    .fuss { z-index: 4; font-size: 9.5px; padding: 3px 8px; }
     .pop { max-height: 46vh; }
   }
 </style>
@@ -351,51 +474,45 @@ try {
 <body>
 
 <header>
-  <div class="kopfzeile">
-    <h1>Pilzkarte</h1>
-    <div class="ansicht">
-      <button class="um aktiv" data-ansicht="karte">Karte</button>
-      <button class="um" data-ansicht="liste">Beste Gebiete</button>
-      <a class="um" href="info.html">?</a>
-    </div>
-    <span id="kontoleiste" hidden><span id="kontostand"></span></span>
+  <!-- Schwebende Bedienung ueber der Karte.
+       Frueher stand hier ein fester Kopfbereich, der auf dem
+       Telefon rund 170 Pixel belegte - fast ein Drittel des
+       Bildschirms. Karten-Apps machen das nicht: Bei ihnen fuellt
+       die Karte alles, und die Bedienung schwebt darueber. -->
+
+  <div class="pille" id="artpille">
+    <b id="pillename">Art wählen</b>
+    <span class="wert" id="pillewert"></span>
+    <span class="pfeil">&#9662;</span>
   </div>
-  <div class="artenzeile">
-    <button class="pfeilknopf" id="artzurueck"
-            title="vorige Art">&#9664;</button>
+
+  <div class="tagchips" id="tage"></div>
+
+  <span id="kontoleiste" hidden><span id="kontostand"></span></span>
+
+  <!-- Bleibt vorhanden, wandert aber ins Ebenenblatt -->
+  <div class="artenzeile" hidden>
+    <button class="pfeilknopf" id="artzurueck">&#9664;</button>
     <div class="leiste" id="arten"></div>
-    <select id="artwahl" title="weitere Arten"></select>
-    <button class="pfeilknopf" id="artvor"
-            title="nächste Art">&#9654;</button>
+    <select id="artwahl"></select>
+    <button class="pfeilknopf" id="artvor">&#9654;</button>
   </div>
-  <div class="regler">
-    <span class="marke">Ausblick</span>
-    <button class="pfeilknopf" id="tagzurueck"
-            title="ein Tag zurueck">&#9664;</button>
+
+  <div class="regler" hidden>
+    <button class="pfeilknopf" id="tagzurueck">&#9664;</button>
     <input type="range" id="tagregler" min="0" max="6" value="0" step="1">
-    <button class="pfeilknopf" id="tagvor"
-            title="ein Tag vor">&#9654;</button>
+    <button class="pfeilknopf" id="tagvor">&#9654;</button>
     <span id="tagname">Heute</span>
   </div>
 
-  <div class="regler">
-    <span class="marke">Deckkraft</span>
-    <input type="range" id="deckregler" min="15" max="100" value="88"
-           step="5">
-    <span id="deckwert">88 %</span>
-  </div>
+  <div id="einstellungen">
+    <div class="regler">
+      <span class="marke">Deckkraft</span>
+      <input type="range" id="deckregler" min="15" max="100" value="88"
+             step="5">
+      <span id="deckwert">88 %</span>
+    </div>
 
-  <div class="mehrzeile">
-    <button class="mehr" id="mehrknopf">
-      <span class="pfeil">&#9662;</span> Einstellungen
-    </button>
-    <button class="hellknopf" data-ansicht-hell
-            title="Auf hell umschalten"
-            onclick="if(typeof ansichtUmschalten==='function')
-                     ansichtUmschalten()">&#9728;</button>
-  </div>
-
-  <div id="einstellungen" hidden>
     <div class="zeile">
       <span class="marke">Ansicht</span>
       <div class="tagleiste" id="darstellung">
@@ -404,7 +521,6 @@ try {
         <button class="tag" data-stil="aus">nur Karte</button>
         <button class="tag" data-schalter="funde">&#9679; Funde</button>
         <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
-
       </div>
     </div>
 
@@ -724,6 +840,24 @@ function aktualisiere() {
   if (window._zeigeGewaehlte) setTimeout(window._zeigeGewaehlte, 30);
   const tn = document.getElementById("tagname");
   if (tn) tn.textContent = tagname(tag);
+
+  // Pille zeigt die gewaehlte Art mit ihrem Wert
+  const pn = document.getElementById("pillename");
+  const pw = document.getElementById("pillewert");
+  if (pn && D.arten[art]) {
+    pn.textContent = D.arten[art].name;
+    const werte = D.zellen
+      .map(z => z.scores[art][tag])
+      .filter(x => x !== null && x !== undefined);
+    const schnitt = werte.length
+      ? Math.round(werte.reduce((a, b) => a + b, 0) / werte.length)
+      : 0;
+    if (pw) pw.textContent = schnitt;
+  }
+
+  // Tageschips
+  document.querySelectorAll(".tagchips button").forEach(b =>
+    b.classList.toggle("aktiv", +b.dataset.tag === tag));
   const zurueck = document.getElementById("tagzurueck");
   const vor = document.getElementById("tagvor");
   if (zurueck) zurueck.disabled = tag <= 0;
@@ -832,6 +966,54 @@ function wertzeile(titel, feld, wert, text) {
 
   return `<tr><td>${titel}</td>
           <td class="${farbe}">${text}</td></tr>`;
+}
+
+function zeigeArtenwahl() {
+  // Alle Arten als Liste, nach Aussichten sortiert. Ersetzt die
+  // Knopfleiste, die bei elf Arten laenger war als der Bildschirm.
+  const sortiert = Object.keys(D.arten).map(a => {
+    const werte = D.zellen.map(z => z.scores[a][tag] ?? 0);
+    return { a, schnitt: Math.round(
+      werte.reduce((x, y) => x + y, 0) / Math.max(1, werte.length)) };
+  }).sort((x, y) => y.schnitt - x.schnitt);
+
+  const zeilen = sortiert.map(({ a, schnitt }) => `
+    <button class="artzeile ${a === art ? "aktiv" : ""}"
+            data-wahl="${a}">
+      <span>${D.arten[a].name}</span>
+      <b>${schnitt}</b>
+    </button>`).join("");
+
+  blatt(`<h3>Art wählen</h3>
+    <p class="klein">Sortiert nach Aussichten für
+      ${tagname(tag).toLowerCase()}</p>
+    <div class="artenliste">${zeilen}</div>`);
+
+  document.querySelectorAll("[data-wahl]").forEach(b =>
+    b.onclick = () => {
+      art = b.dataset.wahl;
+      blattZu();
+      aktualisiere();
+    });
+}
+
+function blatt(inhalt) {
+  let el = document.getElementById("blatt");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "blatt";
+    el.className = "blatt-huelle";
+    el.onclick = e => { if (e.target === el) blattZu(); };
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `<div class="blatt-inhalt">
+    <div class="griff"></div>${inhalt}</div>`;
+  el.hidden = false;
+}
+
+function blattZu() {
+  const el = document.getElementById("blatt");
+  if (el) el.hidden = true;
 }
 
 function popupInhalt(z, klickOrt) {
@@ -1187,6 +1369,20 @@ fetch("daten.json")
     document.getElementById("arten").innerHTML = Object.entries(D.arten)
       .map(([a, e]) => `<button class="art" data-art="${a}">${e.name}
         <span class="wert"></span></button>`).join("");
+    // Tageschips statt Regler - man sieht sofort, was waehlbar ist
+    const chips = document.getElementById("tage");
+    if (chips) {
+      chips.innerHTML = D.tage.map((t, i) =>
+        `<button data-tag="${i}">${tagname(i)}</button>`).join("");
+      chips.querySelectorAll("button").forEach(b =>
+        b.onclick = () => {
+          tag = +b.dataset.tag;
+          const r = document.getElementById("tagregler");
+          if (r) r.value = tag;
+          aktualisiere();
+        });
+    }
+
     const regler = document.getElementById("tagregler");
     regler.max = D.tage.length - 1;
     regler.oninput = () => { tag = +regler.value; aktualisiere(); };
@@ -1211,6 +1407,9 @@ fetch("daten.json")
 
     document.querySelectorAll(".art").forEach(b =>
       b.onclick = () => { art = b.dataset.art; aktualisiere(); });
+
+    const pille = document.getElementById("artpille");
+    if (pille) pille.onclick = () => zeigeArtenwahl();
 
     const wahl = document.getElementById("artwahl");
     if (wahl) wahl.onchange = () => {
@@ -1272,16 +1471,23 @@ fetch("daten.json")
 
     document.querySelectorAll(".um").forEach(b =>
       b.onclick = () => zeigeAnsicht(b.dataset.ansicht));
+    // Das Ausklappmenue gibt es im neuen Aufbau nicht mehr - die
+    // Einstellungen stehen offen da und wandern spaeter ins
+    // Ebenenblatt. Der Code muss das aushalten, ohne abzubrechen.
     const mehr = document.getElementById("mehrknopf");
     const feld = document.getElementById("einstellungen");
-    mehr.onclick = () => {
-      const offen = feld.hidden;
-      feld.hidden = !offen;
-      mehr.classList.toggle("offen", offen);
-      mehr.lastChild.textContent = offen ? " Einstellungen schliessen"
-                                         : " Einstellungen";
-      if (karte) setTimeout(() => karte.resize(), 210);
-    };
+    if (mehr && feld) {
+      mehr.onclick = () => {
+        const offen = feld.hidden;
+        feld.hidden = !offen;
+        mehr.classList.toggle("offen", offen);
+        if (mehr.lastChild) {
+          mehr.lastChild.textContent = offen
+            ? " Einstellungen schliessen" : " Einstellungen";
+        }
+        if (karte) setTimeout(() => karte.resize(), 210);
+      };
+    }
 
     const deck = document.getElementById("deckregler");
     deck.oninput = () => {
