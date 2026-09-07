@@ -185,4 +185,15 @@ button.stift:hover { color: var(--akzent);
 .avatarfeld.aktiv span { color: var(--akzent); }
 
 /* Im Reiter unten */
-.reiter #reiterkonto .avatar { width: 32px; height: 32px; }
+/* Das gewaehlte Bild darf ueber die Leiste hinausragen.
+   Die Pilze sind freigestellt - es ragt also der Pilz heraus, kein
+   Kasten. Der negative Rand oben schafft den Platz, ohne dass die
+   Leiste hoeher wird oder der Name verrutscht. */
+.reiter #reiterkonto .avatar { width: 64px; height: 64px;
+                               margin-top: -32px;
+                               margin-bottom: -4px;
+                               filter: drop-shadow(0 2px 4px
+                                       rgba(0,0,0,.45)); }
+.reiter #reiterkonto i { overflow: visible; min-height: 32px; }
+body.hell .reiter #reiterkonto .avatar {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.2)); }
