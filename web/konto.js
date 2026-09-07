@@ -748,6 +748,10 @@ function sammleEinstellungen() {
 
   return {
     hell: hell,
+    // Vorgemerkte Arten gehoeren ins Konto, nicht nur in den
+    // Browserspeicher: Safari raeumt den nach einiger Zeit auf,
+    // und auf einem zweiten Geraet waeren sie ohnehin weg.
+    lieblinge: (typeof lieblinge !== "undefined") ? lieblinge : [],
     art: typeof art !== "undefined" ? art : null,
     stil: gewaehlt("stil"),
     baum: gewaehlt("baum"),
@@ -808,6 +812,15 @@ function stelleWiederHer(e, versuch) {
   };
 
   if (typeof e.hell === "boolean") setzeAnsicht(e.hell, false);
+
+  if (Array.isArray(e.lieblinge)
+      && typeof lieblinge !== "undefined") {
+    lieblinge = e.lieblinge;
+    try {
+      localStorage.setItem("pilzkarte_lieblinge",
+                           JSON.stringify(lieblinge));
+    } catch (x) {}
+  }
 
   if (e.art && D.arten[e.art]) {
     const b = document.querySelector(`[data-art="${e.art}"]`);

@@ -1202,7 +1202,18 @@ function lieblingUmschalten(a) {
     localStorage.setItem("pilzkarte_lieblinge",
                          JSON.stringify(lieblinge));
   } catch (e) {}
-  if (typeof merkeEinstellungen === "function") merkeEinstellungen();
+
+  // Sofort ins Profil, nicht erst nach der ueblichen Wartezeit -
+  // wer die Seite gleich danach schliesst, haette es sonst
+  // verloren.
+  if (typeof sb !== "undefined" && sb
+      && typeof benutzer !== "undefined" && benutzer) {
+    sb.from("profile")
+      .update({ einstellungen: sammleEinstellungen() })
+      .eq("id", benutzer.id);
+  } else if (typeof merkeEinstellungen === "function") {
+    merkeEinstellungen();
+  }
 }
 
 function nachLieblingen(liste) {
