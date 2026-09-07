@@ -406,6 +406,10 @@ function zeigeRoutenknopf() {
     };
     karte.addControl(steuerung, "top-right");
     routenknopf = true;
+
+    // Der Knopf kommt erst nach dem Anmelden dazu und landet sonst
+    // ganz unten - die Reihenfolge muss neu gesetzt werden.
+    if (typeof ordneKnoepfe === "function") ordneKnoepfe();
   }
 
   const knopf = document.getElementById("routenknopf");
@@ -902,9 +906,9 @@ async function setzeAnsicht(neuHell, speichern) {
   // danach aus wie ein verrutschtes Textfeld.
   const knopf = document.querySelector("[data-ansicht-hell]");
   if (knopf) {
-    // Gezeigt wird, wohin es geht: Sonne heisst "auf hell
-    // umschalten", Mond heisst "auf dunkel".
-    knopf.innerHTML = hell ? "\u263D" : "\u2600";
+    // Das Symbol bleibt der halb gefuellte Pilz - es steht fuer
+    // den Gegensatz selbst, nicht fuer einen der beiden Zustaende.
+    // Nur der Hinweistext sagt, wohin der Druck fuehrt.
     knopf.title = hell ? "Auf dunkel umschalten"
                        : "Auf hell umschalten";
   }

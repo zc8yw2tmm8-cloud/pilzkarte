@@ -624,13 +624,14 @@ try {
   <div class="tagchips" id="tage"></div>
 
   <div class="saeule">
-    <button class="rund" id="ebenenknopf"
-            title="Ebenen und Darstellung">&#9636;</button>
     <button class="rund" data-ansicht-hell
-            title="Auf hell umschalten"
+            title="Hell oder dunkel"
             onclick="if(typeof ansichtUmschalten==='function')
-                     ansichtUmschalten()">&#9728;</button>
-    <a class="rund" href="info.html" title="Wie wird gerechnet?">?</a>
+                     ansichtUmschalten()"></button>
+    <button class="rund" id="ebenenknopf"
+            title="Ebenen und Darstellung"></button>
+    <a class="rund" href="info.html"
+       title="Wie wird gerechnet?">?</a>
   </div>
 
   <!-- Platzhalter: Auf dem Telefon wandert der Einstellungsblock
@@ -740,6 +741,37 @@ const komma = (z, n = 1) =>
 
 const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/" +
              "services/Canvas/";
+
+// ---- Symbole --------------------------------------------------------
+//
+// Als Zeichnung statt als Schriftzeichen: Zeichen wie Sonne und Mond
+// sehen je nach Geraet anders aus und fehlen manchen Schriften ganz.
+
+// Ebenen - drei gestapelte Rauten, wie auf Kartenseiten ueblich
+const SYMBOL_EBENEN =
+  '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" ' +
+  'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" ' +
+  'stroke-linejoin="round">' +
+  '<path d="M12 3 3 8l9 5 9-5-9-5Z"/>' +
+  '<path d="M3 13l9 5 9-5"/>' +
+  '</svg>';
+
+// Hell und dunkel als Pilz, halb gefuellt - das ist auf einer
+// Pilzkarte naheliegender als Sonne und Mond und sagt zugleich,
+// worum es geht: um den Gegensatz von hell und dunkel.
+const SYMBOL_PILZ =
+  '<svg viewBox="0 0 24 24" width="20" height="20">' +
+  '<defs><clipPath id="linkeHaelfte">' +
+  '<rect x="0" y="0" width="12" height="24"/></clipPath></defs>' +
+  '<g stroke="currentColor" stroke-width="1.7" fill="none" ' +
+  'stroke-linejoin="round">' +
+  '<path d="M3.5 11a8.5 6.5 0 0 1 17 0Z"/>' +
+  '<path d="M9.5 11v6.5a2.5 2.5 0 0 0 5 0V11"/>' +
+  '</g>' +
+  '<g clip-path="url(#linkeHaelfte)" fill="currentColor">' +
+  '<path d="M3.5 11a8.5 6.5 0 0 1 17 0Z"/>' +
+  '<path d="M9.5 11v6.5a2.5 2.5 0 0 0 5 0V11Z"/>' +
+  '</g></svg>';
 
 // Gespeicherte Ansicht SOFORT lesen, noch bevor die Karte entsteht.
 //
@@ -1601,6 +1633,28 @@ function setzeStil(stil) {
   setzeDeckkraft();
 }
 
+function ordneKnoepfe() {
+  // Reihenfolge der Knoepfe rechts, von oben nach unten.
+  //
+  // Sie stammen aus drei Quellen - MapLibre, index.html und
+  // konto.js - und landen in der Reihenfolge ihrer Erzeugung. Mit
+  // "order" laesst sich das unabhaengig davon festlegen.
+  const setze = (auswahl, platz) => {
+    const el = document.querySelector(auswahl);
+    if (!el) return;
+    // Der Knopf selbst liegt in einer Huelle; die zaehlt
+    const huelle = el.closest(".maplibregl-ctrl") || el;
+    huelle.style.order = platz;
+  };
+
+  setze("[data-ansicht-hell]", 1);
+  setze("#ebenenknopf", 2);
+  setze(".maplibregl-ctrl-geolocate", 3);
+  setze("#routenknopf", 4);
+  setze("a.rund[href='info.html']", 5);
+  setze(".maplibregl-ctrl-zoom-in", 6);
+}
+
 function freierBereich() {
   // Welche Raender sind von schwebenden Elementen belegt?
   //
@@ -1767,7 +1821,14 @@ fetch("daten.json")
     // als Blatt von unten. Es ist derselbe Block - er wandert nur
     // hin und her, damit die Einstellungen nirgends doppelt sind.
     const eb = document.getElementById("ebenenknopf");
-    if (eb) eb.onclick = () => zeigeEbenen();
+    if (eb) {
+      eb.innerHTML = SYMBOL_EBENEN;
+      eb.onclick = () => zeigeEbenen();
+    }
+    const hk = document.querySelector("[data-ansicht-hell]");
+    if (hk) hk.innerHTML = SYMBOL_PILZ;
+
+    ordneKnoepfe();
 
     const bz = document.getElementById("blockzu");
     if (bz) bz.onclick = () => zeigeEbenen();
@@ -2016,10 +2077,16 @@ fetch("daten.json")
     const saeule = document.querySelector(".saeule");
     const ecke = document.querySelector(".maplibregl-ctrl-top-right");
     if (saeule && ecke) {
-      const huelle = document.createElement("div");
-      huelle.className = "maplibregl-ctrl";
-      huelle.appendChild(saeule);
-      ecke.appendChild(huelle);
+      // Jeder Knopf bekommt eine eigene Huelle, damit sich die
+      // Reihenfolge einzeln festlegen laesst - sonst waeren die
+      // drei aus der Saeule immer aneinandergekettet.
+      [...saeule.children].forEach(knopf => {
+        const huelle = document.createElement("div");
+        huelle.className = "maplibregl-ctrl";
+        huelle.appendChild(knopf);
+        ecke.appendChild(huelle);
+      });
+      saeule.remove();
     }
 
     // Der Massstab lag oben links und wurde von der Pille verdeckt.
