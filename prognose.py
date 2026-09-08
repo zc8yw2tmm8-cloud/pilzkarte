@@ -6,6 +6,7 @@ Nur best_match: icon_d2 reicht nur zwei Tage und liefert keine Bodenwerte.
 """
 import requests
 import csv
+import os
 import sys
 import time
 import threading
@@ -19,6 +20,12 @@ TAGE_VORAUS = 6
 BUENDEL = 40
 ARBEITER = 4
 PAUSE = 0.1
+
+# Wie viele der Punkte mindestens zurueckkommen muessen, damit die
+# alte Datei ersetzt wird. Vorher reichte eine einzige Zeile: Kamen
+# 200 von 1.632 Punkten, wurde trotzdem alles ueberschrieben, der
+# Lauf meldete Erfolg, und die Seite wurde mit Luecken neu gebaut.
+MINDEST_ANTEIL = 0.98
 
 FELDER = [
     "precipitation_sum",
@@ -104,6 +111,65 @@ def leer(wert):
     return "" if wert is None else wert
 
 
+def fehlt_etwas(zeilen, orte, start, ende):
+    """Sagt, was an der neuen Vorhersage unvollstaendig ist.
+
+    Leere Liste heisst: vollstaendig genug zum Ersetzen. Sonst steht
+    hier in Klartext, was fehlt - das landet im Protokoll des
+    Cloud-Laufs und ist dort ohne Nachrechnen lesbar.
+    """
+    maengel = []
+
+    erwartete_tage = []
+    tag = start
+    while tag <= ende:
+        erwartete_tage.append(tag.isoformat())
+        tag += timedelta(days=1)
+
+    je_tag = {t: set() for t in erwartete_tage}
+    unerwartet = set()
+    for z in zeilen:
+        if z["datum"] in je_tag:
+            je_tag[z["datum"]].add(z["ort"])
+        else:
+            unerwartet.add(z["datum"])
+
+    mindestens = int(len(orte) * MINDEST_ANTEIL)
+    for t in erwartete_tage:
+        da = len(je_tag[t])
+        if da < mindestens:
+            maengel.append(f"{t}: nur {da} von {len(orte)} Punkten "
+                           f"(mindestens {mindestens} noetig)")
+
+    if unerwartet:
+        maengel.append("Zeilen mit unerwartetem Datum: "
+                       + ", ".join(sorted(unerwartet)))
+
+    bekannt = {o[0] for o in orte}
+    fremd = {z["ort"] for z in zeilen} - bekannt
+    if fremd:
+        maengel.append(f"{len(fremd)} Kennungen, die nicht in "
+                       f"{PUNKTE_DATEI} stehen")
+
+    return maengel
+
+
+def schreibe(zeilen):
+    """Erst danebenschreiben, dann umbenennen.
+
+    Direkt in die Zieldatei zu schreiben heisst: Ein Abbruch mitten
+    im Schreiben hinterlaesst eine halbe CSV, die niemandem auffaellt.
+    os.replace ist auf einem Laufwerk unteilbar - entweder die alte
+    Datei steht noch ganz da oder die neue.
+    """
+    vorlaeufig = DATEI + ".neu"
+    with open(vorlaeufig, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=SPALTEN)
+        writer.writeheader()
+        writer.writerows(zeilen)
+    os.replace(vorlaeufig, DATEI)
+
+
 def main():
     start = date.today()
     ende = start + timedelta(days=TAGE_VORAUS)
@@ -179,10 +245,18 @@ def main():
               flush=True)
         sys.exit(1)
 
-    with open(DATEI, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=SPALTEN)
-        writer.writeheader()
-        writer.writerows(zeilen)
+    maengel = fehlt_etwas(zeilen, orte, start, ende)
+    if maengel:
+        print("\nVorhersage unvollstaendig - alte Datei bleibt stehen:",
+              flush=True)
+        for m in maengel:
+            print(f"  {m}", flush=True)
+        print("\nBesser eine Vorhersage von gestern als eine mit\n"
+              "Loechern: Fehlende Zellen werden auf der Karte wie\n"
+              "schlechte Bedingungen gezeichnet.", flush=True)
+        sys.exit(1)
+
+    schreibe(zeilen)
 
     print(f"\n{len(zeilen)} Prognosewerte in {time.time()-beginn:.0f} s.",
           flush=True)
