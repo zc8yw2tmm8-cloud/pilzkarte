@@ -161,8 +161,12 @@ def abarbeiten(aufgaben, ziel, titel):
     offen = [a for a in aufgaben if a[0] not in gueltig]
 
     print(f"\n=== {titel} ===")
-    print(f"{len(aufgaben)} Punkte, davon {len(gueltig)} erledigt, "
-          f"{len(offen)} offen")
+    # len(gueltig) waere die Zeilenzahl der Datei, nicht die Zahl
+    # erledigter Punkte - darin stecken auch Kennungen, die gar nicht
+    # mehr abgefragt werden. Das ergab Meldungen wie "1632 Punkte,
+    # davon 1642 erledigt".
+    print(f"{len(aufgaben)} Punkte, davon {len(aufgaben) - len(offen)} "
+          f"erledigt, {len(offen)} offen")
     if verworfen:
         print(f"{verworfen} Zeilen lagen am falschen Ort und werden "
               f"neu geholt")

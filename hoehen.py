@@ -91,8 +91,10 @@ def main():
 
     offen = [p for p in punkte if p[0] not in vorhanden]
 
-    print(f"{len(punkte)} Punkte, {len(vorhanden)} schon bekannt, "
-          f"{len(offen)} offen", flush=True)
+    # Nicht len(vorhanden) - da stecken ausgeschiedene Kennungen mit
+    # drin, und die Meldung sagte mehr bekannt als vorhanden.
+    print(f"{len(punkte)} Punkte, {len(punkte) - len(offen)} schon "
+          f"bekannt, {len(offen)} offen", flush=True)
     if falsch:
         print(f"{len(falsch)} Zeilen lagen am falschen Ort und werden "
               f"neu geholt", flush=True)
