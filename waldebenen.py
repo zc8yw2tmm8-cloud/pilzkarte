@@ -11,6 +11,8 @@ Wird von karte.py aufgerufen, laeuft aber auch allein.
 import os
 import math
 import numpy as np
+
+import mercator
 from PIL import Image
 
 Image.MAX_IMAGE_PIXELS = None
@@ -85,7 +87,10 @@ def lade_gesamtbild():
             voll[y_oben:y_oben + bild.shape[0],
                  x_links:x_links + bild.shape[1]] = bild
 
-    return voll
+    # Die Karte legt das Bild linear in Mercator zwischen die vier
+    # Eckpunkte, aufgebaut ist es in gleichen Breitengradschritten.
+    # Ohne diesen Zug laege es in der Mitte 202 m zu weit noerdlich.
+    return mercator.zieh_nach_mercator(voll, SUED, NORD)
 
 
 def speichere_maske(maske, farbe, dateiname):

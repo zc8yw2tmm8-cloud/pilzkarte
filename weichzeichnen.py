@@ -14,6 +14,8 @@ Braucht numpy und pillow:  pip install numpy pillow
 import os
 import math
 import numpy as np
+
+import mercator
 from PIL import Image, ImageFilter
  
 import farben
@@ -158,6 +160,13 @@ def erzeuge(werte, dateiname, rand_km=3.0, dunkel=False):
  
     bild = np.dstack([rgb, alpha[:, :, None]])
     bild = np.flipud(bild)
+
+    # Gleiche Korrektur wie bei der Waldebene, siehe mercator.py.
+    # Beide Ebenen muessen sie bekommen - sonst laegen sie zwar
+    # jede fuer sich falsch, aber wenigstens gleich falsch, und
+    # eine Korrektur allein wuerde den Versatz zwischen ihnen
+    # groesser machen statt kleiner.
+    bild = mercator.zieh_nach_mercator(bild, sued, nord)
  
     ergebnis = Image.fromarray(bild, mode="RGBA")
     # Letzter Schliff: nimmt die Restkanten der Alpha-Maske
