@@ -68,24 +68,72 @@ jobs:
             echo "Nur sonntags frueh - heute uebersprungen"
           fi
 
+      # Auch dann ablegen, wenn ein Schritt davor gescheitert ist.
+      # Sonst gingen die Messwerte, die sammeln.py schon geholt hat,
+      # verloren, nur weil die Vorhersage unvollstaendig war. Der Lauf
+      # bleibt trotzdem rot - seite.yml baut also nichts Halbes.
       - name: Ergebnisse zurueckschreiben
+        if: ${{ !cancelled() }}
         run: |
+          set -euo pipefail
+
           git config user.name "Pilzkarte"
           git config user.email "actions@github.com"
 
-          # Erst die eigenen Ergebnisse beiseitelegen, dann sauber auf
-          # den Serverstand zuruecksetzen, dann wieder auflegen. Ohne
-          # Verschmelzen - eine Mischung aus alter und neuer Vorhersage
-          # waere sinnlos.
-          git stash push -- wetter_historie/ wetter_prognose.csv || true
-          git fetch origin main
-          git reset --hard origin/main
-          git stash pop || git checkout --theirs . || true
+          # Kein "git stash" mehr. Der alte Weg war:
+          #   git stash pop || git checkout --theirs . || true
+          # Scheiterte das Zurueckholen, griff der zweite Befehl
+          # ausserhalb eines Merges nicht, und "|| true" schluckte auch
+          # das. Ergebnis: Der Serverstand blieb stehen, die gerade
+          # gesammelten Werte waren weg - und der Lauf meldete Erfolg.
+          #
+          # Jetzt liegen die Ergebnisse ausserhalb des Arbeitsbaums.
+          # Was git dort tut, kann ihnen nichts mehr anhaben.
+          ABLAGE="$(mktemp -d)"
+          cp -a wetter_historie "$ABLAGE/wetter_historie"
+          cp -a wetter_prognose.csv "$ABLAGE/wetter_prognose.csv"
 
-          git add wetter_historie/ wetter_prognose.csv
-          if git diff --staged --quiet; then
-            echo "Nichts geaendert"
-          else
+          # Fuenf Anlaeufe: Zwischen fetch und push kann jemand
+          # anderes gepusht haben - dann von vorne, nicht aufgeben.
+          for versuch in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Sicherung gegen stilles Ueberschreiben: Wenn eine
+            # Monatsdatei auf dem Server mehr Zeilen hat als unsere,
+            # hat dort jemand etwas angehaengt, das wir nicht kennen.
+            # Lieber laut abbrechen als Messwerte verlieren.
+            for datei in wetter_historie/*.csv; do
+              [ -e "$datei" ] || continue
+              unsere=$(wc -l < "$ABLAGE/$datei" 2>/dev/null || echo 0)
+              ihre=$(wc -l < "$datei")
+              if [ "$ihre" -gt "$unsere" ]; then
+                echo "$datei: Server hat $ihre Zeilen, wir nur $unsere."
+                echo "Da wurde nebenher geschrieben - nichts ueberschrieben."
+                exit 1
+              fi
+            done
+
+            rm -rf wetter_historie
+            cp -a "$ABLAGE/wetter_historie" wetter_historie
+            cp -a "$ABLAGE/wetter_prognose.csv" wetter_prognose.csv
+
+            git add wetter_historie wetter_prognose.csv
+            if git diff --staged --quiet; then
+              echo "Nichts geaendert"
+              exit 0
+            fi
+
             git commit -m "Wetterdaten $(date -u +%Y-%m-%d\ %H:%M)"
-            git push
-          fi
+            if git push; then
+              echo "Abgelegt."
+              exit 0
+            fi
+
+            echo "Push abgelehnt - Versuch $versuch von 5, neu aufsetzen."
+            sleep $((versuch * 5))
+          done
+
+          echo "Nach fuenf Versuchen nicht abgelegt. Die Daten dieses"
+          echo "Laufs sind nicht im Repository."
+          exit 1
