@@ -46,3 +46,6 @@ ortspruefung.csv
 
 # Ablage der Claude-App fuer heruntergeladene Dateien
 Claude outputs/
+
+# Sicherungen, die ortsreparatur.py anlegt
+*.vor_ortsreparatur

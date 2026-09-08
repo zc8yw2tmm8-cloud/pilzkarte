@@ -20,6 +20,8 @@ import random
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+import ortsbezug
+
 URL = "https://rest.isric.org/soilgrids/v2.0/properties/query"
 HEADERS = {"User-Agent": "PilzkarteWolfsburg/1.0 (privates Lernprojekt)"}
 
@@ -143,12 +145,31 @@ def vorhandene(datei):
 def abarbeiten(aufgaben, ziel, titel):
     """aufgaben: Liste von (kennung, lat, lon)"""
     fertig = vorhandene(ziel)
-    zeilen = list(fertig.values())
-    offen = [a for a in aufgaben if a[0] not in fertig]
+
+    # Eine Kennung allein macht einen Punkt nicht erledigt: Steht in
+    # der Zeile eine andere Koordinate, wurde der Boden woanders
+    # gemessen. Solche Zeilen fliegen raus und werden neu geholt.
+    # Zeilen zu Kennungen, die gar nicht mehr abgefragt werden,
+    # bleiben unangetastet - ueber die sagt dieser Lauf nichts.
+    je_kennung = {a[0]: a for a in aufgaben}
+    gueltig = {k: z for k, z in fertig.items()
+               if k not in je_kennung
+               or ortsbezug.am_ort(z, je_kennung[k][1], je_kennung[k][2])}
+    verworfen = len(fertig) - len(gueltig)
+
+    zeilen = list(gueltig.values())
+    offen = [a for a in aufgaben if a[0] not in gueltig]
 
     print(f"\n=== {titel} ===")
-    print(f"{len(aufgaben)} Punkte, davon {len(fertig)} erledigt, "
-          f"{len(offen)} offen")
+    # len(gueltig) waere die Zeilenzahl der Datei, nicht die Zahl
+    # erledigter Punkte - darin stecken auch Kennungen, die gar nicht
+    # mehr abgefragt werden. Das ergab Meldungen wie "1632 Punkte,
+    # davon 1642 erledigt".
+    print(f"{len(aufgaben)} Punkte, davon {len(aufgaben) - len(offen)} "
+          f"erledigt, {len(offen)} offen")
+    if verworfen:
+        print(f"{verworfen} Zeilen lagen am falschen Ort und werden "
+              f"neu geholt")
 
     if not offen:
         print("Nichts zu tun.")
