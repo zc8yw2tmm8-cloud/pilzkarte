@@ -31,6 +31,7 @@ wetter_historie.csv
 CLAUDE.md
 ABHAENGIGKEITEN.md
 UEBERGABE.md
+UEBERGABE_AN_CLAUDE_PROJEKTPRUEFUNG_*.md
 
 # Weitere Sicherungskopien
 arten_vor_baumarten.py
@@ -39,3 +40,9 @@ waldpunkte_vorher.csv
 
 # Editoreinstellungen
 .vscode/
+
+# Berichte, die pruefe_orte.py erzeugt
+ortspruefung.csv
+
+# Ablage der Claude-App fuer heruntergeladene Dateien
+Claude outputs/
