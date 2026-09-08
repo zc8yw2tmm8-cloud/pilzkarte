@@ -15,6 +15,8 @@ import csv
 import time
 import requests
 
+import ortsbezug
+
 PUNKTE_DATEI = "waldpunkte.csv"
 DATEI = "hoehen.csv"
 BLOCK = 100
@@ -78,10 +80,23 @@ def main():
     punkte = lade_punkte()
     vorhanden = lade_vorhandene()
 
+    # Eine Kennung allein macht einen Punkt nicht erledigt: Steht in
+    # der Zeile eine andere Koordinate, wurde die Hoehe woanders
+    # gemessen. Frueher blieben solche Zeilen bei jedem Lauf stehen.
+    falsch = [p[0] for p in punkte
+              if p[0] in vorhanden
+              and not ortsbezug.am_ort(vorhanden[p[0]], p[1], p[2])]
+    for kennung in falsch:
+        del vorhanden[kennung]
+
     offen = [p for p in punkte if p[0] not in vorhanden]
 
     print(f"{len(punkte)} Punkte, {len(vorhanden)} schon bekannt, "
-          f"{len(offen)} offen\n", flush=True)
+          f"{len(offen)} offen", flush=True)
+    if falsch:
+        print(f"{len(falsch)} Zeilen lagen am falschen Ort und werden "
+              f"neu geholt", flush=True)
+    print(flush=True)
 
     if not offen:
         print("Nichts zu holen.")

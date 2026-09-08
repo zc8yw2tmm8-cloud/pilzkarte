@@ -25,6 +25,7 @@ import historie
 import arten as artenmodul
 import infoseite
 import farben
+import ortsbezug
 
 try:
     import weichzeichnen
@@ -176,11 +177,12 @@ def gueltige_punkte():
     Feld lagen -, bleibt seine Historie bestehen. Ohne diesen Filter
     taucht er weiter auf der Karte auf, und zwei Kacheln liegen
     uebereinander.
+
+    Liefert Kennung -> (lat, lon). Frueher waren es nur die
+    Kennungen; seit der Ortspruefung brauchen die Aufrufer auch die
+    Koordinate, um zu pruefen, ob ein Wert wirklich von hier stammt.
     """
-    if not os.path.exists(PUNKTE_DATEI):
-        return None
-    with open(PUNKTE_DATEI, "r", encoding="utf-8") as f:
-        return {z["id"] for z in csv.DictReader(f)}
+    return ortsbezug.lade_punkte(PUNKTE_DATEI)
 
 
 def alter_der_daten():
@@ -251,7 +253,15 @@ def lade_reihen():
         ort = z["ort"]
         if erlaubt is not None and ort not in erlaubt:
             continue
-        punkte[ort] = (float(z["lat"]), float(z["lon"]))
+        # Die Koordinate der Wetterzeile muss zum Punkt passen. Vorher
+        # wurde sie ungeprueft uebernommen - eine Zeile mit fremder
+        # Kennung hat die Zelle damit an den falschen Ort geschoben.
+        if erlaubt is not None:
+            if not ortsbezug.am_ort(z, *erlaubt[ort]):
+                continue
+            punkte[ort] = erlaubt[ort]
+        else:
+            punkte[ort] = (float(z["lat"]), float(z["lon"]))
 
         regen = zahl(z.get("regen_icon"))
         if regen is None:
@@ -276,9 +286,13 @@ def lade_reihen():
                 ort = z["ort"]
                 if erlaubt is not None and ort not in erlaubt:
                     continue
+                if erlaubt is not None and not ortsbezug.am_ort(
+                        z, *erlaubt[ort]):
+                    continue
                 tag = date.fromisoformat(z["datum"])
                 if ort not in punkte:
-                    punkte[ort] = (float(z["lat"]), float(z["lon"]))
+                    punkte[ort] = (erlaubt[ort] if erlaubt is not None
+                                   else (float(z["lat"]), float(z["lon"])))
                 if tag in reihen[ort]:
                     continue
 
@@ -370,8 +384,12 @@ def lade_hoehen():
     hoehen = {}
     if not os.path.exists(HOEHEN_DATEI):
         return hoehen
+    erlaubt = gueltige_punkte()
     with open(HOEHEN_DATEI, "r", encoding="utf-8") as f:
         for z in csv.DictReader(f):
+            if erlaubt is not None and z["id"] in erlaubt:
+                if not ortsbezug.am_ort(z, *erlaubt[z["id"]]):
+                    continue
             h = zahl(z.get("hoehe"))
             if h is not None:
                 hoehen[z["id"]] = h
@@ -401,8 +419,14 @@ def lade_boden():
     boden = {}
     if not os.path.exists(BODEN_DATEI):
         return boden
+    erlaubt = gueltige_punkte()
     with open(BODEN_DATEI, "r", encoding="utf-8") as f:
         for z in csv.DictReader(f):
+            # Woanders gemessene Werte gelten als fehlend. Fehlend ist
+            # ehrlich; falsch verortet sieht aus wie eine Messung.
+            if erlaubt is not None and z["id"] in erlaubt:
+                if not ortsbezug.am_ort(z, *erlaubt[z["id"]]):
+                    continue
             eintrag = {feld: zahl(z.get(feld))
                        for feld in ("ph", "sand", "clay", "cec", "humus")}
             if eintrag.get("ph") is not None or eintrag.get("sand") is not None:
@@ -438,8 +462,12 @@ def lade_bestand():
     if not os.path.exists(BAUMARTEN_DATEI):
         return bestand
 
+    erlaubt = gueltige_punkte()
     with open(BAUMARTEN_DATEI, "r", encoding="utf-8") as f:
         for z in csv.DictReader(f):
+            if erlaubt is not None and z["id"] in erlaubt:
+                if not ortsbezug.am_ort(z, *erlaubt[z["id"]]):
+                    continue
             anteile = {}
             for teil in (z.get("verteilung") or "").split(";"):
                 if ":" not in teil:
