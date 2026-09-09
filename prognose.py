@@ -1,15 +1,15 @@
 """
 Holt die Vorhersage fuer 7 Tage. Wird jeden Tag komplett ueberschrieben -
-eine alte Vorhersage ist wertlos.
+Nur gepruefte Ergebnisse duerfen die bisherige Datei ersetzen.
 
 Nur best_match: icon_d2 reicht nur zwei Tage und liefert keine Bodenwerte.
 """
-import requests
 import csv
 import os
 import sys
 import time
 import threading
+import math
 from datetime import date, timedelta
 from concurrent.futures import ThreadPoolExecutor
 
@@ -54,6 +54,8 @@ bremse = threading.Event()
 
 def hole_buendel(orte, start, ende):
     """Mehrere Orte in einer Anfrage. None bei Misserfolg."""
+    import requests
+
     url = "https://api.open-meteo.com/v1/forecast"
     parameter = {
         "latitude": ",".join(f"{o[1]}" for o in orte),
@@ -107,51 +109,81 @@ def buendel_moeglich(orte, start, ende):
     return e is not None and len(e) == 2
 
 
-def leer(wert):
-    return "" if wert is None else wert
-
-
 def fehlt_etwas(zeilen, orte, start, ende):
-    """Sagt, was an der neuen Vorhersage unvollstaendig ist.
+    """Prueft Ort/Tag-Eindeutigkeit, Werte und die Abdeckung vor dem Ersetzen.
 
-    Leere Liste heisst: vollstaendig genug zum Ersetzen. Sonst steht
-    hier in Klartext, was fehlt - das landet im Protokoll des
-    Cloud-Laufs und ist dort ohne Nachrechnen lesbar.
+    Aufwand linear in der Zeilenzahl; keine Suche pro Ort durch alle Zeilen.
+    Die Fehlermeldungen bleiben auch bei einem deutschlandweiten Raster kurz.
     """
-    maengel = []
+    if not orte or start > ende:
+        return ["Keine Orte oder ungueltiger Prognosezeitraum"]
+    bekannt = {o[0]: (o[1], o[2]) for o in orte}
+    if len(bekannt) != len(orte):
+        return ["Doppelte Ortskennungen im Eingaberaster"]
+    if any(not name or not all(math.isfinite(v) for v in xy)
+           or abs(xy[0]) > 90 or abs(xy[1]) > 180
+           for name, xy in bekannt.items()):
+        return ["Ungueltige Ortskennung oder Koordinaten im Eingaberaster"]
 
-    erwartete_tage = []
-    tag = start
-    while tag <= ende:
-        erwartete_tage.append(tag.isoformat())
-        tag += timedelta(days=1)
+    tage = [(start + timedelta(days=i)).isoformat()
+            for i in range((ende - start).days + 1)]
+    je_tag = {t: set() for t in tage}
+    gesehen = set()
+    fehler = {}
 
-    je_tag = {t: set() for t in erwartete_tage}
-    unerwartet = set()
+    def mangel(text):
+        fehler[text] = fehler.get(text, 0) + 1
+
     for z in zeilen:
-        if z["datum"] in je_tag:
-            je_tag[z["datum"]].add(z["ort"])
-        else:
-            unerwartet.add(z["datum"])
+        ort, tag = z.get("ort"), z.get("datum")
+        if ort not in bekannt or tag not in je_tag:
+            mangel("Zeilen mit unbekanntem Ort oder unerwartetem Datum")
+            continue
+        schluessel = (ort, tag)
+        if schluessel in gesehen:
+            mangel("Doppelte Ort-Tag-Zeilen")
+        gesehen.add(schluessel)
+        try:
+            werte = [z[k] for k in SPALTEN[2:]]
+            if any(isinstance(v, bool) or not math.isfinite(float(v))
+                   for v in werte):
+                raise ValueError
+            if (float(z["lat"]), float(z["lon"])) != bekannt[ort]:
+                mangel("Zeilen mit vom Eingaberaster abweichenden Koordinaten")
+                continue
+        except (KeyError, ValueError, TypeError, OverflowError):
+            mangel("Zeilen mit fehlenden oder nicht endlichen Messwerten/Koordinaten")
+            continue
+        je_tag[tag].add(ort)
 
-    mindestens = int(len(orte) * MINDEST_ANTEIL)
-    for t in erwartete_tage:
-        da = len(je_tag[t])
-        if da < mindestens:
-            maengel.append(f"{t}: nur {da} von {len(orte)} Punkten "
-                           f"(mindestens {mindestens} noetig)")
-
-    if unerwartet:
-        maengel.append("Zeilen mit unerwartetem Datum: "
-                       + ", ".join(sorted(unerwartet)))
-
-    bekannt = {o[0] for o in orte}
-    fremd = {z["ort"] for z in zeilen} - bekannt
-    if fremd:
-        maengel.append(f"{len(fremd)} Kennungen, die nicht in "
-                       f"{PUNKTE_DATEI} stehen")
-
+    maengel = [f"{text}: {zahl}" for text, zahl in fehler.items()]
+    mindestens = math.ceil(len(orte) * MINDEST_ANTEIL)
+    # Derselbe Ort muss den gesamten Zeitraum abdecken. Wechselnde Luecken
+    # duerfen nicht an jedem Tag erneut die Ausfalltoleranz ausschoepfen.
+    vollstaendig = set.intersection(*je_tag.values())
+    if len(vollstaendig) < mindestens:
+        maengel.append(f"Nur {len(vollstaendig)} von {len(orte)} Orten an allen "
+                       f"{len(tage)} Tagen vollstaendig (mindestens {mindestens})")
+    for tag in tage:
+        if len(je_tag[tag]) < mindestens:
+            maengel.append(f"{tag}: nur {len(je_tag[tag])} von {len(orte)} Orten")
     return maengel
+
+
+def tageszeilen(ort, daten):
+    """Antwortform pruefen, bevor Spalten per Index zusammengefuehrt werden."""
+    if not isinstance(daten, dict) or not isinstance(daten.get("time"), list):
+        raise ValueError("daily.time fehlt oder ist keine Liste")
+    tage = daten["time"]
+    if not tage or any(not isinstance(t, str) for t in tage):
+        raise ValueError("Leere oder ungueltige Tagesliste")
+    if any(not isinstance(daten.get(f), list) or len(daten[f]) != len(tage)
+           for f in FELDER):
+        raise ValueError("Messwertspalten fehlen oder haben verschiedene Laengen")
+    name, lat, lon = ort
+    return [dict(zip(SPALTEN, [tag, name, lat, lon]
+                     + [daten[f][i] for f in FELDER]))
+            for i, tag in enumerate(tage)]
 
 
 def schreibe(zeilen):
@@ -174,6 +206,11 @@ def main():
     start = date.today()
     ende = start + timedelta(days=TAGE_VORAUS)
     orte = lade_punkte()
+    # Rasterfehler vor dem ersten Netzwerkabruf erkennen.
+    rasterfehler = fehlt_etwas([], orte, start, ende)
+    if not orte or any("Eingaberaster" in m for m in rasterfehler):
+        print("Ungueltiges Eingaberaster - alte Datei bleibt stehen.", flush=True)
+        sys.exit(1)
 
     print(f"Prognose {start} bis {ende} fuer {len(orte)} Punkte", flush=True)
 
@@ -206,31 +243,11 @@ def main():
                         if not d:
                             fehler += 1
                             continue
-                        n = len(d["time"])
+                        try:
+                            zeilen.extend(tageszeilen((name, lat, lon), d))
+                        except ValueError:
+                            fehler += 1
 
-                        def spalte(feld, d=d, n=n):
-                            return d.get(feld) or [None] * n
-
-                        for j, tag in enumerate(d["time"]):
-                            regen = spalte("precipitation_sum")[j]
-                            if regen is None:
-                                continue
-                            zeilen.append({
-                                "datum": tag, "ort": name,
-                                "lat": lat, "lon": lon, "regen": regen,
-                                "temperatur": leer(
-                                    spalte("temperature_2m_mean")[j]),
-                                "bt07": leer(spalte(
-                                    "soil_temperature_0_to_7cm_mean")[j]),
-                                "bf07": leer(spalte(
-                                    "soil_moisture_0_to_7cm_mean")[j]),
-                                "bt728": leer(spalte(
-                                    "soil_temperature_7_to_28cm_mean")[j]),
-                                "bf728": leer(spalte(
-                                    "soil_moisture_7_to_28cm_mean")[j]),
-                                "et0": leer(spalte(
-                                    "et0_fao_evapotranspiration")[j]),
-                            })
 
                 if erledigt[0] % 20 == 0 or erledigt[0] == len(pakete):
                     dauer = time.time() - beginn
@@ -258,10 +275,18 @@ def main():
 
     schreibe(zeilen)
 
+    tage_je_ort = {}
+    for z in zeilen:
+        tage_je_ort.setdefault(z["ort"], set()).add(z["datum"])
+    komplette = sum(len(t) == TAGE_VORAUS + 1 for t in tage_je_ort.values())
+    print(f"Abdeckung: {komplette}/{len(orte)} Orte mit allen Tagen; "
+          f"{len(orte) - komplette} Orte unvollstaendig oder fehlend.", flush=True)
+
     print(f"\n{len(zeilen)} Prognosewerte in {time.time()-beginn:.0f} s.",
           flush=True)
     if fehler:
         print(f"{fehler} Punkte ohne Daten.", flush=True)
 
 
-main()
+if __name__ == "__main__":
+    main()
