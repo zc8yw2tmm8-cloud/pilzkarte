@@ -10,6 +10,14 @@ let sb = null;             // Supabase-Verbindung
 let benutzer = null;       // angemeldeter Benutzer
 let aufzeichnung = null;   // laufende Routenaufzeichnung
 
+// Nur fuer HTML-Text und zitierte HTML-Attribute, nie fuer JavaScript/URLs.
+// Erst bei der Ausgabe kodieren: gespeicherte Originaltexte bleiben erhalten.
+function kontoHtml(wert) {
+  return String(wert ?? "").replace(/[&<>"']/g, zeichen => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[zeichen]);
+}
+
 // ---- Verbindung -----------------------------------------------------
 
 async function kontoStarten() {
@@ -74,7 +82,7 @@ function zeigeKontostand() {
     let name = anzeigename || (benutzer.email || "").split("@")[0];
     if (name.length > 12) name = name.slice(0, 11) + "\u2026";
     el.innerHTML = `<button class="tag an" onclick="zeigeKontomenue()"
-      title="${benutzer.email}">&#9679; ${name}</button>`;
+      title="${kontoHtml(benutzer.email)}">&#9679; ${kontoHtml(name)}</button>`;
   } else {
     el.innerHTML = `<button class="tag" onclick="zeigeAnmeldung()">
         anmelden</button>`;
@@ -129,10 +137,10 @@ function zeigeKontomenue() {
                  : '<span class="ohnebild">?</span>'}
       </button>
       <div>
-        <h3>${anzeigename || "ohne Namen"}
+        <h3>${kontoHtml(anzeigename || "ohne Namen")}
           <button class="stift" title="Name ändern"
             onclick="zeigeNamenswahl(false)">${STIFT}</button></h3>
-        <p class="klein">${benutzer.email}</p>
+        <p class="klein">${kontoHtml(benutzer.email)}</p>
       </div>
     </div>
     <button class="voll" onclick="zeigeTagebuch()">Tagebuch</button>
@@ -643,8 +651,7 @@ function routeBeenden(stillschweigend) {
     <p class="klein">${fertig.km.toFixed(1)} km in ${min} Minuten,
     ${fertig.punkte.length} Punkte</p>
     <input type="text" id="routentitel" placeholder="Wo warst du?"
-           value="${routenvorschlag(fertig.punkte)
-             .replace(/"/g, "&quot;")}">
+           value="${kontoHtml(routenvorschlag(fertig.punkte))}">
     <textarea id="routennotiz" rows="2"
       placeholder="Notiz (was gesehen, was gefunden)"></textarea>
     <button class="voll" onclick='routeSpeichern(${JSON.stringify(
@@ -1071,9 +1078,9 @@ async function ladeFremdeDaten() {
       new maplibregl.Popup({ maxWidth: "240px" })
         .setLngLat(e.features[0].geometry.coordinates)
         .setHTML(`<div class="pop">
-          <b>${p.null == 1 ? "Nichts gefunden" : p.art}</b>
-          <div class="lage">${p.datum} &middot; anderer Nutzer</div>
-          ${p.notiz ? `<div class="klein">${p.notiz}</div>` : ""}
+          <b>${kontoHtml(p.null == 1 ? "Nichts gefunden" : p.art)}</b>
+          <div class="lage">${kontoHtml(p.datum)} &middot; anderer Nutzer</div>
+          ${p.notiz ? `<div class="klein">${kontoHtml(p.notiz)}</div>` : ""}
         </div>`).addTo(karte);
     });
   }
@@ -1138,7 +1145,7 @@ function zeigeNamenswahl(erstmalig) {
     <input type="text" id="wunschname" maxlength="20"
            autocomplete="off" autocapitalize="off"
            placeholder="dein Name"
-           value="${erstmalig ? "" : (anzeigename || "")}">
+           value="${kontoHtml(erstmalig ? "" : (anzeigename || ""))}">
     <p class="klein" id="namenshinweis">&nbsp;</p>
     <button class="voll" id="namenknopf" onclick="namenSpeichern()"
             disabled>Speichern</button>
@@ -1257,7 +1264,7 @@ async function ladeAvatarliste() {
 
 function avatarBild(datei, groesse) {
   if (!datei) return "";
-  return `<img src="avatare/${datei}" alt=""
+  return `<img src="avatare/${kontoHtml(datei)}" alt=""
     width="${groesse}" height="${groesse}" class="avatar">`;
 }
 
@@ -1573,10 +1580,10 @@ async function ladeEigeneFunde() {
     new maplibregl.Popup({ maxWidth: "240px" })
       .setLngLat(e.features[0].geometry.coordinates)
       .setHTML(`<div class="pop">
-        <b>${p.null == 1 ? "Nichts gefunden" : p.art}</b>
-        <div class="lage">${p.datum}${p.anzahl
-          ? " &middot; " + p.anzahl + " Stück" : ""}</div>
-        ${p.notiz ? `<div class="klein">${p.notiz}</div>` : ""}
+        <b>${kontoHtml(p.null == 1 ? "Nichts gefunden" : p.art)}</b>
+        <div class="lage">${kontoHtml(p.datum)}${p.anzahl
+          ? " &middot; " + kontoHtml(p.anzahl) + " Stück" : ""}</div>
+        ${p.notiz ? `<div class="klein">${kontoHtml(p.notiz)}</div>` : ""}
       </div>`)
       .addTo(karte);
   });
@@ -1741,9 +1748,9 @@ function zeichneRouten() {
     const p = e.features[0].properties;
     new maplibregl.Popup({ maxWidth: "240px" })
       .setLngLat(e.lngLat)
-      .setHTML(`<div class="pop"><b>${p.titel}</b>
-        <div class="lage">${p.datum} &middot; ${p.km} km
-        &middot; ${p.min} min</div></div>`)
+      .setHTML(`<div class="pop"><b>${kontoHtml(p.titel)}</b>
+        <div class="lage">${kontoHtml(p.datum)} &middot; ${kontoHtml(p.km)} km
+        &middot; ${kontoHtml(p.min)} min</div></div>`)
       .addTo(karte);
   });
   karte.on("mouseenter", "routen",
@@ -1784,7 +1791,7 @@ function zeigeRoutenleiste() {
   if (gezeigteRoute) {
     const r = alleRouten.find(x => x.id === gezeigteRoute);
     const titel = r ? (r.titel || "Route") : "Route";
-    el.innerHTML = `<span>${titel}</span>
+    el.innerHTML = `<span>${kontoHtml(titel)}</span>
       <button onclick="alleRoutenZeigen()">alle ${alleRouten.length}
         </button>
       <button onclick="routenAusblenden()" title="Ausblenden">
@@ -1870,9 +1877,9 @@ async function routeBearbeiten(id) {
       .toLocaleDateString("de-DE")} &middot; ${r.laenge_km || "?"} km
       &middot; ${r.dauer_min || "?"} min</p>
     <input type="text" id="rtitel" maxlength="60"
-           value="${(r.titel || "").replace(/"/g, "&quot;")}">
+           value="${kontoHtml(r.titel || "")}">
     <textarea id="rnotiz" rows="3"
-      placeholder="Notiz">${r.notiz || ""}</textarea>
+      placeholder="Notiz">${kontoHtml(r.notiz || "")}</textarea>
     <button class="voll" onclick="routeSpeichernAenderung('${id}')">
       Speichern</button>
     <button class="voll leer" onclick="zeigeTagebuch()">Zurück</button>
@@ -2017,19 +2024,18 @@ async function zeigeTagebuch() {
     const titel = r.titel || "ohne Titel";
     const datum = new Date(r.begonnen).toLocaleDateString("de-DE");
     return `<div class="eintrag">
-      <div class="kopfzeile"><b>${titel}</b>${knopf}
+      <div class="kopfzeile"><b>${kontoHtml(titel)}</b>${knopf}
         <button class="stift" title="Bearbeiten"
           onclick="routeBearbeiten('${r.id}')">${STIFT}</button>
         <button class="muell" title="L\u00f6schen"
-          onclick="loesche('route', '${r.id}',
-            '${titel.replace(/'/g, "")} vom ${datum}, '
-            + '${r.laenge_km || "?"} km')"
+          data-loeschen="route" data-id="${kontoHtml(r.id)}"
+          data-beschreibung="${kontoHtml(`${titel} vom ${datum}, ${r.laenge_km || "?"} km`)}"
           >${MUELLEIMER}</button>
       </div>
       <div class="klein">${new Date(r.begonnen)
         .toLocaleDateString("de-DE")} &middot; ${r.laenge_km || "?"} km
         &middot; ${r.dauer_min || "?"} min ${marke}</div>
-      ${r.notiz ? `<div class="klein">${r.notiz}</div>` : ""}
+      ${r.notiz ? `<div class="klein">${kontoHtml(r.notiz)}</div>` : ""}
     </div>`;
   }).join("") || '<p class="klein">Noch keine Routen.</p>';
 
@@ -2045,18 +2051,18 @@ async function zeigeTagebuch() {
     const datum = new Date(f.gefunden_am).toLocaleDateString("de-DE");
     return `<div class="eintrag">
       <div class="kopfzeile">
-        <b>${name}</b>${knopf}
+        <b>${kontoHtml(name)}</b>${knopf}
         <button class="stift" title="Bearbeiten"
           onclick="fundBearbeiten('${f.id}')">${STIFT}</button>
         <button class="muell" title="L\u00f6schen"
-          onclick="loesche('fund', '${f.id}',
-            '${name.replace(/'/g, "")} vom ${datum}')"
+          data-loeschen="fund" data-id="${kontoHtml(f.id)}"
+          data-beschreibung="${kontoHtml(`${name} vom ${datum}`)}"
           >${MUELLEIMER}</button>
       </div>
       <div class="klein">${new Date(f.gefunden_am)
         .toLocaleDateString("de-DE")}${f.anzahl
         ? " &middot; " + f.anzahl + " Stück" : ""}</div>
-      ${f.notiz ? `<div class="klein">${f.notiz}</div>` : ""}
+      ${f.notiz ? `<div class="klein">${kontoHtml(f.notiz)}</div>` : ""}
     </div>`;
   }).join("") || '<p class="klein">Noch keine Funde.</p>';
 
@@ -2072,6 +2078,10 @@ async function zeigeTagebuch() {
     <h4>Funde</h4>${fundListe}
     <button class="voll leer" onclick="kastenZu()">Schliessen</button>
   `);
+  document.querySelectorAll("#kasten [data-loeschen]").forEach(knopf => {
+    knopf.onclick = () => loesche(knopf.dataset.loeschen,
+      knopf.dataset.id, knopf.dataset.beschreibung);
+  });
 }
 
 // ---- Kasten ---------------------------------------------------------

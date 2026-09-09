@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><title>Tests: sichere Kontoausgabe</title>
+<h1>Sichere Kontoausgabe</h1><p>Lokale Testdaten, kein Backendzugriff.</p>
+<button onclick="tests()">Tests ausführen</button><pre id="ergebnis"></pre>
+<div id="poptest"></div>
+<script src="../web/konto.js"></script>
+<script>
+const D={arten:{}};
+const angriff='</textarea><img src=x onerror="document.body.dataset.angriff=1"> " \' & <b>Text</b>';
+const fund={id:'11111111-1111-4111-8111-111111111111',art:angriff,notiz:angriff,gefunden_am:'2026-09-01',lat:52,lon:10,anzahl:2};
+const route={id:'22222222-2222-4222-8222-222222222222',titel:angriff,notiz:angriff,begonnen:'2026-09-01',punkte:[],laenge_km:1,dauer_min:20};
+benutzer={id:'test',email:'test@example.invalid'};
+sb={from(t){return {select(){return this},eq(){return this},neq(){return this},order(){return this},limit(){return Promise.resolve({data:t==='fund'?[fund]:[route]})}}},rpc(){return Promise.resolve({data:[]})}};
+const events={},sources={};
+const karte={getSource(id){return sources[id]},getLayer(){return false},addSource(id,s){sources[id]=s},addLayer(){},on(event,id,fn){events[event+id]=fn},getCanvas(){return {style:{}}}};
+const maplibregl={Popup:class {setLngLat(){return this}setHTML(html){document.getElementById('poptest').innerHTML=html;return this}addTo(){return this}}};
+function fundeSichtbar(){return true}
+function check(ok,msg){if(!ok)throw Error(msg)}
+function sicher(el){check(!el.querySelector('img,script,b b'),'HTML wurde interpretiert');check(!document.body.dataset.angriff,'Ereignis ausgeführt')}
+async function tests(){
+ Object.keys(sources).forEach(k=>delete sources[k]);
+ Object.keys(events).forEach(k=>delete events[k]);
+ const result=[];
+ async function test(name,fn){try{await fn();result.push('OK: '+name)}catch(e){result.push('FEHLER: '+name+' – '+e.message)}}
+ await test('Sonderzeichen und unveränderte Textwiedergabe',()=>{const el=document.createElement('div');el.innerHTML=kontoHtml(angriff);sicher(el);check(el.textContent===angriff,'Text verändert')});
+ await test('Tagebuch: Fundname, Routentitel und Notizen',async()=>{await zeigeTagebuch();const el=document.getElementById('kasten');sicher(el);check([...el.querySelectorAll('.kopfzeile b')].every(b=>b.textContent===angriff),'Name verändert')});
+ await test('Löschknöpfe übergeben Originaltext ohne Codeausführung',()=>{let aufrufe=[];const vorher=loesche;loesche=(...args)=>aufrufe.push(args);try{document.querySelectorAll('[data-loeschen]').forEach(b=>b.click());check(aufrufe.length===2,'Knöpfe fehlen');check(aufrufe.every(a=>a[2].startsWith(angriff)),'Text verändert');sicher(document.getElementById('kasten'))}finally{loesche=vorher}});
+ await test('Routenbearbeitung: Textarea-Ausbruch und Attributausbruch verhindert',async()=>{alleRouten=[route];await routeBearbeiten(route.id);sicher(document.getElementById('kasten'));check(document.getElementById('rtitel').value===angriff,'Titel verändert');check(document.getElementById('rnotiz').value===angriff,'Notiz verändert')});
+ await test('Eigene Fund-Popups',async()=>{await ladeEigeneFunde();events.clickeigene({features:[sources.eigene.data.features[0]]});const el=document.getElementById('poptest');sicher(el);check(el.querySelector('b').textContent===angriff,'Art verändert');check(el.querySelector('.klein').textContent===angriff,'Notiz verändert')});
+ await test('Freigegebene Fund-Popups',async()=>{fremdeSichtbar=true;await ladeFremdeDaten();events.clickfremde_funde({features:[sources.fremde_funde.data.features[0]]});const el=document.getElementById('poptest');sicher(el);check(el.querySelector('b').textContent===angriff,'Art verändert')});
+ document.getElementById('kasten').hidden=true;document.getElementById('poptest').hidden=true;document.getElementById('ergebnis').textContent=result.join('\n');
+}
+</script></html>
