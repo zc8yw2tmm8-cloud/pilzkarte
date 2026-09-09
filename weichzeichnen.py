@@ -39,6 +39,7 @@ AUS_KM = 3.3
  
 ORDNER = "bilder"
 BILDORDNER = ORDNER
+KEINE_DATEN_RGB = (145, 145, 145)
  
  
 def _farbtabelle(dunkel):
@@ -63,7 +64,7 @@ _GEOMETRIE = {}
  
 def erzeuge(werte, dateiname, rand_km=3.0, dunkel=False):
     """
-    werte: Liste von (lat, lon, score)
+    werte: Liste von (lat, lon, score); None kennzeichnet fehlende Scores.
     Rueckgabe: (pfad, bounds) fuer folium.raster_layers.ImageOverlay
                oder (None, None) bei zu wenig Daten
     """
@@ -100,7 +101,8 @@ def erzeuge(werte, dateiname, rand_km=3.0, dunkel=False):
  
     # Die Punktlage aendert sich zwischen den Bildern nie - Gewichte,
     # Naehe und Fensterlagen also nur einmal rechnen und merken.
-    schluessel = (round(sued, 5), round(west, 5), hoehe, breite, len(werte))
+    schluessel = (lats.tobytes(), lons.tobytes(), rand_km, BILD_KM,
+                  STREUUNG_KM, VOLL_KM, AUS_KM)
  
     if schluessel not in _GEOMETRIE:
         gewicht = np.zeros((hoehe, breite), dtype=np.float32)
@@ -137,15 +139,29 @@ def erzeuge(werte, dateiname, rand_km=3.0, dunkel=False):
                        naehe_kern[ky0:ky0 + (y1 - y0), kx0:kx0 + (x1 - x0)],
                        out=naehe[y0:y1, x0:x1])
  
+        _GEOMETRIE.clear()
         _GEOMETRIE[schluessel] = (fenster_lage, gewicht, naehe)
  
     fenster_lage, gewicht, naehe = _GEOMETRIE[schluessel]
  
     summe = np.zeros((hoehe, breite), dtype=np.float32)
+    gueltig = np.isfinite(scores) & (scores >= 0) & (scores <= 100)
+    luecken = not gueltig.all()
+    if luecken:
+        gewicht = np.zeros_like(gewicht)
+        bekannt_nah = np.zeros_like(gewicht)
+        unbekannt_nah = np.zeros_like(gewicht)
     for lage, s in zip(fenster_lage, scores):
         if lage is None:
             continue
         y0, y1, x0, x1, teil = lage
+        if luecken:
+            bekannt = np.isfinite(s) and 0 <= s <= 100
+            nah = bekannt_nah if bekannt else unbekannt_nah
+            np.maximum(nah[y0:y1, x0:x1], teil, out=nah[y0:y1, x0:x1])
+            if not bekannt:
+                continue
+            gewicht[y0:y1, x0:x1] += teil
         summe[y0:y1, x0:x1] += teil * np.float32(s)
  
     hat_daten = gewicht > 1e-6
@@ -155,6 +171,9 @@ def erzeuge(werte, dateiname, rand_km=3.0, dunkel=False):
     # Bild aufbauen. Zeile 0 ist im Bild oben, also Norden -> umdrehen.
     stufen = np.clip(mittel / 100.0 * 255.0, 0, 255).astype(np.uint8)
     rgb = farbtabelle(dunkel)[stufen]
+    unbekannt = ((unbekannt_nah >= bekannt_nah) & (unbekannt_nah > 0)
+                 if luecken else np.zeros_like(hat_daten))
+    rgb[unbekannt] = KEINE_DATEN_RGB
     deckkraft = farben.thema(dunkel)["kachel_deckkraft"]
     alpha = (np.clip(naehe, 0, 1) * deckkraft).astype(np.uint8)
  
@@ -171,6 +190,12 @@ def erzeuge(werte, dateiname, rand_km=3.0, dunkel=False):
     ergebnis = Image.fromarray(bild, mode="RGBA")
     # Letzter Schliff: nimmt die Restkanten der Alpha-Maske
     ergebnis = ergebnis.filter(ImageFilter.GaussianBlur(radius=1.2))
+    if luecken:
+        # Die Weichzeichnung darf keine Scorefarbe in Datenluecken ziehen.
+        maske = mercator.zieh_nach_mercator(np.flipud(unbekannt), sued, nord)
+        pixel = np.array(ergebnis)
+        pixel[maske, :3] = KEINE_DATEN_RGB
+        ergebnis = Image.fromarray(pixel, mode="RGBA")
  
     pfad = os.path.join(BILDORDNER, dateiname)
     ergebnis.save(pfad, compress_level=6)

@@ -24,11 +24,7 @@ BILDORDNER = "bilder"
 SUED, WEST, NORD, OST = 52.05, 10.10, 52.85, 11.15
 KACHELN_X, KACHELN_Y = 4, 4
 
-# Jeder vierte Bildpunkt - 40 m statt 10 m. Fuer eine Uebersichtsebene,
-# die man ein- und ausblendet, reicht das voellig. Bei 2 statt 4 werden
-# die elf Masken viermal so gross und die Erzeugung dauert viermal
-# so lange.
-SPARSAM = 4
+SPARSAM = 2
 
 # Klassenwerte der Thuenen-Karte
 KLASSEN = {
@@ -54,9 +50,6 @@ def lade_gesamtbild():
     if not os.path.isdir(KACHELORDNER):
         return None
 
-    km_lat = 111.0
-    km_lon = 111.0 * math.cos(math.radians((SUED + NORD) / 2))
-
     teile = {}
     breiten = [0] * KACHELN_X
     hoehen = [0] * KACHELN_Y
@@ -66,10 +59,10 @@ def lade_gesamtbild():
             pfad = os.path.join(KACHELORDNER, f"k_{iy}_{ix}.tif")
             if not os.path.exists(pfad):
                 return None
-            bild = np.array(Image.open(pfad))
+            with Image.open(pfad) as quelle:
+                bild = np.array(quelle)
             if bild.ndim == 3:
                 bild = bild[:, :, 0]
-            bild = bild[::SPARSAM, ::SPARSAM]
             teile[(iy, ix)] = bild
             hoehen[iy] = max(hoehen[iy], bild.shape[0])
             breiten[ix] = max(breiten[ix], bild.shape[1])
@@ -87,19 +80,26 @@ def lade_gesamtbild():
             voll[y_oben:y_oben + bild.shape[0],
                  x_links:x_links + bild.shape[1]] = bild
 
-    # Die Karte legt das Bild linear in Mercator zwischen die vier
-    # Eckpunkte, aufgebaut ist es in gleichen Breitengradschritten.
-    # Ohne diesen Zug laege es in der Mitte 202 m zu weit noerdlich.
-    return mercator.zieh_nach_mercator(voll, SUED, NORD)
+    return voll
+
+
+def flaechenanteile(maske, faktor=SPARSAM):
+    """Mittelt binaere Flaechenmasken, nicht die numerischen Artenklassen."""
+    if faktor < 1 or int(faktor) != faktor:
+        raise ValueError("Der Verkleinerungsfaktor muss eine positive ganze Zahl sein")
+    hoehe, breite = maske.shape
+    ziel = (math.ceil(breite / faktor), math.ceil(hoehe / faktor))
+    bild = Image.fromarray(maske.astype(np.uint8) * 255)
+    return np.array(bild.resize(ziel, Image.Resampling.BOX))
 
 
 def speichere_maske(maske, farbe, dateiname):
-    hoehe, breite = maske.shape
+    anteile = flaechenanteile(maske)
+    anteile = mercator.zieh_nach_mercator(anteile, SUED, NORD)
+    hoehe, breite = anteile.shape
     bild = np.zeros((hoehe, breite, 4), dtype=np.uint8)
-    bild[maske, 0] = farbe[0]
-    bild[maske, 1] = farbe[1]
-    bild[maske, 2] = farbe[2]
-    bild[maske, 3] = DECKKRAFT
+    bild[:, :, :3] = farbe
+    bild[:, :, 3] = np.rint(anteile.astype(np.float32) * DECKKRAFT / 255).astype(np.uint8)
 
     os.makedirs(BILDORDNER, exist_ok=True)
     pfad = os.path.join(BILDORDNER, dateiname)

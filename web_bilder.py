@@ -89,11 +89,10 @@ def main():
     # werden dann auf dieselbe Flaeche gestreckt und liegen versetzt
     # uebereinander.
     #
-    # Zellen ohne Wert bekommen 0. Das ist auch inhaltlich richtig:
-    # keine Daten heisst keine Aussicht.
+    # Fehlende Werte bleiben None; der Zeichner markiert sie separat.
     for art in arten:
         for i, tag in enumerate(tage):
-            werte = [(z["lat"], z["lon"], z["scores"][art][i] or 0)
+            werte = [(z["lat"], z["lon"], z["scores"][art][i])
                      for z in zellen]
             if len(werte) < 3:
                 continue
@@ -116,8 +115,10 @@ def main():
 
     anzahl = sum(len(v) for v in eintraege.values())
     print(f"\n{anzahl} Bilder, zusammen {gesamt/1024/1024:.1f} MB")
-    print(f"Je Ansicht laedt der Browser eines, etwa "
-          f"{gesamt/anzahl/1024:.0f} KB")
+    if anzahl:
+        print(f"Je Ansicht laedt der Browser eines, etwa "
+              f"{gesamt/anzahl/1024:.0f} KB")
 
 
-main()
+if __name__ == "__main__":
+    main()

@@ -17,7 +17,6 @@ Image.MAX_IMAGE_PIXELS = None
 
 QUELLE = "bilder"
 ZIEL = "web"
-MAX_BREITE = 2200
 
 
 BAUMNAMEN = {
@@ -64,24 +63,10 @@ def main():
         if not os.path.exists(pfad):
             continue
 
-        bild = Image.open(pfad)
-        breite, hoehe = bild.size
-        if breite > MAX_BREITE:
-            bild = bild.resize(
-                (MAX_BREITE, int(hoehe * MAX_BREITE / breite)),
-                Image.LANCZOS)
-        if bild.mode != "RGBA":
-            bild = bild.convert("RGBA")
-
-        # Maskenbilder haben wenige Farben - das druecken wir aus
-        alpha = bild.split()[3]
-        farbig = bild.convert("RGB").quantize(
-            colors=16, method=Image.MEDIANCUT, dither=Image.NONE)
-        farbig = farbig.convert("RGBA")
-        farbig.putalpha(alpha)
-
+        with Image.open(pfad) as quelle:
+            bild = quelle.convert("RGBA")
         zieldatei = f"wald/wald_{schluessel}.png"
-        farbig.save(os.path.join(ZIEL, zieldatei), "PNG", optimize=True)
+        bild.save(os.path.join(ZIEL, zieldatei), "PNG", optimize=True)
 
         vorher = os.path.getsize(pfad) / 1024
         nachher = os.path.getsize(os.path.join(ZIEL, zieldatei)) / 1024
@@ -106,4 +91,5 @@ def main():
           f"{gesamt_vorher/1024:.1f} MB -> {gesamt_nachher/1024:.1f} MB")
 
 
-main()
+if __name__ == "__main__":
+    main()

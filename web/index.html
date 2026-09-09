@@ -727,6 +727,29 @@ const SKALA = [
   [0.65, [255, 225, 90]], [0.85, [130, 220, 70]], [1.00, [45, 175, 75]]
 ];
 
+function scoreGueltig(wert) {
+  return Number.isFinite(wert) && wert >= 0 && wert <= 100;
+}
+
+function scoreMittel(werte) {
+  const bekannt = werte.filter(scoreGueltig);
+  return bekannt.length
+    ? Math.round(bekannt.reduce((summe, w) => summe + w, 0) / bekannt.length)
+    : null;
+}
+
+function scoreText(wert) {
+  return scoreGueltig(wert) ? String(wert) : "Keine Daten";
+}
+
+function scoreFlaechenfarbe() {
+  return ["case", ["get", "unbekannt"], "rgb(145,145,145)",
+    ["interpolate", ["linear"], ["coalesce", ["get", "wert"], 0],
+      0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
+      50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
+      85, "rgb(130,220,70)", 100, "rgb(45,175,75)"]];
+}
+
 function farbe(wert) {
   const p = Math.max(0, Math.min(100, wert)) / 100;
   for (let i = 0; i < SKALA.length - 1; i++) {
@@ -988,7 +1011,9 @@ function baueGeoJson() {
       return {
         type: "Feature",
         id: i,
-        properties: { i: i, wert: z.scores[art][tag] ?? 0 },
+        properties: { i: i,
+          wert: scoreGueltig(z.scores[art][tag]) ? z.scores[art][tag] : null,
+          unbekannt: !scoreGueltig(z.scores[art][tag]) },
         geometry: {
           type: "Polygon",
           coordinates: [[[w, s], [o, s], [o, n], [w, n], [w, s]]]
@@ -1010,12 +1035,10 @@ function aktualisiere() {
   const knoepfe = [...leiste.querySelectorAll(".art")];
   const bewertet = knoepfe.map(b => {
     const a = b.dataset.art;
-    const werte = D.zellen.map(z => z.scores[a][tag] ?? 0);
-    const schnitt = Math.round(
-      werte.reduce((s, w) => s + w, 0) / werte.length);
+    const schnitt = scoreMittel(D.zellen.map(z => z.scores[a][tag]));
     b.classList.toggle("aktiv", a === art);
-    b.querySelector(".wert").innerHTML = `<b>${schnitt}</b>/100`;
-    return { b, schnitt };
+    b.querySelector(".wert").innerHTML = scoreGueltig(schnitt) ? `<b>${scoreText(schnitt)}</b>/100` : "Keine Daten";
+    return { b, a, schnitt };
   });
   nachLieblingen(bewertet)
     .forEach(({ b }) => leiste.appendChild(b));
@@ -1040,7 +1063,7 @@ function aktualisiere() {
           .map(({ b, schnitt }) => {
             const a = b.dataset.art;
             return `<option value="${a}">${D.arten[a].name}` +
-                   ` — ${schnitt}</option>`;
+                   ` — ${scoreText(schnitt)}</option>`;
           }).join("");
     wahl.value = "";
   }
@@ -1054,13 +1077,8 @@ function aktualisiere() {
   const pw = document.getElementById("pillewert");
   if (pn && D.arten[art]) {
     pn.textContent = D.arten[art].name;
-    const werte = D.zellen
-      .map(z => z.scores[art][tag])
-      .filter(x => x !== null && x !== undefined);
-    const schnitt = werte.length
-      ? Math.round(werte.reduce((a, b) => a + b, 0) / werte.length)
-      : 0;
-    if (pw) pw.textContent = schnitt;
+    const schnitt = scoreMittel(D.zellen.map(z => z.scores[art][tag]));
+    if (pw) pw.textContent = scoreText(schnitt);
   }
 
   // Tageschips
@@ -1078,8 +1096,8 @@ function aktualisiere() {
 function trendZeile(z) {
   const liste = z.scores[art];
   const jetzt = liste[0];
-  if (jetzt === null) return "";
-  const kuenftig = liste.slice(1).filter(w => w !== null);
+  if (!scoreGueltig(jetzt)) return "";
+  const kuenftig = liste.slice(1).filter(scoreGueltig);
   if (!kuenftig.length) return "";
 
   const best = Math.max(...kuenftig), tief = Math.min(...kuenftig);
@@ -1222,7 +1240,7 @@ function nachLieblingen(liste) {
     const lx = istLiebling(x.a) ? 1 : 0;
     const ly = istLiebling(y.a) ? 1 : 0;
     if (lx !== ly) return ly - lx;
-    return y.schnitt - x.schnitt;
+    return (y.schnitt ?? -1) - (x.schnitt ?? -1);
   });
 }
 
@@ -1231,9 +1249,7 @@ function zeigeArtenwahl() {
   // Alle Arten als Liste, nach Aussichten sortiert. Ersetzt die
   // Knopfleiste, die bei elf Arten laenger war als der Bildschirm.
   const sortiert = nachLieblingen(Object.keys(D.arten).map(a => {
-    const werte = D.zellen.map(z => z.scores[a][tag] ?? 0);
-    return { a, schnitt: Math.round(
-      werte.reduce((x, y) => x + y, 0) / Math.max(1, werte.length)) };
+    return { a, schnitt: scoreMittel(D.zellen.map(z => z.scores[a][tag])) };
   }));
 
   const zeilen = sortiert.map(({ a, schnitt }) => `
@@ -1245,7 +1261,7 @@ function zeigeArtenwahl() {
         ${istLiebling(a) ? "&#9733;" : "&#9734;"}</button>
       <button class="artname" data-wahl="${a}">
         <span>${D.arten[a].name}</span>
-        <b>${schnitt}</b>
+        <b>${scoreText(schnitt)}</b>
       </button>
     </div>`).join("");
 
@@ -1326,15 +1342,15 @@ function blattZu() {
 }
 
 function popupInhalt(z, klickOrt) {
-  const wert = z.scores[art][tag] ?? 0;
+  const wert = z.scores[art][tag];
   const k = z.kenn;
 
   const andere = Object.keys(D.arten)
-    .map(a => [a, z.scores[a][tag] ?? 0])
-    .sort((x, y) => y[1] - x[1])
+    .map(a => [a, z.scores[a][tag]])
+    .sort((x, y) => (y[1] ?? -1) - (x[1] ?? -1))
     .map(([a, w]) => `<tr${a === art ? ' class="hier"' : ""}>
       <td>${D.arten[a].name}</td>
-      <td style="color:${farbe(w)};font-weight:600">${w}</td></tr>`).join("");
+      <td style="color:${scoreGueltig(w) ? farbe(w) : "var(--leise)"};font-weight:600">${scoreText(w)}</td></tr>`).join("");
 
   const lage = [tagname(tag)];
   if (z.hoehe !== null) lage.push(z.hoehe + " m");
@@ -1348,9 +1364,9 @@ function popupInhalt(z, klickOrt) {
     <div class="titel">${z.titel}</div>
     <div class="lage">${lage.join(" · ")}</div>
     <div class="score">${D.arten[art].name}
-      <b>${wert}</b><span class="max">/100</span></div>
+      <b>${scoreText(wert)}</b>${scoreGueltig(wert) ? '<span class="max">/100</span>' : ""}</div>
     ${tag === 0 ? trendZeile(z) : ""}
-    ${bremszeile(z)}
+    ${scoreGueltig(wert) ? bremszeile(z) : ""}
     <div class="knopfreihe">
       ${fundknopf(z, klickOrt)}
       ${navigationsknopf(klickOrt ? klickOrt.lat : z.lat,
@@ -1517,8 +1533,8 @@ function reliefEinbinden() {
 function pfeilFuer(z, a) {
   const liste = z.scores[a];
   const jetzt = liste[0];
-  if (jetzt === null) return "";
-  const kuenftig = liste.slice(1).filter(w => w !== null);
+  if (!scoreGueltig(jetzt)) return "";
+  const kuenftig = liste.slice(1).filter(scoreGueltig);
   if (!kuenftig.length) return "";
   if (Math.max(...kuenftig) >= jetzt + 8)
     return '<span style="color:#2e9e4f" title="wird besser">▲</span>';
@@ -1535,7 +1551,7 @@ function baueListe() {
     const beste = D.zellen
       .map(z => [z, z.scores[a][tag]])
       .filter(([, w]) => w !== null && w > 0)
-      .sort((x, y) => y[1] - x[1])
+      .sort((x, y) => (y[1] ?? -1) - (x[1] ?? -1))
       .slice(0, 12);
     return { a, e, beste, spitze: beste.length ? beste[0][1] : -1 };
   }).sort((x, y) => {
@@ -1639,10 +1655,7 @@ function setzeStil(stil) {
   // anklicken geht trotzdem
   karte.setPaintProperty("flaechen", "fill-color",
     stil === "hart"
-      ? ["interpolate", ["linear"], ["get", "wert"],
-         0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
-         50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
-         85, "rgb(130,220,70)", 100, "rgb(45,175,75)"]
+      ? scoreFlaechenfarbe()
       : "#000");
   setzeDeckkraft();
 }
@@ -1735,10 +1748,7 @@ fetch("daten.json")
       art = START.art;
     } else {
     art = Object.keys(D.arten).reduce((beste, a) => {
-      const schnitt = liste => liste.reduce((s, x) => s + x, 0)
-                             / Math.max(1, liste.length);
-      const wert = a => schnitt(
-        D.zellen.map(z => z.scores[a][0] ?? 0));
+      const wert = a => scoreMittel(D.zellen.map(z => z.scores[a][0])) ?? -1;
       return wert(a) > wert(beste) ? a : beste;
     }, Object.keys(D.arten)[0]);
     }
@@ -2146,10 +2156,7 @@ fetch("daten.json")
       karte.addLayer({
         id: "flaechen", type: "fill", source: "zellen",
         paint: {
-          "fill-color": ["interpolate", ["linear"], ["get", "wert"],
-            0, "rgb(150,40,70)", 25, "rgb(225,70,55)",
-            50, "rgb(250,155,40)", 65, "rgb(255,225,90)",
-            85, "rgb(130,220,70)", 100, "rgb(45,175,75)"],
+          "fill-color": scoreFlaechenfarbe(),
           "fill-opacity": 0.72
         }
       });
@@ -2280,13 +2287,11 @@ fetch("daten.json")
       karte.on("mouseleave", "flaechen",
         () => karte.getCanvas().style.cursor = "");
 
-      // Die Legende ist entfallen - die Farbskala erklaert sich
-      // von selbst, und die Fundpunkte stehen mit Namen im Popup.
-
       // Ruhiger Hinweis am unteren Rand statt eines Kastens beim Start
       const fuss = document.createElement("div");
       fuss.className = "fuss";
       fuss.innerHTML = 'Zeigt Bedingungen, keine Pilze &ndash; ' +
+        '<span>Grau = keine Daten.</span> ' +
         'Bestimmung immer selbst pr&uuml;fen. ' +
         '<a href="info.html">Wie wird gerechnet?</a>';
       document.getElementById("karte").appendChild(fuss);
@@ -2304,8 +2309,9 @@ fetch("daten.json")
           if (!w || !w.ebenen) return;
           const g = w.grenzen;
 
-          w.ebenen.forEach(e => {
+          function ladeWaldebene(e) {
             const kennung = "wald_" + e.schluessel;
+            if (karte.getLayer(kennung)) return;
             karte.addSource(kennung, {
               type: "image", url: e.datei,
               coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
@@ -2322,7 +2328,7 @@ fetch("daten.json")
               paint: { "raster-opacity": 0.5 }
             }, karte.getLayer("beschriftung")
                  ? "beschriftung" : undefined);
-          });
+          }
 
           const leiste = document.getElementById("baumleiste");
           leiste.innerHTML = w.ebenen.map(e => `<button class="tag"
@@ -2339,9 +2345,12 @@ fetch("daten.json")
               }
               leiste.querySelectorAll("[data-baum]").forEach(x =>
                 x.classList.remove("aktiv"));
-              w.ebenen.forEach(e => karte.setLayoutProperty(
-                "wald_" + e.schluessel, "visibility", "none"));
+              w.ebenen.forEach(e => {
+                const id = "wald_" + e.schluessel;
+                if (karte.getLayer(id)) karte.setLayoutProperty(id, "visibility", "none");
+              });
               if (an) {
+                ladeWaldebene(w.ebenen.find(e => e.schluessel === b.dataset.baum));
                 b.classList.add("aktiv");
                 karte.setLayoutProperty("wald_" + b.dataset.baum,
                   "visibility", "visible");
