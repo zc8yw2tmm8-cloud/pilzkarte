@@ -113,7 +113,6 @@ def fehlt_etwas(zeilen, orte, start, ende):
     """Prueft Ort/Tag-Eindeutigkeit, Werte und die Abdeckung vor dem Ersetzen.
 
     Aufwand linear in der Zeilenzahl; keine Suche pro Ort durch alle Zeilen.
-    Die Fehlermeldungen bleiben auch bei einem deutschlandweiten Raster kurz.
     """
     if not orte or start > ende:
         return ["Keine Orte oder ungueltiger Prognosezeitraum"]
