@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mehrere Funde – lokaler Test</title>
+<link rel="stylesheet" href="../web/konto.css">
+<style>:root{--linie:#d5ddd5;--akzent:#34734c;--papier:#fff;--text:#24362b}*{box-sizing:border-box}body{font:16px system-ui;background:#eef3ee;padding:24px}button{padding:10px;cursor:pointer}.kasten-inhalt{background:white}.voll{display:block;width:100%;padding:12px;margin-top:8px;background:#34734c;color:white;border:1px solid #34734c;border-radius:8px}.leer{background:white;color:#34734c}.klein{font-size:14px}.fehler{color:#a22}</style>
+<h1>Mehrere Funde testen</h1>
+<p>Nur Testdaten: Es besteht keine Verbindung zum Backend. Speichern verändert keine echten Funde.</p>
+<button onclick="fundBeginnen(52.4,10.7,'test')">Neuen Fund testen</button>
+<button onclick="fundBearbeiten('11111111-1111-4111-8111-111111111111')">Bearbeiten testen</button>
+<button onclick="tests()">Automatische Tests ausführen</button>
+<pre id="ergebnis" role="status"></pre>
+<script src="../web/konto.js"></script>
+<script>
+const D={arten:{stein:{name:'Steinpilz'},pfiff:{name:'Pfifferling'}},tage:[{datum:fundHeute()}],zellen:[{id:'test',scores:{stein:[80],pfiff:[0]}}]};
+let art='stein', requests=[], fail=false, pending=null;
+const original={id:'11111111-1111-4111-8111-111111111111',art:'stein',gefunden_am:fundHeute(),anzahl:2,notiz:'Vorhandene Notiz',nullfund:false,lat:52.4,lon:10.7,zelle:'test',score:63};
+benutzer={id:'22222222-2222-4222-8222-222222222222'};
+sb={from(table){if(table!=='fund')throw Error('Unerwartete Tabelle');return {
+ upsert(rows,options){requests.push({rows:structuredClone(rows),options});return pending||Promise.resolve({error:fail?{message:'Test-Verbindungsfehler'}:null});},
+ select(){return this},eq(){return this},single(){return Promise.resolve({data:structuredClone(original),error:null})}
+}}};
+melde=text=>{document.getElementById('ergebnis').textContent=text};
+ladeEigeneFunde=async()=>{};
+zeigeTagebuch=()=>kastenZu();
+const check=(value,message)=>{if(!value)throw Error(message)};
+const click=id=>document.getElementById(id).click();
+function neu(){fundFormular=null;requests=[];fail=false;pending=null;fundBeginnen(52.4,10.7,'test')}
+function zweite(){click('fund-plus');let z=fundFormular.zeilen[1];z.auswahl.value='pfiff';z.auswahl.dispatchEvent(new Event('change'));return z}
+async function tests(){
+ const result=[];
+ async function test(name,fn){try{await fn();result.push('OK: '+name)}catch(e){result.push('FEHLER: '+name+' – '+e.message)}}
+ await test('Plus, Minus und Nummerierung',async()=>{neu();zweite();click('fund-plus');check(fundFormular.zeilen.length===3,'drei Zeilen');fundFormular.zeilen[1].el.querySelector('button').click();check(fundFormular.zeilen.length===2,'entfernt');check(fundFormular.zeilen[1].el.querySelector('legend').textContent==='Fund 2','Nummerierung');check(fundFormular.zeilen[0].el.querySelector('button').hidden,'erster Fund bleibt')});
+ await test('Zwei Arten, eigene Mengen und Scores, ein Request',async()=>{neu();fundFormular.zeilen[0].anzahl.value='3';zweite().anzahl.value='7';document.getElementById('fundnotiz').value='Gemeinsame Notiz';await fundSpeichern();const r=requests[0].rows;check(requests.length===1&&r.length===2,'Sammelrequest');check(r[0].anzahl===3&&r[1].anzahl===7,'Mengen');check(r[0].score===80&&r[1].score===0,'Scores einschließlich Null');check(r[0].id!==r[1].id,'eigene IDs');check(r.every(e=>e.notiz==='Gemeinsame Notiz'&&e.ort==='POINT(10.7 52.4)'),'gemeinsame Angaben')});
+ await test('Fehlende Auswahl, ungültige Menge und Datum blockieren Speichern',async()=>{neu();click('fund-plus');await fundSpeichern();check(requests.length===0,'Auswahl');fundFormular.zeilen[1].auswahl.value='pfiff';fundFormular.zeilen[0].anzahl.value='1.5';await fundSpeichern();check(requests.length===0,'ganze Menge');fundFormular.zeilen[0].anzahl.value='';document.getElementById('funddatum').value='';await fundSpeichern();check(requests.length===0,'Datum')});
+ await test('Eigene Namen sind Text; historischer Score bleibt unbekannt',async()=>{neu();const z=fundFormular.zeilen[0];z.auswahl.value='__eigene';z.auswahl.dispatchEvent(new Event('change'));z.eigene.value='<img src=x onerror=alert(1)>';document.getElementById('funddatum').value='2020-01-01';await fundSpeichern();check(requests[0].rows[0].score===null,'kein erfundener Score');check(!document.querySelector('#kasten img'),'kein HTML aus Name')});
+ await test('Bearbeiten erhält ID und ursprünglichen Score, fügt neuen Fund hinzu',async()=>{neu();await fundBearbeiten(original.id);zweite();await fundSpeichern();const r=requests[0].rows;check(r[0].id===original.id&&r[0].score===63,'bestehender Fund');check(r[1].id!==original.id&&r[1].score===0,'neuer Fund')});
+ await test('Artwechsel beim Bearbeiten berechnet passenden Score',async()=>{neu();await fundBearbeiten(original.id);fundFormular.zeilen[0].auswahl.value='pfiff';await fundSpeichern();check(requests[0].rows[0].score===0,'neuer Score')});
+ await test('Nullfund je Zeile und für alle',async()=>{neu();zweite().nullfund.checked=true;await fundSpeichern();check(!requests[0].rows[0].nullfund&&requests[0].rows[1].nullfund,'einzelner Nullfund');neu();zweite();await fundSpeichern(true);check(requests[0].rows.every(r=>r.nullfund&&r.anzahl===null),'alle Nullfunde')});
+ await test('Fehler bewahrt Eingaben und IDs für Wiederholung',async()=>{neu();zweite();fail=true;await fundSpeichern();check(!document.getElementById('fundfehler').hidden&&fundFormular.zeilen.length===2,'Form erhalten');check(!document.getElementById('fund-speichern').disabled,'erneut möglich');fail=false;await fundSpeichern();check(requests[0].rows.every((r,i)=>r.id===requests[1].rows[i].id),'IDs stabil')});
+ await test('Doppelklick und Schließen während Speichern gesperrt',async()=>{neu();let resolve;pending=new Promise(r=>resolve=r);const save=fundSpeichern();await fundSpeichern();kastenZu();check(requests.length===1,'nur ein Request');check(!document.getElementById('kasten').hidden,'bleibt offen');resolve({error:null});await save});
+ fundFormular=null;kastenZu();document.getElementById('ergebnis').textContent=result.join('\n');
+}
+</script></html>

@@ -1141,9 +1141,8 @@ function fundknopf(z, klickOrt) {
   if (typeof benutzer === "undefined" || !benutzer) return "";
   const lat = klickOrt ? klickOrt.lat : z.lat;
   const lon = klickOrt ? klickOrt.lng : z.lon;
-  const wert = z.scores[art][tag] ?? 0;
   return `<a class="navi eintrag" onclick='fundBeginnen(${lat},
-    ${lon}, ${JSON.stringify(z.id)}, ${wert})'>
+    ${lon}, ${JSON.stringify(z.id)})'>
     &#43; Fund eintragen</a>`;
 }
 

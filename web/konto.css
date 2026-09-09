@@ -197,3 +197,22 @@ button.stift:hover { color: var(--akzent);
 .reiter #reiterkonto i { overflow: visible; min-height: 32px; }
 body.hell .reiter #reiterkonto .avatar {
   filter: drop-shadow(0 2px 4px rgba(0,0,0,.2)); }
+
+/* Mehrere Funde am selben Ort; grosse Ziele auch auf dem Telefon. */
+.kasten-inhalt .fund-zeile { min-width: 0; margin: 12px 0;
+  padding: 8px 12px 12px; border: 1px solid var(--linie); border-radius: 8px; }
+.fund-zeile legend { color: var(--leise); font-size: 13px; padding: 0 5px; }
+.fund-artwahl { display: flex; align-items: center; gap: 8px; }
+.kasten-inhalt .fund-artwahl select { flex: 1; min-width: 0; }
+.fund-entfernen { flex: 0 0 44px; min-height: 44px; font-size: 24px;
+  border: 1px solid var(--linie); border-radius: 6px;
+  background: var(--grund); color: var(--text); cursor: pointer; }
+.fund-entfernen[hidden], .fund-zeile input[hidden] { display: none; }
+.fund-nullwahl { display: flex; align-items: center; gap: 8px;
+  min-height: 44px; color: var(--leise); font-size: 14px; }
+.kasten-inhalt .fund-nullwahl input { width: 20px; height: 20px; margin: 0; }
+.fund-label { display: block; margin-top: 14px; font-size: 14px; }
+.kasten-inhalt .fund-plus { color: var(--akzent); }
+.fund-plus span { font-size: 22px; vertical-align: middle; }
+.fund-zeile input, .fund-zeile select { box-sizing: border-box; }
+.kasten-inhalt button:disabled { opacity: .55; cursor: wait; }

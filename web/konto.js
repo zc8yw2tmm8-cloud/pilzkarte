@@ -1311,85 +1311,199 @@ async function avatarSpeichern(datei) {
 // nirgends. Vor allem die Nullfunde - "war hier, nichts gefunden".
 // Ohne sie lassen sich die Schwellen der Karte nur einseitig pruefen.
 
-let fundOrt = null;
+let fundFormular = null;
 
-function fundBeginnen(lat, lon, zelle, score) {
+function fundHeute() {
+  const teile = Object.fromEntries(new Intl.DateTimeFormat("de-DE", {
+    timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(new Date()).map(p => [p.type, p.value]));
+  return `${teile.year}-${teile.month}-${teile.day}`;
+}
+
+function fundBeginnen(lat, lon, zelle) {
   if (!benutzer) {
     melde("Erst anmelden, dann lassen sich Funde eintragen.");
     return;
   }
-  fundOrt = { lat, lon, zelle, score };
+  fundFormularOeffnen({ lat, lon, zelle });
+}
 
-  const heute = new Date().toISOString().slice(0, 10);
-  const arten = Object.entries(D.arten)
-    .map(([a, e]) => `<option value="${a}">${e.name}</option>`).join("");
-
+function fundFormularOeffnen(ort, original = null) {
+  if (fundFormular?.speichert) return;
+  const zustand = { ort, original, zeilen: [], speichert: false, daten: D };
+  fundFormular = zustand;
   kasten(`
-    <h3>Fund eintragen</h3>
-    <p class="klein">${lat.toFixed(5)}, ${lon.toFixed(5)}</p>
-
-    <select id="fundart" onchange="fundArtWechsel()">${arten}
-      <option value="__eigene">— andere Art, selbst eintragen —</option>
-    </select>
-    <input type="text" id="fundeigene" placeholder="Welcher Pilz?"
-           hidden>
-    <input type="date" id="funddatum" value="${heute}">
-    <input type="number" id="fundanzahl" placeholder="Wie viele? (kann leer bleiben)" min="1">
-    <textarea id="fundnotiz" rows="2"
-      placeholder="Notiz: Bestand, Bodenbeschaffenheit, Besonderheiten"></textarea>
-
-    <button class="voll" onclick="fundSpeichern(false)">Fund speichern</button>
-    <button class="voll leer" onclick="fundSpeichern(true)">
-      Nichts gefunden &ndash; auch eintragen</button>
-    <p class="klein" style="margin-top:10px">Ein Nullfund ist genauso
-    wertvoll wie ein Fund: Er sagt, dass die Bedingungen hier nicht
-    gereicht haben. Solche Daten gibt es sonst nirgends.</p>
+    <h3>${original ? "Fund bearbeiten" : "Funde eintragen"}</h3>
+    <p class="klein">Weitere Pilzarten über das Plus hinzufügen.
+      Ort, Datum und Notiz gelten für alle Einträge.</p>
+    <div id="fundzeilen"></div>
+    <button type="button" class="voll leer fund-plus" id="fund-plus">
+      <span aria-hidden="true">＋</span> Weitere Pilzart</button>
+    <label class="fund-label" for="funddatum">Funddatum</label>
+    <input type="date" id="funddatum" required>
+    <label class="fund-label" for="fundnotiz">Notiz für diese Funde</label>
+    <textarea id="fundnotiz" rows="2" placeholder="Bestand, Boden, Besonderheiten"></textarea>
+    <p id="fundfehler" class="klein fehler" role="alert" hidden></p>
+    <button type="button" class="voll" id="fund-speichern">Speichern</button>
+    ${original ? "" : `<button type="button" class="voll leer" id="fund-null">
+      Nichts gefunden – alle als Nullfund speichern</button>`}
+    <button type="button" class="voll leer" id="fund-abbrechen">Abbrechen</button>
   `);
+  zustand.element = document.querySelector("#kasten .kasten-inhalt");
+  const datum = document.getElementById("funddatum");
+  datum.value = original ? original.gefunden_am.slice(0, 10) : fundHeute();
+  datum.max = fundHeute();
+  document.getElementById("fundnotiz").value = original?.notiz ?? "";
+  document.getElementById("fund-plus").onclick = () => fundZeileHinzufuegen();
+  document.getElementById("fund-speichern").onclick = () => fundSpeichern(false);
+  const nullknopf = document.getElementById("fund-null");
+  if (nullknopf) nullknopf.onclick = () => fundSpeichern(true);
+  document.getElementById("fund-abbrechen").onclick = () => {
+    if (zustand.speichert) return;
+    fundFormular = null;
+    if (original) zeigeTagebuch(); else kastenZu();
+  };
+  fundZeileHinzufuegen(original || {
+    art: typeof art === "string" && D.arten[art] ? art : Object.keys(D.arten)[0]
+  }, false);
 }
 
-function fundArtWechsel() {
-  const wahl = document.getElementById("fundart").value;
-  const feld = document.getElementById("fundeigene");
-  feld.hidden = wahl !== "__eigene";
-  if (!feld.hidden) feld.focus();
-}
-
-async function fundSpeichern(nullfund) {
-  if (!sb || !benutzer || !fundOrt) return;
-
-  let art = document.getElementById("fundart").value;
-  if (art === "__eigene") {
-    art = (document.getElementById("fundeigene").value || "").trim();
-    if (!art && !nullfund) {
-      melde("Bitte den Pilznamen eintragen.");
-      return;
-    }
-    art = art || "unbekannt";
+function fundZeileHinzufuegen(vorgabe = {}, fokus = true) {
+  const zustand = fundFormular;
+  if (!zustand || zustand.speichert) return;
+  const zeile = { id: vorgabe.id ?? crypto.randomUUID(), original: vorgabe.id != null };
+  const el = document.createElement("fieldset");
+  el.className = "fund-zeile";
+  el.innerHTML = `
+    <legend></legend>
+    <div class="fund-artwahl"><select aria-label="Pilzart" required></select>
+      <button type="button" class="fund-entfernen" aria-label="Zusätzlichen Fund entfernen">−</button></div>
+    <input class="fund-eigene" type="text" aria-label="Eigener Pilzname" placeholder="Welcher Pilz?" hidden>
+    <input class="fund-anzahl" type="number" aria-label="Anzahl" placeholder="Anzahl (optional)" min="1" step="1">
+    <label class="fund-nullwahl"><input type="checkbox"> Nichts gefunden</label>`;
+  const auswahl = el.querySelector("select");
+  auswahl.add(new Option("Pilzart wählen …", ""));
+  Object.entries(zustand.daten.arten).forEach(([a, e]) => auswahl.add(new Option(e.name, a)));
+  auswahl.add(new Option("Andere Art, selbst eintragen …", "__eigene"));
+  const eigene = el.querySelector(".fund-eigene");
+  if (vorgabe.art) {
+    const bekannt = Object.hasOwn(zustand.daten.arten, vorgabe.art);
+    auswahl.value = bekannt ? vorgabe.art : "__eigene";
+    if (!bekannt) eigene.value = vorgabe.art;
   }
-  const datum = document.getElementById("funddatum").value;
-  const anzahl = document.getElementById("fundanzahl").value;
-  const notiz = document.getElementById("fundnotiz").value;
+  const anzahl = el.querySelector(".fund-anzahl");
+  anzahl.value = vorgabe.anzahl ?? "";
+  const nullfund = el.querySelector('input[type="checkbox"]');
+  nullfund.checked = !!vorgabe.nullfund;
+  const wechsel = () => {
+    eigene.hidden = auswahl.value !== "__eigene";
+    eigene.required = !eigene.hidden;
+    anzahl.disabled = nullfund.checked;
+  };
+  auswahl.onchange = () => { wechsel(); if (!eigene.hidden) eigene.focus(); };
+  nullfund.onchange = wechsel;
+  wechsel();
+  const entfernen = el.querySelector(".fund-entfernen");
+  entfernen.hidden = zustand.zeilen.length === 0;
+  entfernen.onclick = () => {
+    if (zustand.speichert) return;
+    zustand.zeilen = zustand.zeilen.filter(z => z !== zeile);
+    el.remove();
+    fundZeilenNummerieren();
+    document.getElementById("fund-plus").focus();
+  };
+  Object.assign(zeile, { el, auswahl, eigene, anzahl, nullfund });
+  zustand.zeilen.push(zeile);
+  document.getElementById("fundzeilen").appendChild(el);
+  fundZeilenNummerieren();
+  if (fokus) auswahl.focus();
+}
 
-  const { error } = await sb.from("fund").insert({
-    benutzer: benutzer.id,
-    art: art,
-    gefunden_am: datum,
-    anzahl: nullfund ? null : (anzahl ? +anzahl : null),
-    ort: `POINT(${fundOrt.lon} ${fundOrt.lat})`,
-    nullfund: nullfund,
-    notiz: notiz || null,
-    zelle: fundOrt.zelle || null,
-    score: fundOrt.score ?? null
+function fundZeilenNummerieren() {
+  fundFormular.zeilen.forEach((z, i) => {
+    z.el.querySelector("legend").textContent = `Fund ${i + 1}`;
+    z.auswahl.setAttribute("aria-label", `Pilzart für Fund ${i + 1}`);
+    z.anzahl.setAttribute("aria-label", `Anzahl für Fund ${i + 1}`);
   });
+}
 
-  if (error) {
-    melde("Konnte nicht speichern: " + error.message);
+function fundZeilenLesen(zustand, alleNull = false) {
+  return zustand.zeilen.map((z, i) => {
+    const art = z.auswahl.value === "__eigene" ? z.eigene.value.trim() : z.auswahl.value;
+    if (!art) throw new Error(`Bitte für Fund ${i + 1} eine Pilzart eintragen.`);
+    const nullfund = alleNull || z.nullfund.checked;
+    const roh = z.anzahl.value;
+    const anzahl = nullfund || roh === "" ? null : Number(roh);
+    if (!nullfund && (z.anzahl.validity.badInput ||
+        (anzahl !== null && (!Number.isSafeInteger(anzahl) || anzahl < 1)))) {
+      throw new Error(`Die Anzahl für Fund ${i + 1} muss eine positive ganze Zahl sein.`);
+    }
+    return { id: z.id, art, nullfund, anzahl };
+  });
+}
+
+function fundScore(zustand, eintrag, datum) {
+  const alt = zustand.original;
+  if (alt && eintrag.id === alt.id && eintrag.art === alt.art &&
+      datum === alt.gefunden_am.slice(0, 10)) return alt.score ?? null;
+  const zelle = zustand.daten.zellen.find(z => z.id === zustand.ort.zelle);
+  const tag = zustand.daten.tage.findIndex(t => t.datum === datum);
+  const wert = zelle?.scores[eintrag.art]?.[tag];
+  return Number.isInteger(wert) && wert >= 0 && wert <= 100 ? wert : null;
+}
+
+async function fundSpeichern(alleNull = false) {
+  const zustand = fundFormular;
+  if (!sb || !benutzer || !zustand || zustand.speichert) return;
+  const fehler = zustand.element.querySelector("#fundfehler");
+  fehler.hidden = true;
+  let zeilen;
+  try {
+    const datumfeld = zustand.element.querySelector("#funddatum");
+    if (!datumfeld.value || !datumfeld.checkValidity()) throw new Error("Bitte ein gültiges Funddatum bis heute wählen.");
+    const datum = datumfeld.value;
+    const { lat, lon, zelle } = zustand.ort;
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+      throw new Error("Der Fundort fehlt. Bitte den Fund über die Karte öffnen.");
+    }
+    const notiz = zustand.element.querySelector("#fundnotiz").value.trim() || null;
+    zeilen = fundZeilenLesen(zustand, alleNull).map(e => ({
+      ...e, benutzer: benutzer.id, gefunden_am: datum,
+      ort: `POINT(${lon} ${lat})`, zelle: zelle || null, notiz,
+      score: fundScore(zustand, e, datum)
+    }));
+  } catch (e) {
+    fehler.textContent = e.message;
+    fehler.hidden = false;
     return;
   }
-
-  kastenZu();
-  melde(nullfund ? "Nullfund eingetragen." : "Fund eingetragen.");
-  ladeEigeneFunde();
+  zustand.speichert = true;
+  const controls = [...zustand.element.querySelectorAll("input, select, textarea, button")];
+  const vorher = controls.map(el => el.disabled);
+  controls.forEach(el => { el.disabled = true; });
+  const knopf = zustand.element.querySelector("#fund-speichern");
+  knopf.textContent = "Wird gespeichert …";
+  try {
+    // Ein Request: vorhandenen Fund aktualisieren und weitere anlegen.
+    // Stabile IDs verhindern Duplikate beim Wiederholen nach Netzfehlern.
+    const { error } = await sb.from("fund").upsert(zeilen, { onConflict: "id" });
+    if (error) throw error;
+  } catch (e) {
+    fehler.textContent = "Konnte nicht speichern: " + (e.message || "Verbindung fehlgeschlagen.");
+    fehler.hidden = false;
+    return;
+  } finally {
+    zustand.speichert = false;
+    controls.forEach((el, i) => { el.disabled = vorher[i]; });
+    knopf.textContent = "Speichern";
+  }
+  if (fundFormular === zustand) {
+    fundFormular = null;
+    kastenZu();
+  }
+  melde(zeilen.length === 1 ? "Fund gespeichert." : `${zeilen.length} Funde gespeichert.`);
+  await ladeEigeneFunde();
+  if (zustand.original && !fundFormular) zeigeTagebuch();
 }
 
 // ---- Eigene Funde auf der Karte -------------------------------------
@@ -1788,52 +1902,17 @@ async function routeSpeichernAenderung(id) {
 }
 
 async function fundBearbeiten(id) {
-  const { data } = await sb.from("fund")
-    .select("id, art, gefunden_am, anzahl, notiz, nullfund")
-    .eq("id", id).single();
-  if (!data) return;
-
-  const arten = Object.entries(D.arten)
-    .map(([a, e]) => `<option value="${a}"${a === data.art
-      ? " selected" : ""}>${e.name}</option>`).join("");
-
-  kasten(`
-    <h3>Fund bearbeiten</h3>
-    <select id="fart">${arten}
-      <option value="${data.art}"${D.arten[data.art] ? "" : " selected"}
-        >${D.arten[data.art] ? "— eigener Name —" : data.art}</option>
-    </select>
-    <input type="date" id="fdatum" value="${data.gefunden_am}">
-    <input type="number" id="fanzahl" min="1" placeholder="Wie viele?"
-           value="${data.anzahl || ""}">
-    <textarea id="fnotiz" rows="3"
-      placeholder="Notiz">${data.notiz || ""}</textarea>
-    <button class="voll" onclick="fundSpeichernAenderung('${id}')">
-      Speichern</button>
-    <button class="voll leer" onclick="zeigeTagebuch()">Zurück</button>
-  `);
-}
-
-async function fundSpeichernAenderung(id) {
-  const art = document.getElementById("fart").value;
-  const datum = document.getElementById("fdatum").value;
-  const anzahl = document.getElementById("fanzahl").value;
-  const notiz = document.getElementById("fnotiz").value.trim();
-
-  const { error } = await sb.from("fund").update({
-    art: art, gefunden_am: datum,
-    anzahl: anzahl ? +anzahl : null,
-    notiz: notiz || null
-  }).eq("id", id);
-
-  if (error) {
-    melde("Konnte nicht speichern: " + error.message);
+  if (!sb || !benutzer) return;
+  const { data, error } = await sb.from("fund")
+    .select("id, art, gefunden_am, anzahl, notiz, nullfund, lat, lon, zelle, score")
+    .eq("id", id).eq("benutzer", benutzer.id).single();
+  if (error || !data) {
+    melde("Der Fund konnte nicht geladen werden.");
     return;
   }
-  melde("Gespeichert.");
-  await ladeEigeneFunde();
-  zeigeTagebuch();
+  fundFormularOeffnen({ lat: data.lat, lon: data.lon, zelle: data.zelle }, data);
 }
+
 
 // ---- Loeschen -------------------------------------------------------
 //
@@ -2009,6 +2088,7 @@ function zeigeFundAufKarte(lat, lon) {
 }
 
 function kasten(inhalt) {
+  if (fundFormular?.speichert) return;
   let el = document.getElementById("kasten");
   if (!el) {
     el = document.createElement("div");
@@ -2022,6 +2102,7 @@ function kasten(inhalt) {
 }
 
 function kastenZu() {
+  if (fundFormular?.speichert) return;
   const el = document.getElementById("kasten");
   if (el) el.hidden = true;
 }
