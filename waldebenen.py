@@ -9,13 +9,9 @@ Ergebnis: bilder/wald_gesamt.png, bilder/wald_kiefer.png usw.
 Wird von karte.py aufgerufen, laeuft aber auch allein.
 """
 import os
-import math
 import numpy as np
 
-import mercator
-from PIL import Image
 
-Image.MAX_IMAGE_PIXELS = None
 
 KACHELORDNER = "kacheln"
 BILDORDNER = "bilder"
@@ -24,7 +20,6 @@ BILDORDNER = "bilder"
 SUED, WEST, NORD, OST = 52.05, 10.10, 52.85, 11.15
 KACHELN_X, KACHELN_Y = 4, 4
 
-SPARSAM = 2
 
 # Klassenwerte der Thuenen-Karte
 KLASSEN = {
@@ -45,112 +40,68 @@ DECKKRAFT = 165
 MINDESTANTEIL = 0.004      # Arten unter 0,4 % der Waldflaeche weglassen
 
 
-def lade_gesamtbild():
-    """Setzt die 16 Kacheln zu einem Bild zusammen."""
-    if not os.path.isdir(KACHELORDNER):
-        return None
-
-    teile = {}
-    breiten = [0] * KACHELN_X
-    hoehen = [0] * KACHELN_Y
-
-    for iy in range(KACHELN_Y):
-        for ix in range(KACHELN_X):
-            pfad = os.path.join(KACHELORDNER, f"k_{iy}_{ix}.tif")
-            if not os.path.exists(pfad):
-                return None
-            with Image.open(pfad) as quelle:
-                bild = np.array(quelle)
-            if bild.ndim == 3:
-                bild = bild[:, :, 0]
-            teile[(iy, ix)] = bild
-            hoehen[iy] = max(hoehen[iy], bild.shape[0])
-            breiten[ix] = max(breiten[ix], bild.shape[1])
-
-    gesamt_h = sum(hoehen)
-    gesamt_b = sum(breiten)
-    voll = np.zeros((gesamt_h, gesamt_b), dtype=np.uint8)
-
-    # Kachelzeile 0 liegt im Sueden, im Bild aber unten
-    for iy in range(KACHELN_Y):
-        for ix in range(KACHELN_X):
-            bild = teile[(iy, ix)]
-            y_oben = sum(hoehen[KACHELN_Y - 1 - j] for j in range(KACHELN_Y - 1 - iy))
-            x_links = sum(breiten[:ix])
-            voll[y_oben:y_oben + bild.shape[0],
-                 x_links:x_links + bild.shape[1]] = bild
-
-    return voll
-
-
-def flaechenanteile(maske, faktor=SPARSAM):
-    """Mittelt binaere Flaechenmasken, nicht die numerischen Artenklassen."""
-    if faktor < 1 or int(faktor) != faktor:
-        raise ValueError("Der Verkleinerungsfaktor muss eine positive ganze Zahl sein")
-    hoehe, breite = maske.shape
-    ziel = (math.ceil(breite / faktor), math.ceil(hoehe / faktor))
-    bild = Image.fromarray(maske.astype(np.uint8) * 255)
-    return np.array(bild.resize(ziel, Image.Resampling.BOX))
-
-
-def speichere_maske(maske, farbe, dateiname):
-    anteile = flaechenanteile(maske)
-    anteile = mercator.zieh_nach_mercator(anteile, SUED, NORD)
-    hoehe, breite = anteile.shape
-    bild = np.zeros((hoehe, breite, 4), dtype=np.uint8)
-    bild[:, :, :3] = farbe
-    bild[:, :, 3] = np.rint(anteile.astype(np.float32) * DECKKRAFT / 255).astype(np.uint8)
-
-    os.makedirs(BILDORDNER, exist_ok=True)
-    pfad = os.path.join(BILDORDNER, dateiname)
-    Image.fromarray(bild, mode="RGBA").save(pfad, compress_level=6)
-    return pfad.replace(os.sep, "/")
-
-
 def erzeuge():
-    """
-    Rueckgabe: (liste, grenzen)
-    liste: [(anzeigename, pfad, anteil_prozent), ...]
-    grenzen: [[sued, west], [nord, ost]] fuer ImageOverlay
-    """
-    voll = lade_gesamtbild()
-    if voll is None:
-        return [], None
+    import tempfile
+    import rasterio
+    from rasterio.shutil import copy as rasterkopie
+    from pathlib import Path
+    from wald_geo import pruefe_kachel, zielraster, anteilsfenster, geografische_grenzen
 
-    grenzen = [[SUED, WEST], [NORD, OST]]
-    ebenen = []
-
-    wald = voll > 0
-    gesamt = int(wald.sum())
-    if gesamt == 0:
-        return [], None
-
-    pfad = speichere_maske(wald, (60, 110, 60), "wald_gesamt.png")
-    ebenen.append(("Wald gesamt", pfad, 100.0))
-
-    for wert, (schluessel, name, farbe) in sorted(
-            KLASSEN.items(), key=lambda x: x[0]):
-        maske = voll == wert
-        n = int(maske.sum())
-        anteil = n / gesamt
-        if anteil < MINDESTANTEIL:
-            continue
-        pfad = speichere_maske(maske, farbe, f"wald_{schluessel}.png")
-        ebenen.append((f"{name} ({round(anteil * 100, 1)} %)", pfad,
-                       round(anteil * 100, 1)))
-
-    # Nach Flaeche sortieren, "Wald gesamt" bleibt vorn
-    kopf, rest = ebenen[0], ebenen[1:]
-    rest.sort(key=lambda e: -e[2])
-    # Grenzen ablegen, damit web_wald.py sie findet
-    try:
-        with open(os.path.join(BILDORDNER, "wald_grenzen.txt"), "w",
-                  encoding="utf-8") as f:
-            f.write(f"{SUED},{WEST},{NORD},{OST}\n")
-    except Exception:
-        pass
-
-    return [kopf] + rest, grenzen
+    pfade = [Path(KACHELORDNER) / f"k_{iy}_{ix}.tif"
+             for iy in range(KACHELN_Y) for ix in range(KACHELN_X)]
+    for pfad in pfade:
+        pruefe_kachel(pfad)
+    transform, breite, hoehe = zielraster((SUED, WEST, NORD, OST))
+    grenzen = geografische_grenzen(transform, breite, hoehe)
+    ausgaben = [(None, "gesamt", "Wald gesamt", (60, 110, 60))]
+    ausgaben += [(k, *v) for k, v in sorted(KLASSEN.items())]
+    zaehler = np.zeros(len(ausgaben), dtype=np.int64)
+    os.makedirs(BILDORDNER, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=BILDORDNER) as tmp:
+        anteilspfad = Path(tmp) / "anteile.tif"
+        profil = dict(driver="GTiff", width=breite, height=hoehe,
+                      count=len(ausgaben), dtype="uint8", crs="EPSG:3857",
+                      transform=transform, tiled=True, compress="deflate")
+        with rasterio.open(anteilspfad, "w", **profil) as dst:
+            for fenster, klassen in anteilsfenster(pfade, transform, breite, hoehe):
+                h, w = int(fenster.height), int(fenster.width)
+                for i, (klasse, _, _, _) in enumerate(ausgaben):
+                    maske = klassen > 0 if klasse is None else klassen == klasse
+                    zaehler[i] += int(maske.sum())
+                    anteile = maske.reshape(h, 2, w, 2).mean(axis=(1, 3))
+                    dst.write(np.rint(anteile * DECKKRAFT).astype(np.uint8), i+1, window=fenster)
+        if zaehler[0] == 0:
+            raise ValueError("Keine Waldflaechen im Ausgabegebiet")
+        ebenen = []
+        with rasterio.open(anteilspfad) as src:
+            for i, (_, schluessel, name, farbe) in enumerate(ausgaben):
+                anteil = zaehler[i] / zaehler[0]
+                if i and anteil < MINDESTANTEIL:
+                    continue
+                rgba = Path(tmp) / "rgba.tif"
+                profil.update(count=4)
+                with rasterio.open(rgba, "w", **profil) as dst:
+                    dst.colorinterp = (rasterio.enums.ColorInterp.red, rasterio.enums.ColorInterp.green,
+                                       rasterio.enums.ColorInterp.blue, rasterio.enums.ColorInterp.alpha)
+                    for _, win in src.block_windows(1):
+                        alpha = src.read(i+1, window=win)
+                        bild = np.empty((4, *alpha.shape), dtype=np.uint8)
+                        for kanal in range(3): bild[kanal].fill(farbe[kanal])
+                        bild[3] = alpha
+                        dst.write(bild, window=win)
+                datei = f"wald_{schluessel}.png"
+                rasterkopie(rgba, Path(tmp) / datei, driver="PNG", ZLEVEL=6)
+                titel = name if i == 0 else f"{name} ({anteil*100:.1f} %)"
+                ebenen.append((titel, str(Path(BILDORDNER) / datei).replace(os.sep, "/"), round(anteil*100, 1)))
+        # Erst nach vollstaendiger Erzeugung den bisherigen Bestand ersetzen.
+        for _, pfad, _ in ebenen:
+            os.replace(Path(tmp) / Path(pfad).name, pfad)
+        namen = {Path(e[1]).name for e in ebenen}
+        for alt in Path(BILDORDNER).glob("wald_*.png"):
+            if alt.name not in namen: alt.unlink()
+        with open(Path(BILDORDNER) / "wald_grenzen.txt", "w", encoding="utf-8") as f:
+            f.write(f"{grenzen[0][0]},{grenzen[0][1]},{grenzen[1][0]},{grenzen[1][1]}\n")
+    return [ebenen[0]] + sorted(ebenen[1:], key=lambda e: -e[2]), grenzen
 
 
 if __name__ == "__main__":

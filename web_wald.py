@@ -46,8 +46,7 @@ def main():
             sued, west, nord, ost = [float(x) for x in
                                      f.read().strip().split(",")]
     else:
-        sued, west, nord, ost = 52.05, 10.10, 52.85, 11.15
-        print("wald_grenzen.txt fehlt - nehme das Arbeitsgebiet.")
+        raise ValueError("wald_grenzen.txt fehlt; keine geschaetzten Bildgrenzen verwenden")
 
     os.makedirs(os.path.join(ZIEL, "wald"), exist_ok=True)
     for d in os.listdir(os.path.join(ZIEL, "wald")):

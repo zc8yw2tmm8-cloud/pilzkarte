@@ -3,3 +3,4 @@ numpy>=1.26
 pillow>=10.0
 folium>=0.15
 truststore>=0.9
+rasterio==1.4.4

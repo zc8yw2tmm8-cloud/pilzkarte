@@ -21,6 +21,9 @@ import csv
 import os
 import io
 import math
+import json
+import hashlib
+from wald_geo import pruefe_kachel
 from collections import Counter
 
 import numpy as np
@@ -109,8 +112,19 @@ def hole_kachel(sued, west, nord, ost, breite, hoehe, pfad):
     WCS GetCoverage. Probiert mehrere Fassungen durch, weil je nach
     Serverkonfiguration eine andere funktioniert.
     """
-    if os.path.exists(pfad) and os.path.getsize(pfad) > 1000:
-        return True, "aus Zwischenspeicher"
+    anfrage = {"quelle": BASIS, "ebene": EBENE,
+               "gebiet": [sued, west, nord, ost], "groesse": [breite, hoehe]}
+    manifest = pfad + ".json"
+    try:
+        with open(manifest, encoding="utf-8") as f:
+            cache = json.load(f)
+        with open(pfad, "rb") as f:
+            signatur = hashlib.file_digest(f, "sha256").hexdigest()
+        if (cache["anfrage"] == anfrage and cache["sha256"] == signatur
+                and cache["geografie"] == pruefe_kachel(pfad)):
+            return True, "aus geprueftem Zwischenspeicher"
+    except (OSError, ValueError, KeyError):
+        pass
 
     versuche = [
         ("WCS 1.0.0", {
@@ -152,9 +166,25 @@ def hole_kachel(sued, west, nord, ost, breite, hoehe, pfad):
         except Exception:
             continue
 
-        with open(pfad, "wb") as f:
-            f.write(antwort.content)
-        return True, name
+        vorlaeufig = pfad + ".neu"
+        try:
+            with open(vorlaeufig, "wb") as f:
+                f.write(antwort.content)
+            geografie = pruefe_kachel(vorlaeufig)
+            from rasterio.warp import transform_bounds
+            l, u, r, o = transform_bounds(geografie["crs"], "EPSG:4326", *geografie["bounds"])
+            if l > west or u > sued or r < ost or o < nord:
+                raise ValueError("Kachel deckt das angefragte Gebiet nicht ab")
+            cache = {"anfrage": anfrage, "geografie": geografie, "verfahren": name,
+                     "sha256": hashlib.sha256(antwort.content).hexdigest()}
+            with open(manifest + ".neu", "w", encoding="utf-8") as f:
+                json.dump(cache, f)
+            os.replace(vorlaeufig, pfad)
+            os.replace(manifest + ".neu", manifest)
+            return True, name
+        except (OSError, ValueError):
+            if os.path.exists(vorlaeufig): os.remove(vorlaeufig)
+            continue
 
     return False, "alle Fassungen fehlgeschlagen"
 
