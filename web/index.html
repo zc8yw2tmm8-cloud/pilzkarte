@@ -124,6 +124,9 @@
               transform: translateX(-50%);
               width: min(520px, calc(100vw - 20px));
               display: flex; gap: 6px; overflow-x: auto;
+              touch-action: pan-x;
+              overscroll-behavior: contain;
+              -webkit-overflow-scrolling: touch;
               scrollbar-width: none; padding-bottom: 2px;
               max-width: 520px; }
   .tagchips::-webkit-scrollbar { display: none; }
@@ -1776,6 +1779,10 @@ fetch("daten.json")
     // Tageschips statt Regler - man sieht sofort, was waehlbar ist
     const chips = document.getElementById("tage");
     if (chips) {
+      ["touchstart", "touchmove", "touchend", "touchcancel",
+       "pointerdown", "pointermove", "pointerup", "wheel"].forEach(typ => {
+        chips.addEventListener(typ, e => e.stopPropagation(), { passive: true });
+      });
       chips.innerHTML = D.tage.map((t, i) =>
         `<button data-tag="${i}">${tagname(i)}</button>`).join("");
       chips.querySelectorAll("button").forEach(b =>
