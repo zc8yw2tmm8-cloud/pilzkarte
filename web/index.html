@@ -1493,33 +1493,46 @@ function aktualisiereFunde() {
 // Schummerung das Gelaende wie bei tiefstehender Sonne. Beide liegen
 // in 1-m-Aufloesung und sind nur fuer die Reviere da, in die man
 // tatsaechlich faehrt.
+//
+// Die Bilder werden erst beim Antippen eines Reviers geladen. Eine
+// Bildquelle laedt MapLibre sofort beim Anlegen, auch wenn die Ebene
+// ausgeblendet ist - vorher kamen so bei jedem Seitenaufruf alle
+// Reviere zusammen (rund 40 MB) herunter.
 let relief = [];
+
+function reliefEntfernen() {
+  relief.forEach(g => Object.keys(g.dateien).forEach(art => {
+    const kennung = `relief_${g.gebiet}_${art}`;
+    if (karte.getLayer(kennung)) karte.removeLayer(kennung);
+    if (karte.getSource(kennung)) karte.removeSource(kennung);
+  }));
+}
+
+function reliefLaden(g) {
+  Object.entries(g.dateien).forEach(([art, datei]) => {
+    const kennung = `relief_${g.gebiet}_${art}`;
+    if (karte.getSource(kennung)) return;
+    karte.addSource(kennung, {
+      type: "image",
+      url: datei,
+      coordinates: [
+        [g.grenzen[0][1], g.grenzen[1][0]],
+        [g.grenzen[1][1], g.grenzen[1][0]],
+        [g.grenzen[1][1], g.grenzen[0][0]],
+        [g.grenzen[0][1], g.grenzen[0][0]]
+      ]
+    });
+    karte.addLayer({
+      id: kennung, type: "raster", source: kennung,
+      paint: { "raster-opacity": art === "schummerung" ? 0.55 : 0.75 }
+    // Vor die Beschriftung einhaengen, damit Ortsnamen sichtbar
+    // bleiben
+    }, karte.getLayer("beschriftung") ? "beschriftung" : undefined);
+  });
+}
 
 function reliefEinbinden() {
   if (!relief.length) return;
-
-  relief.forEach(g => {
-    Object.entries(g.dateien).forEach(([art, datei]) => {
-      const kennung = `relief_${g.gebiet}_${art}`;
-      karte.addSource(kennung, {
-        type: "image",
-        url: datei,
-        coordinates: [
-          [g.grenzen[0][1], g.grenzen[1][0]],
-          [g.grenzen[1][1], g.grenzen[1][0]],
-          [g.grenzen[1][1], g.grenzen[0][0]],
-          [g.grenzen[0][1], g.grenzen[0][0]]
-        ]
-      });
-      karte.addLayer({
-        id: kennung, type: "raster", source: kennung,
-        paint: { "raster-opacity": art === "schummerung" ? 0.55 : 0.75 },
-        layout: { visibility: "none" }
-      // Vor die Beschriftung einhaengen, damit Ortsnamen sichtbar
-      // bleiben
-      }, karte.getLayer("beschriftung") ? "beschriftung" : undefined);
-    });
-  });
 
   const leiste = document.getElementById("ebenen");
   leiste.innerHTML = relief.map(g => `
@@ -1529,19 +1542,16 @@ function reliefEinbinden() {
 
   leiste.querySelectorAll("[data-relief]").forEach(b => b.onclick = () => {
     const an = !b.classList.contains("aktiv");
-    // Immer nur ein Revier - sonst ueberlagern sich die Bilder
+    // Immer nur ein Revier - sonst ueberlagern sich die Bilder. Das
+    // vorige wird ganz entfernt, damit sein Bild den Speicher freigibt.
     leiste.querySelectorAll("[data-relief]").forEach(x =>
       x.classList.remove("aktiv"));
-    relief.forEach(g => Object.keys(g.dateien).forEach(art =>
-      karte.setLayoutProperty(`relief_${g.gebiet}_${art}`,
-        "visibility", "none")));
+    reliefEntfernen();
 
     if (an) {
       b.classList.add("aktiv");
       const g = relief.find(x => x.gebiet === b.dataset.relief);
-      Object.keys(g.dateien).forEach(art =>
-        karte.setLayoutProperty(`relief_${g.gebiet}_${art}`,
-          "visibility", "visible"));
+      reliefLaden(g);
       karte.fitBounds([[g.grenzen[0][1], g.grenzen[0][0]],
                        [g.grenzen[1][1], g.grenzen[1][0]]],
                       { padding: 30 });

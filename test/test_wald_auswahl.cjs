@@ -38,7 +38,7 @@ const map = {
   removeLayer: id => layers.delete(id), removeSource: id => sources.delete(id)
 };
 const manifest = {grenzen: [[52, 10], [53, 11]], version: 'test',
-  ebenen: ['gesamt', 'kiefer', 'eiche'].map(s => ({schluessel: s, name: s, datei: s+'.png', kontur: s+'-k.png'}))};
+  ebenen: ['gesamt', 'kiefer', 'eiche'].map(s => ({schluessel: s, name: s, datei: s+'.png'}))};
 const leiste = element(), legende = element();
 ctx.waldEinrichten(map, manifest, leiste, legende, () => {}, ['kiefer', 'eiche']);
 assert.equal(sources.size, 1);
