@@ -66,7 +66,7 @@ button.zeigen:hover { border-color: var(--akzent); }
 
 /* Routenknopf auf der Karte, unter dem Standortknopf */
 #routenknopf { display: flex; align-items: center;
-               justify-content: center; color: #333; }
+               justify-content: center; color: var(--text); }
 #routenknopf.laeuft { background: rgba(192,57,43,.12); }
 #routenknopf[hidden] { display: none; }
 
