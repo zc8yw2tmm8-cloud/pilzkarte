@@ -745,7 +745,7 @@ let einstellungenBereit = false;
 function gespeicherteBaeume(e) {
   const werte = Array.isArray(e.baeume) ? e.baeume : (e.baum ? [e.baum] : []);
   const arten = [...new Set(werte.filter(w => typeof w === "string" && /^[a-z_]+$/.test(w)))];
-  return arten.includes("gesamt") ? ["gesamt"] : arten;
+  return arten.slice(0, 1);
 }
 
 function sammleEinstellungen() {

@@ -706,7 +706,7 @@ try {
 
     <div class="zeile" id="baumzeile" hidden>
       <span class="marke">Wald</span>
-      <div class="tagleiste" id="baumleiste" aria-label="Baumarten – Mehrfachauswahl"></div>
+      <div class="tagleiste" id="baumleiste" aria-label="Wald – höchstens eine Auswahl"></div>
     </div>
 
     <div class="zeile" id="gelaendezeile" hidden>
@@ -738,7 +738,7 @@ try {
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="interaktion.js"></script>
-<script src="wald.js?v=20260912"></script>
+<script src="wald.js?v=einzelauswahl1"></script>
 <script src="konto_konfig.js" onerror="window.OHNE_KONTO=true"></script>
 <script>
 // ---- Farbskala, gleiche Werte wie in farben.py (dunkel) -------------
@@ -2355,6 +2355,6 @@ fetch("daten.json")
       "Daten konnten nicht geladen werden: " + e.message;
   });
 </script>
-<script src="konto.js?v=20260912"></script>
+<script src="konto.js?v=einzelauswahl1"></script>
 </body>
 </html>
