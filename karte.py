@@ -108,6 +108,7 @@ NAMEN_DATEI = "ortsnamen.csv"
 BODEN_DATEI = "bodendaten.csv"
 FUNDE_DATEI = "funde_arten.csv"
 BAUMARTEN_DATEI = "baumarten.csv"
+RELIEF_WEB_INDEX = os.path.join("web", "relief.json")
 RELIEF_GRENZEN_DATEI = "relief_grenzen.csv"
 RELIEF_ALT = "relief_grenzen.txt"
 RELIEF_WEIT = "relief_weit_grenzen.txt"
@@ -1035,8 +1036,45 @@ def baue_ebene(art, bezugstag, name, punkte, cache, waldtypen, hoehen,
     return gruppe, len(scores), sum(scores) / len(scores)
 
 
+def reliefebenen_web(karte):
+    """
+    Dieselben Reliefbilder wie auf der Website, aus web/relief.json.
+
+    relief_web.py hat sie ins Kartenraster umgelegt und auf den Wald
+    zugeschnitten. Die Bilder in bilder/ liegen dagegen im UTM-Gitter;
+    mit ihren Ecken als Rechteck hingelegt, lagen sie an den Ecken 300
+    bis 500 m daneben.
+    """
+    with open(RELIEF_WEB_INDEX, "r", encoding="utf-8") as f:
+        gebiete = json.load(f)
+
+    anzahl = 0
+    for g in gebiete:
+        titel = g.get("titel") or g["gebiet"]
+        for art, beschriftung in [
+            ("feuchte", f"Feuchte Senken: {titel}"),
+            ("schummerung", f"Gelaendeschummerung: {titel}"),
+        ]:
+            datei = g.get("dateien", {}).get(art)
+            if not datei:
+                continue
+            pfad = f"web/{datei}"
+            if not os.path.exists(pfad):
+                continue
+            gruppe = folium.FeatureGroup(name=beschriftung, show=False)
+            bild_ebene(pfad, g["grenzen"], 3).add_to(gruppe)
+            gruppe.add_to(karte)
+            anzahl += 1
+    return anzahl
+
+
 def reliefebenen(karte):
     """Feinkarten aus dem 1-m-Hoehenmodell, ein Paar je Gebiet."""
+    if os.path.exists(RELIEF_WEB_INDEX):
+        anzahl = reliefebenen_web(karte)
+        if anzahl:
+            return anzahl
+
     gebiete = []
 
     if os.path.exists(RELIEF_GRENZEN_DATEI):
