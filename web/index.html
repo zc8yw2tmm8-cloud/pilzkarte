@@ -2332,7 +2332,9 @@ fetch("daten.json")
         .then(b => { bilder = b; zeigeWeichbild(); })
         .catch(() => {});
 
-      fetch("relief.json")
+      // Immer beim Server nachfragen: Aendern sich die Reliefbilder,
+      // passt eine alte relief.json nicht mehr zu ihnen
+      fetch("relief.json", {cache: "no-cache"})
         .then(r => r.ok ? r.json() : [])
         .then(r => { relief = r; reliefEinbinden(); })
         .catch(() => {});

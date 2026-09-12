@@ -24,6 +24,8 @@ import re
 import numpy as np
 from PIL import Image
 
+import relief_geo
+
 Image.MAX_IMAGE_PIXELS = None
 
 DGM_ORDNER = "dgm"
@@ -269,9 +271,19 @@ def wgs84_zu_utm(lat, lon):
 
 def waldmaske(form, rahmen, waldpunkte, schritt):
     """
-    True, wo Wald ist. Ein Kreis je Waldpunkt, gerastert.
+    True, wo Wald ist.
+
+    Bevorzugt die Gesamtwald-Ebene der Karte (etwa 20 m genau), dann
+    deckt sich das Relief mit dem Wald auf der Karte. Nur wenn die
+    fehlt, ein Kreis je Waldpunkt - das ist grob und faerbt auch
+    Aecker am Waldrand ein.
     """
-    if not NUR_WALD or not waldpunkte:
+    if not NUR_WALD:
+        return np.ones(form, dtype=bool)
+    genau = relief_geo.Waldmaske.laden()
+    if genau is not None:
+        return genau.fuer_utm_gitter(form, rahmen, schritt)
+    if not waldpunkte:
         return np.ones(form, dtype=bool)
 
     hoehe, breite = form
