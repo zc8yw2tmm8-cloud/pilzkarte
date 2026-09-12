@@ -742,6 +742,12 @@ async function routeSpeichern(daten) {
 
 let einstellungenBereit = false;
 
+function gespeicherteBaeume(e) {
+  const werte = Array.isArray(e.baeume) ? e.baeume : (e.baum ? [e.baum] : []);
+  const arten = [...new Set(werte.filter(w => typeof w === "string" && /^[a-z_]+$/.test(w)))];
+  return arten.includes("gesamt") ? ["gesamt"] : arten;
+}
+
 function sammleEinstellungen() {
   const gewaehlt = w => {
     const b = document.querySelector(`[data-${w}].aktiv`);
@@ -764,7 +770,7 @@ function sammleEinstellungen() {
     lieblinge: (typeof lieblinge !== "undefined") ? lieblinge : [],
     art: typeof art !== "undefined" ? art : null,
     stil: gewaehlt("stil"),
-    baum: gewaehlt("baum"),
+    baeume: [...document.querySelectorAll("[data-baum].aktiv")].map(b => b.dataset.baum),
     relief: gewaehlt("relief"),
     deckkraft: regler("deckregler"),
     funde: an("funde"),
@@ -805,8 +811,8 @@ function stelleWiederHer(e, versuch) {
   // noch nicht - dann greift der Klick ins Leere und die zuletzt
   // gewaehlte Waldebene bleibt aus.
   versuch = versuch || 0;
-  const fehltNoch = (e.baum && !document.querySelector(
-                       `[data-baum="${e.baum}"]`))
+  const baeume = gespeicherteBaeume(e);
+  const fehltNoch = (baeume.length && !document.querySelector("[data-baum]"))
                  || (e.relief && !document.querySelector(
                        `[data-relief="${e.relief}"]`));
   if (fehltNoch && versuch < 20) {
@@ -844,7 +850,10 @@ function stelleWiederHer(e, versuch) {
     if (b) b.click();
   }
   druecke("stil", e.stil);
-  druecke("baum", e.baum);
+  document.querySelectorAll("[data-baum].aktiv").forEach(b => {
+    if (!baeume.includes(b.dataset.baum)) b.click();
+  });
+  baeume.forEach(baum => druecke("baum", baum));
   druecke("relief", e.relief);
 
   if (typeof e.deckkraft === "number") {

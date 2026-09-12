@@ -497,6 +497,16 @@
          background: transparent; color: var(--leise);
          padding: 5px 10px; border-radius: 14px; cursor: pointer;
          font-size: 12px; min-height: 32px; white-space: nowrap; }
+  .baumfarbe { display: inline-block; width: 11px; height: 11px;
+    flex: 0 0 11px; border-radius: 50%; border: 1px solid #fff;
+    box-shadow: 0 0 0 1px #263040; vertical-align: middle; margin-right: 6px; }
+  #baumlegende { position: absolute; bottom: calc(120px + env(safe-area-inset-bottom)); left: 10px; z-index: 6;
+    max-width: min(430px, calc(100% - 70px));
+    display: flex; flex-wrap: wrap; gap: 7px 13px; padding: 9px 12px;
+    border-radius: 9px; background: rgba(255,255,255,.94); color: #182333;
+    box-shadow: 0 1px 6px #0004; font-size: 12px; pointer-events: none; }
+  #baumlegende[hidden] { display: none; }
+  .baumlegende-eintrag { white-space: nowrap; }
   .tag.aktiv { border-color: var(--akzent); color: var(--akzent);
                font-weight: 600; }
 
@@ -696,7 +706,7 @@ try {
 
     <div class="zeile" id="baumzeile" hidden>
       <span class="marke">Wald</span>
-      <div class="tagleiste" id="baumleiste"></div>
+      <div class="tagleiste" id="baumleiste" aria-label="Baumarten – Mehrfachauswahl"></div>
     </div>
 
     <div class="zeile" id="gelaendezeile" hidden>
@@ -728,6 +738,7 @@ try {
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="interaktion.js"></script>
+<script src="wald.js?v=20260912"></script>
 <script src="konto_konfig.js" onerror="window.OHNE_KONTO=true"></script>
 <script>
 // ---- Farbskala, gleiche Werte wie in farben.py (dunkel) -------------
@@ -2288,59 +2299,21 @@ fetch("daten.json")
         melde("Dieser Browser kennt keine Standortbestimmung.");
       }
 
-      fetch("wald.json")
+      const baumlegende = document.createElement("div");
+      baumlegende.id = "baumlegende";
+      baumlegende.hidden = true;
+      baumlegende.setAttribute("aria-label", "Ausgewählte Baumarten");
+      document.getElementById("karte").appendChild(baumlegende);
+
+      fetch("wald.json", {cache: "no-cache"})
         .then(r => r.ok ? r.json() : null)
         .then(w => {
           if (!w || !w.ebenen) return;
-          const g = w.grenzen;
-
-          function ladeWaldebene(e) {
-            const kennung = "wald_" + e.schluessel;
-            if (karte.getLayer(kennung)) return;
-            karte.addSource(kennung, {
-              type: "image", url: e.datei,
-              coordinates: [[g[0][1], g[1][0]], [g[1][1], g[1][0]],
-                            [g[1][1], g[0][0]], [g[0][1], g[0][0]]]
-            });
-            // UEBER die Farbflaechen, direkt unter die Beschriftung.
-            // Frueher lagen sie darunter und waren bei kraeftiger
-            // Deckkraft kaum zu sehen - dabei sind sie gerade dann
-            // nuetzlich, wenn man wissen will, welcher Wald hinter
-            // einem guten Wert steckt.
-            karte.addLayer({
-              id: kennung, type: "raster", source: kennung,
-              layout: { visibility: "none" },
-              paint: { "raster-opacity": 0.5 }
-            }, karte.getLayer("beschriftung")
-                 ? "beschriftung" : undefined);
-          }
-
-          const leiste = document.getElementById("baumleiste");
-          leiste.innerHTML = w.ebenen.map(e => `<button class="tag"
-              data-baum="${e.schluessel}">${e.name}</button>`).join("");
+          waldEinrichten(karte, w, document.getElementById("baumleiste"),
+            document.getElementById("baumlegende"), () => {
+              if (typeof merkeEinstellungen === "function") merkeEinstellungen();
+            }, gespeicherteBaeume(START));
           document.getElementById("baumzeile").hidden = false;
-
-          leiste.querySelectorAll("[data-baum]").forEach(b =>
-            b.onclick = () => {
-              const an = !b.classList.contains("aktiv");
-              // Immer nur eine Baumart - sonst ueberlagern sich die
-              // Masken und man sieht nur noch eine Flaeche
-              if (typeof merkeEinstellungen === "function") {
-                merkeEinstellungen();
-              }
-              leiste.querySelectorAll("[data-baum]").forEach(x =>
-                x.classList.remove("aktiv"));
-              w.ebenen.forEach(e => {
-                const id = "wald_" + e.schluessel;
-                if (karte.getLayer(id)) karte.setLayoutProperty(id, "visibility", "none");
-              });
-              if (an) {
-                ladeWaldebene(w.ebenen.find(e => e.schluessel === b.dataset.baum));
-                b.classList.add("aktiv");
-                karte.setLayoutProperty("wald_" + b.dataset.baum,
-                  "visibility", "visible");
-              }
-            });
         })
         .catch(() => {});
 
@@ -2382,6 +2355,6 @@ fetch("daten.json")
       "Daten konnten nicht geladen werden: " + e.message;
   });
 </script>
-<script src="konto.js"></script>
+<script src="konto.js?v=20260912"></script>
 </body>
 </html>
