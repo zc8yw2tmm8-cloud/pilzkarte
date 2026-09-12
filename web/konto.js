@@ -812,7 +812,7 @@ function stelleWiederHer(e, versuch) {
   // gewaehlte Waldebene bleibt aus.
   versuch = versuch || 0;
   const baeume = gespeicherteBaeume(e);
-  const fehltNoch = (baeume.length && !document.querySelector("[data-baum]"))
+  const fehltNoch = !document.querySelector("[data-baum]")
                  || (e.relief && !document.querySelector(
                        `[data-relief="${e.relief}"]`));
   if (fehltNoch && versuch < 20) {
