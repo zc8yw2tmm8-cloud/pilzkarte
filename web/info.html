@@ -20,141 +20,334 @@
     --grund: #15181c; --flaeche: #1e2228; --text: #e6e6e6;
     --leise: #9aa0a6; --linie: #2f353d; --akzent: #5fb763;
     --warn: #e8a33d;
+    --schwebe: rgba(30,34,40,.94);
+    --akzent-hauch: rgba(95,183,99,.12);
   }
   body.hell {
     --grund: #f4f2ee; --flaeche: #ffffff; --text: #1c1f22;
     --leise: #5f6469; --linie: #d9d5cd; --akzent: #2f7a35;
     --warn: #b4761e;
+    --schwebe: rgba(255,255,255,.94);
+    --akzent-hauch: rgba(47,122,53,.1);
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
   body { margin: 0; background: var(--grund); color: var(--text);
-         font: 16px/1.65 system-ui, -apple-system, "Segoe UI",
+         font: 16px/1.6 system-ui, -apple-system, "Segoe UI",
                Roboto, sans-serif;
          -webkit-text-size-adjust: 100%; }
 
-  .breite { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+  .breite { max-width: 980px; margin: 0 auto; padding: 0 18px; }
 
-  header { border-bottom: 1px solid var(--linie);
-           padding: 14px 0 20px; margin-bottom: 26px; }
-  header a { display: inline-block; color: var(--akzent);
-             text-decoration: none; font-size: 15px;
-             padding: 8px 14px; margin: 0 0 10px -14px;
-             border-radius: 8px; min-height: 40px; line-height: 24px; }
-  header a:hover { background: var(--flaeche); }
-
-  h1 { font-size: 25px; margin: 6px 0 0; line-height: 1.25; }
-  h2 { font-size: 20px; margin: 38px 0 12px; }
-  h3 { font-size: 16px; margin: 26px 0 8px; }
-
-  p { margin: 0 0 14px; }
-  ul { margin: 0 0 16px; padding-left: 22px; }
-  li { margin-bottom: 5px; }
+  h1 { font-size: 24px; margin: 0; line-height: 1.2; }
+  h2 { font-size: 20px; margin: 0 0 12px; line-height: 1.3; }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  p { margin: 0 0 12px; }
+  ul { margin: 0 0 14px; padding-left: 22px; }
+  li { margin-bottom: 4px; }
+  b { font-weight: 650; }
 
   .klein { font-size: 13.5px; color: var(--leise); }
   .gross { font-size: 18px; }
 
-  .datenstand-oben { margin: 16px 0 4px; padding: 11px 15px;
-                     background: var(--flaeche); border-radius: 8px;
-                     border-left: 3px solid var(--akzent); }
-  .datenstand-oben p { margin: 0; font-size: 13.5px;
+  /* ===== Kopf ===== */
+  header { padding: 14px 0 6px; }
+  .kopfzeile { display: flex; align-items: center; gap: 12px;
+               flex-wrap: wrap; }
+  /* Wie die runden Knoepfe auf der Karte */
+  .zurueck { display: inline-flex; align-items: center;
+             min-height: 40px; padding: 0 16px; border-radius: 20px;
+             background: var(--schwebe); border: 1px solid var(--linie);
+             color: var(--text); text-decoration: none; font-size: 14.5px;
+             white-space: nowrap; }
+  .zurueck:hover { border-color: var(--akzent); color: var(--akzent); }
+  .marke { display: flex; align-items: center; gap: 10px;
+           margin: 18px 0 10px; }
+  .marke svg { flex: 0 0 auto; color: var(--text); }
+
+  /* Datenstand als Pille statt als Kasten */
+  .datenstand-oben { display: inline-block; margin: 0 0 4px;
+                     padding: 6px 14px; border-radius: 16px;
+                     background: var(--schwebe);
+                     border: 1px solid var(--linie); }
+  .datenstand-oben p { margin: 0; font-size: 12.5px;
                        color: var(--leise); }
+  .datenstand-oben b { color: var(--text); }
 
-  .kasten { background: var(--flaeche); border-radius: 10px;
-            padding: 16px 19px; margin: 20px 0; }
-  .kasten h3 { margin-top: 0; }
-  .kasten p:last-child { margin-bottom: 0; }
-  .kasten.warn { border-left: 3px solid var(--warn); }
-  .kasten.gut { border-left: 3px solid var(--akzent); }
+  /* ===== Sprungleiste - wie die Tageschips auf der Karte =====
+     Klebt oben, damit man von jeder Stelle aus springen kann. */
+  .sprung { position: sticky; top: 0; z-index: 10;
+            background: var(--grund); margin: 0 0 8px;
+            border-bottom: 1px solid var(--linie); }
+  .sprung .breite { display: flex; gap: 6px; overflow-x: auto;
+                    padding-top: 10px; padding-bottom: 10px;
+                    scrollbar-width: none; }
+  .sprung .breite::-webkit-scrollbar { display: none; }
+  .sprung a { flex: 0 0 auto; min-height: 32px; padding: 5px 13px;
+              border-radius: 15px; border: 1px solid var(--linie);
+              background: var(--schwebe); color: var(--text);
+              font-size: 12.5px; text-decoration: none;
+              white-space: nowrap; }
+  .sprung a:hover { border-color: var(--akzent); }
+  .sprung a.an { background: var(--akzent); border-color: var(--akzent);
+                 color: #10130f; font-weight: 600; }
+  body.hell .sprung a.an { color: #ffffff; }
 
-  table { width: 100%; border-collapse: collapse; margin: 14px 0 20px;
-          font-size: 14.5px; }
-  th, td { text-align: left; padding: 8px 10px;
-           border-bottom: 1px solid var(--linie); }
-  th { color: var(--leise); font-weight: 600; font-size: 12.5px;
-       text-transform: uppercase; letter-spacing: .04em; }
+  /* ===== Abschnitte ===== */
+  section { padding: 30px 0 6px; scroll-margin-top: 56px; }
+  section + section { border-top: 1px solid var(--linie); }
+  /* Kleiner Balken ueber jeder Ueberschrift - derselbe Griff wie
+     am Blatt, das auf der Karte von unten hochkommt. */
+  h2::before { content: ""; display: block; width: 30px; height: 4px;
+               border-radius: 2px; background: var(--akzent);
+               margin-bottom: 12px; }
+  .warn h2::before { background: var(--warn); }
+  .text { max-width: 68ch; }
+
+  .kasten { background: var(--flaeche); border: 1px solid var(--linie);
+            border-radius: 14px; padding: 16px 18px; margin: 0 0 14px; }
+  .kasten p:last-child, .kasten ul:last-child { margin-bottom: 0; }
+  .spalten > .kasten { margin: 0; }
+  .kasten.warn p { max-width: 78ch; }
+
+  /* Kernsatz */
+  .kernsatz { margin: 18px 0 8px; padding: 18px 20px;
+              border-radius: 14px; background: var(--akzent-hauch);
+              border: 1px solid var(--akzent); }
+  .kernsatz p { margin: 0; font-size: 19px; line-height: 1.45;
+                font-weight: 500; }
+
+  .spalten { display: grid; gap: 14px 22px; }
+  @media (min-width: 700px) {
+    .spalten { grid-template-columns: 1fr 1fr; }
+    .spalten.breit-schmal { grid-template-columns: 3fr 2fr; }
+  }
+
+  /* ===== Farbband der Werte =====
+     Im HTML von gut nach schlecht, dargestellt von links schlecht
+     nach rechts gut - so liest man eine Skala. */
+  .skala { display: flex; flex-direction: row-reverse; gap: 3px;
+           margin: 4px 0 16px; }
+  .skala div { flex: 1; min-width: 0; }
+  .skala i { display: block; height: 12px; border-radius: 3px;
+             margin-bottom: 6px; }
+  .skala div:first-child i { border-radius: 3px 8px 8px 3px; }
+  .skala div:last-child i { border-radius: 8px 3px 3px 8px; }
+  .skala span { display: block; font-size: 12.5px; line-height: 1.3;
+                color: var(--leise); }
+  .skala span b { display: block; font-size: 14px; color: var(--text);
+                  font-variant-numeric: tabular-nums; }
+  .skala .trenn { display: none; }
+
+  /* ===== Rechenbeispiel ===== */
+  .beispiel { background: var(--flaeche); border: 1px solid var(--linie);
+              border-radius: 14px; padding: 16px 18px; margin: 10px 0 14px; }
+  .beispiel .art { font-size: 17px; margin-bottom: 14px; }
+  .beispiel table { width: 100%; border-collapse: collapse;
+                    margin: 6px 0 4px; font-size: 14.5px; }
+  .beispiel td { text-align: left; padding: 7px 4px;
+                 border-bottom: 1px solid var(--linie);
+                 vertical-align: top; }
+  .beispiel tr:last-child td { border-bottom: 0; }
   td.z { text-align: right; font-variant-numeric: tabular-nums;
          white-space: nowrap; }
+  .beispiel .spalten { gap: 16px 28px; margin-bottom: 8px; }
+  .rechnung { display: flex; flex-wrap: wrap; align-items: center;
+              justify-content: center; gap: 6px 8px;
+              padding: 14px 10px; margin: 10px 0 12px;
+              background: var(--grund); border-radius: 10px;
+              font-variant-numeric: tabular-nums; color: var(--leise); }
+  .rechnung span { min-width: 44px; padding: 6px 10px; text-align: center;
+                   border-radius: 8px; border: 1px solid var(--linie);
+                   background: var(--flaeche); color: var(--text);
+                   font-size: 16px; }
+  .rechnung span.ende { background: var(--akzent); border-color: var(--akzent);
+                        color: #10130f; font-weight: 700; font-size: 19px; }
+  body.hell .rechnung span.ende { color: #ffffff; }
+  .beispiel > p:last-child { margin-bottom: 0; }
 
-  .beispiel { background: var(--flaeche); border-radius: 8px;
-              padding: 4px 16px 14px; margin: 14px 0 24px; }
-  .beispiel table { margin: 8px 0 14px; }
-  .beispiel td { padding: 6px 8px; }
-  .rechnung { text-align: center; padding: 14px 8px;
-              background: var(--grund); border-radius: 6px;
-              font-size: 15px; font-variant-numeric: tabular-nums;
-              margin: 4px 0 12px; }
-  .rechnung b { color: var(--akzent); font-size: 19px; }
+  /* ===== Faktoren ===== */
+  .faktoren { display: grid; gap: 14px; margin-top: 6px; }
+  @media (min-width: 700px) {
+    .faktoren { grid-template-columns: 1fr 1fr; }
+  }
+  .faktoren .kasten { margin: 0; }
+  .faktorkopf { display: flex; align-items: center; gap: 10px;
+                margin-bottom: 8px; }
+  .faktorkopf h3 { margin: 0; font-size: 17px; }
+  .symbol { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--akzent-hauch); color: var(--akzent); }
 
-  .skala div { display: flex; align-items: center; gap: 11px;
-               padding: 5px 0; }
-  .skala i { width: 26px; height: 14px; border-radius: 3px;
-             flex: 0 0 auto; }
+  /* Aufzaehlungen als Chips - kurze Begriffe brauchen keine Zeile */
+  ul.chips { list-style: none; padding: 0; margin: 4px 0 12px;
+             display: flex; flex-wrap: wrap; gap: 6px; }
+  ul.chips li { margin: 0; padding: 4px 11px; border-radius: 14px;
+                border: 1px solid var(--linie); background: var(--grund);
+                font-size: 13.5px; line-height: 1.4; }
+  ul.chips.gruen li { border-color: var(--akzent); color: var(--akzent);
+                      background: var(--akzent-hauch); }
 
-  .fuss { margin: 44px 0 60px; padding-top: 20px;
+  /* ===== Genauigkeit: zwei Fragen nebeneinander ===== */
+  .fragen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            margin: 4px 0 14px; max-width: 640px; }
+  .fragen .kasten { margin: 0; display: flex; align-items: center; }
+  .fragen .ja { background: var(--akzent-hauch);
+                border-color: var(--akzent); }
+  .fragen .ja p { font-size: 18px; font-weight: 600; line-height: 1.35; }
+  .fragen .nein p { color: var(--leise); font-size: 15px;
+                    line-height: 1.4; }
+
+  /* ===== Quellen: die Tabelle als Kacheln ===== */
+  .quellen { width: 100%; border-collapse: collapse; }
+  .quellen thead { position: absolute; width: 1px; height: 1px;
+                   overflow: hidden; clip: rect(0 0 0 0); }
+  .quellen tbody { display: grid; grid-template-columns: 1fr 1fr;
+                   gap: 8px; }
+  @media (min-width: 700px) {
+    .quellen tbody { grid-template-columns: repeat(3, 1fr); }
+  }
+  .quellen tr { display: flex; flex-direction: column-reverse;
+                justify-content: flex-end; gap: 2px;
+                background: var(--flaeche); border: 1px solid var(--linie);
+                border-radius: 12px; padding: 11px 13px; }
+  .quellen td { padding: 0; line-height: 1.3; }
+  .quellen td:first-child { font-size: 12.5px; color: var(--leise); }
+  .quellen td:last-child { font-weight: 650; font-size: 14.5px; }
+
+  /* ===== Kurz gesagt: fuenf Schritte ===== */
+  .kurz { margin: 26px 0 0; }
+  .kurz h3 { font-size: 12px; text-transform: uppercase;
+             letter-spacing: .06em; color: var(--leise); margin-bottom: 10px; }
+  .kurz .gross { max-width: 68ch; line-height: 1.5; }
+  .gruss { margin: 16px 0 0; font-size: 18px; font-weight: 600;
+           color: var(--akzent); }
+
+  .fuss { margin: 34px 0 50px; padding-top: 18px;
           border-top: 1px solid var(--linie);
           font-size: 13.5px; color: var(--leise); }
   .fuss a { color: var(--akzent); }
+
+  /* Auf dem Telefon stehen Karten, die am Rechner nebeneinander
+     passen, in einer Reihe zum Wischen - wie die Tageschips auf der
+     Karte. Die naechste Karte schaut am Rand hervor, damit man sieht,
+     dass es weitergeht. */
+  .punkte { display: none; }
+  @media (max-width: 699px) {
+    .wisch { display: flex !important; gap: 12px; overflow-x: auto;
+             scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+             margin: 0 -18px; padding: 0 18px 2px;
+             scroll-padding: 0 18px; scrollbar-width: none; }
+    .wisch::-webkit-scrollbar { display: none; }
+    .wisch > * { flex: 0 0 86%; scroll-snap-align: start; min-width: 0; }
+    .punkte { display: flex; justify-content: center; gap: 6px;
+              margin: 10px 0 4px; }
+    .punkte i { width: 7px; height: 7px; border-radius: 50%;
+                background: var(--linie); transition: background .2s; }
+    .punkte i.an { background: var(--akzent); }
+    .beispiel .wisch { margin: 0 -18px; }
+  }
+
+  @media (max-width: 699px) {
+    h1 { font-size: 22px; }
+    section { padding-top: 24px; }
+    .kernsatz p { font-size: 17.5px; }
+    .fragen .ja p { font-size: 16.5px; }
+    .fragen .nein p { font-size: 14px; }
+  }
 </style>
 </head>
 <body>
 
 <header><div class="breite">
-  <a href="index.html">&larr; Karte</a>
-  <h1>So funktioniert die Pilzkarte</h1>
+  <div class="kopfzeile">
+    <a class="zurueck" href="index.html">&larr; Karte</a>
+  </div>
+  <div class="marke">
+    <!-- Voll gefuellter Pilz in Textfarbe. Bewusst nicht das halb
+         gefuellte Zeichen vom Hell-Dunkel-Knopf der Karte - das saehe
+         aus wie ein Umschalter. -->
+    <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"
+         fill="currentColor">
+      <path d="M3.5 11a8.5 6.5 0 0 1 17 0Z"/>
+      <path d="M9.5 12.3v5.2a2.5 2.5 0 0 0 5 0v-5.2Z"/>
+    </svg>
+    <h1>So funktioniert die Pilzkarte</h1>
+  </div>
 
   <div class="datenstand-oben">
     <p class="klein" id="datenstand">Wetterstand wird geladen &hellip;</p>
   </div>
 </div></header>
 
+<nav class="sprung" aria-label="Abschnitte"><div class="breite">
+  <a href="#wert">Wert</a>
+  <a href="#rechnen">Beispiel</a>
+  <a href="#faktoren">Faktoren</a>
+  <a href="#genauigkeit">Genauigkeit</a>
+  <a href="#daten">Daten</a>
+  <a href="#hinweise">Hinweise</a>
+</div></nav>
+
 <main class="breite">
 
+<div class="text">
 <p>Die Pilzkarte hilft dir, <b>interessante Suchgebiete zu
 finden</b>.</p>
 
 <p>Wähle oben eine Pilzart und schau auf die Karte. Je höher der Wert,
 desto besser passen die aktuellen Bedingungen zu den typischen
 Bedingungen dieser Art.</p>
+</div>
 
-<div class="kasten gut">
-  <p class="gross" style="margin:0">Die Karte zeigt dir keine Pilze.
-  Sie zeigt dir, wo sich die Suche heute eher lohnen könnte.</p>
+<div class="kernsatz">
+  <p>Die Karte zeigt dir keine Pilze. Sie
+  zeigt dir, wo sich die Suche heute eher lohnen könnte.</p>
 </div>
 
 
-<h2>Was bedeutet der Wert?</h2>
+<section id="wert">
+<div class="spalten breit-schmal">
+  <div>
+    <h2>Was bedeutet der Wert?</h2>
 
-<div class="skala">
-  <div><i style="background:rgb(45,175,75)"></i>
-    <span><b>95+</b> &middot; sehr gut</span></div>
-  <div><i style="background:rgb(130,220,70)"></i>
-    <span><b>80&ndash;94</b> &middot; gut</span></div>
-  <div><i style="background:rgb(255,225,90)"></i>
-    <span><b>60&ndash;79</b> &middot; interessant</span></div>
-  <div><i style="background:rgb(250,155,40)"></i>
-    <span><b>40&ndash;59</b> &middot; eher schwach</span></div>
-  <div><i style="background:rgb(200,60,60)"></i>
-    <span><b>unter 40</b> &middot; ungünstig</span></div>
+    <div class="skala">
+      <div><i style="background:rgb(45,175,75)"></i>
+        <span><b>95+</b> <span class="trenn">&middot;</span> sehr gut</span></div>
+      <div><i style="background:rgb(130,220,70)"></i>
+        <span><b>80&ndash;94</b> <span class="trenn">&middot;</span> gut</span></div>
+      <div><i style="background:rgb(255,225,90)"></i>
+        <span><b>60&ndash;79</b> <span class="trenn">&middot;</span> interessant</span></div>
+      <div><i style="background:rgb(250,155,40)"></i>
+        <span><b>40&ndash;59</b> <span class="trenn">&middot;</span> eher schwach</span></div>
+      <div><i style="background:rgb(200,60,60)"></i>
+        <span><b>unter 40</b> <span class="trenn">&middot;</span> ungünstig</span></div>
+    </div>
+
+    <p><b>100 bedeutet nicht, dass dort ein Pilz steht.</b> Es bedeutet,
+    dass die berücksichtigten Bedingungen für diese Art besonders gut
+    zusammenpassen.</p>
+
+    <p>Bei niedrigen Werten zeigt dir das Popup, <b>was die Bedingungen
+    gerade verschlechtert</b> &ndash; zum Beispiel zu wenig Feuchtigkeit,
+    eine unpassende Jahreszeit oder fehlende passende Bäume.</p>
+  </div>
+
+  <div class="kasten">
+    <h3>Jede Pilzart wird für sich bewertet</h3>
+
+    <p>Die Werte verschiedener Arten lassen sich nicht direkt vergleichen.
+    Eine 70 beim Steinpilz bedeutet nicht automatisch mehr Pilze als eine
+    50 beim Schwefelporling.</p>
+
+    <p>Der Wert zeigt vor allem, <b>welche Gebiete für die ausgewählte Art
+    momentan interessanter sind</b>.</p>
+  </div>
 </div>
-
-<p><b>100 bedeutet nicht, dass dort ein Pilz steht.</b> Es bedeutet,
-dass die berücksichtigten Bedingungen für diese Art besonders gut
-zusammenpassen.</p>
-
-<p>Bei niedrigen Werten zeigt dir das Popup, <b>was die Bedingungen
-gerade verschlechtert</b> &ndash; zum Beispiel zu wenig Feuchtigkeit,
-eine unpassende Jahreszeit oder fehlende passende Bäume.</p>
-
-<h3>Jede Pilzart wird für sich bewertet</h3>
-
-<p>Die Werte verschiedener Arten lassen sich nicht direkt vergleichen.
-Eine 70 beim Steinpilz bedeutet nicht automatisch mehr Pilze als eine
-50 beim Schwefelporling.</p>
-
-<p>Der Wert zeigt vor allem, <b>welche Gebiete für die ausgewählte Art
-momentan interessanter sind</b>.</p>
+</section>
 
 
+<section id="rechnen">
 <h2>So entsteht ein Wert</h2>
 
 <p>Ein Beispiel von heute, mit echten Zahlen aus der Karte:</p>
@@ -162,135 +355,201 @@ momentan interessanter sind</b>.</p>
 <div id="beispiel" class="beispiel">
   <p class="klein">Wird geladen &hellip;</p>
 </div>
+</section>
 
 
+<section id="faktoren">
 <h2>Was wird berücksichtigt?</h2>
 
-<h3>Wetter</h3>
+<div class="faktoren wisch">
+  <div class="kasten">
+    <div class="faktorkopf">
+      <span class="symbol"><svg viewBox="0 0 24 24" width="20" height="20"
+        fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M7 15a4 4 0 0 1 .4-8 5.5 5.5 0 0 1 10.4 1.6A3.3 3.3 0 0 1 17.5 15Z"/>
+        <path d="M9 18.5l-1 2M13 18.5l-1 2M17 18.5l-1 2"/></svg></span>
+      <h3>Wetter</h3>
+    </div>
 
-<p>Unter anderem werden berücksichtigt:</p>
+    <p>Unter anderem werden berücksichtigt:</p>
 
-<ul>
-  <li>Bodenfeuchtigkeit</li>
-  <li>Bodentemperatur</li>
-  <li>Niederschlag der vergangenen Wochen</li>
-  <li>Anzahl der Regentage</li>
-  <li>Wasserbilanz</li>
-  <li>längere Trockenperioden</li>
-  <li>Frost</li>
-</ul>
+    <ul class="chips">
+      <li>Bodenfeuchtigkeit</li>
+      <li>Bodentemperatur</li>
+      <li>Niederschlag der vergangenen Wochen</li>
+      <li>Anzahl der Regentage</li>
+      <li>Wasserbilanz</li>
+      <li>längere Trockenperioden</li>
+      <li>Frost</li>
+    </ul>
 
-<p>Dabei zählt nicht nur, wie feucht es gerade ist. Entscheidend ist
-auch, <b>wie die Bedingungen im Vergleich zu dieser Jahreszeit
-normalerweise sind</b>.</p>
+    <p>Dabei zählt nicht nur, wie feucht es gerade ist. Entscheidend ist
+    auch, <b>wie die Bedingungen im Vergleich zu dieser Jahreszeit
+    normalerweise sind</b>.</p>
+  </div>
 
-<h3>Jahreszeit</h3>
+  <div class="kasten">
+    <div class="faktorkopf">
+      <span class="symbol"><svg viewBox="0 0 24 24" width="20" height="20"
+        fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/>
+        <path d="M4 10.5h16M9 3.5v4M15 3.5v4"/></svg></span>
+      <h3>Jahreszeit</h3>
+    </div>
 
-<p>Jede Pilzart hat ihre eigene Saison.</p>
+    <p>Jede Pilzart hat ihre eigene Saison.</p>
 
-<p>Die Karte nutzt dafür echte Fundmeldungen und wertet aus,
-<b>wann eine Art besonders häufig gefunden wird</b>.</p>
+    <p>Die Karte nutzt dafür echte Fundmeldungen und wertet aus,
+    <b>wann eine Art besonders häufig gefunden wird</b>.</p>
 
-<p>Dabei wird auch berücksichtigt, wie viele andere Pilze im gleichen
-Zeitraum gemeldet wurden. So lässt sich besser unterscheiden, ob eine
-Art tatsächlich häufiger vorkommt oder einfach mehr Menschen
-unterwegs waren.</p>
+    <p>Dabei wird auch berücksichtigt, wie viele andere Pilze im gleichen
+    Zeitraum gemeldet wurden. So lässt sich besser unterscheiden, ob eine
+    Art tatsächlich häufiger vorkommt oder einfach mehr Menschen
+    unterwegs waren.</p>
+  </div>
 
-<h3>Bäume</h3>
+  <div class="kasten">
+    <div class="faktorkopf">
+      <span class="symbol"><svg viewBox="0 0 24 24" width="20" height="20"
+        fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3 6.5 11h3L5 17.5h14L14.5 11h3Z"/>
+        <path d="M12 17.5v3.5"/></svg></span>
+      <h3>Bäume</h3>
+    </div>
 
-<p>Viele Pilze sind eng mit bestimmten Baumarten verbunden.</p>
+    <p>Viele Pilze sind eng mit bestimmten Baumarten verbunden.</p>
 
-<p>Deshalb berücksichtigt die Karte die vorhandene Baumartenmischung
-und kann erkennen, ob ein Gebiet passende Bäume für die jeweilige
-Pilzart bietet.</p>
+    <p>Deshalb berücksichtigt die Karte die vorhandene Baumartenmischung
+    und kann erkennen, ob ein Gebiet passende Bäume für die jeweilige
+    Pilzart bietet.</p>
+  </div>
 
-<h3>Boden</h3>
+  <div class="kasten">
+    <div class="faktorkopf">
+      <span class="symbol"><svg viewBox="0 0 24 24" width="20" height="20"
+        fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 7.5c3-2 6 2 9 0s6 2 9 0"/>
+        <path d="M3 20h18"/>
+        <circle cx="7" cy="12.5" r=".9" fill="currentColor"/>
+        <circle cx="13" cy="11.5" r=".9" fill="currentColor"/>
+        <circle cx="17.5" cy="15" r=".9" fill="currentColor"/>
+        <circle cx="10" cy="16" r=".9" fill="currentColor"/></svg></span>
+      <h3>Boden</h3>
+    </div>
 
-<p>Bei einigen Arten werden zusätzlich Bodeneigenschaften
-berücksichtigt, zum Beispiel:</p>
+    <p>Bei einigen Arten werden zusätzlich Bodeneigenschaften
+    berücksichtigt, zum Beispiel:</p>
 
-<ul>
-  <li>Säuregrad (pH-Wert)</li>
-  <li>Sandanteil</li>
-  <li>Tonanteil</li>
-</ul>
+    <ul class="chips">
+      <li>Säuregrad (pH-Wert)</li>
+      <li>Sandanteil</li>
+      <li>Tonanteil</li>
+    </ul>
 
-<p>Diese Informationen werden dort verwendet, wo genügend Funddaten
-vorhanden sind.</p>
+    <p>Diese Informationen werden dort verwendet, wo genügend Funddaten
+    vorhanden sind.</p>
+  </div>
+</div>
+</section>
 
 
+<section id="genauigkeit">
 <h2>Wie genau ist die Karte?</h2>
 
+<div class="text">
 <p>Die Karte arbeitet mit Bereichen von etwa
 <b>2 &times; 2 Kilometern</b>.</p>
 
 <p>Sie beantwortet deshalb eher die Frage:</p>
-
-<div class="kasten gut">
-  <p class="gross" style="margin:0">„Wohin fahre ich heute?"</p>
 </div>
 
-<p>und nicht: „Wo genau steht der Pilz?"</p>
+<div class="fragen">
+  <div class="kasten ja">
+    <p>„Wohin fahre ich heute?"</p>
+  </div>
+  <div class="kasten nein">
+    <p>und nicht: „Wo genau steht der Pilz?"</p>
+  </div>
+</div>
 
-<p>Der angezeigte Wert bezieht sich auf geeignete Waldflächen
+<p class="text">Der angezeigte Wert bezieht sich auf geeignete Waldflächen
 innerhalb des jeweiligen Bereichs &ndash; nicht auf Äcker, Straßen
 oder Ortschaften.</p>
+</section>
 
 
-<h2>Die Karte lernt aus echten Funden</h2>
+<section id="daten">
+<div class="spalten wisch">
+  <div class="kasten">
+    <h2>Die Karte lernt aus echten Funden</h2>
 
-<p>Die Berechnung basiert nicht nur auf allgemeinen Angaben über
-Pilze.</p>
+    <p>Die Berechnung basiert nicht nur auf allgemeinen Angaben über
+    Pilze.</p>
 
-<p>Für die verschiedenen Arten werden <b>echte Fundmeldungen</b>
-ausgewertet. Dadurch lässt sich erkennen, unter welchen Bedingungen
-und zu welchen Zeiten eine Art tatsächlich häufiger gemeldet wird.</p>
+    <p>Für die verschiedenen Arten werden <b>echte Fundmeldungen</b>
+    ausgewertet. Dadurch lässt sich erkennen, unter welchen Bedingungen
+    und zu welchen Zeiten eine Art tatsächlich häufiger gemeldet wird.</p>
 
-<p>Je mehr hochwertige Funddaten verfügbar sind, desto besser lassen
-sich diese Zusammenhänge bestimmen.</p>
+    <p>Je mehr hochwertige Funddaten verfügbar sind, desto besser lassen
+    sich diese Zusammenhänge bestimmen.</p>
+  </div>
 
+  <div class="kasten">
+    <h2>Wie gut sind die Daten?</h2>
 
-<h2>Wie gut sind die Daten?</h2>
+    <p>Nicht für jede Pilzart stehen gleich viele Funddaten zur
+    Verfügung.</p>
 
-<p>Nicht für jede Pilzart stehen gleich viele Funddaten zur
-Verfügung.</p>
+    <div class="spalten" style="grid-template-columns:1fr 1fr">
+      <div>
+        <p style="margin-bottom:4px"><b>Für alle 11 Arten:</b></p>
+        <ul class="chips">
+          <li>Wetter</li>
+          <li>Jahreszeit</li>
+        </ul>
+      </div>
+      <div>
+        <p style="margin-bottom:4px"><b>Zusätzlich für:</b></p>
+        <ul class="chips gruen">
+          <li>Steinpilz</li>
+          <li>Marone</li>
+          <li>Parasol</li>
+          <li>Schwefelporling</li>
+        </ul>
 
-<p><b>Für alle 11 Arten:</b></p>
-<ul>
-  <li>Wetter</li>
-  <li>Jahreszeit</li>
-</ul>
+        <p class="klein">werden auch Baum- und Bodeneigenschaften ausgewertet.</p>
+      </div>
+    </div>
 
-<p><b>Zusätzlich für:</b></p>
-<ul>
-  <li>Steinpilz</li>
-  <li>Marone</li>
-  <li>Parasol</li>
-  <li>Schwefelporling</li>
-</ul>
+    <p>Bei selteneren Arten wie Edelreizker und den beiden
+    Hexenröhrlingen ist die Datenbasis kleiner. Deshalb stehen dort noch
+    nicht alle Faktoren zur Verfügung.</p>
+  </div>
+</div>
 
-<p>werden auch Baum- und Bodeneigenschaften ausgewertet.</p>
+<h2 style="margin-top:22px">Woher kommen die Daten?</h2>
 
-<p>Bei selteneren Arten wie Edelreizker und den beiden
-Hexenröhrlingen ist die Datenbasis kleiner. Deshalb stehen dort nicht
-alle Faktoren zur Verfügung.</p>
-
-
-<h2>Woher kommen die Daten?</h2>
-
-<table>
-  <tr><th>Daten</th><th>Quelle</th></tr>
+<table class="quellen">
+  <thead><tr><th>Daten</th><th>Quelle</th></tr></thead>
+  <tbody>
   <tr><td>Wetter und Wettervorhersage</td><td>Open-Meteo / DWD</td></tr>
   <tr><td>Pilz-Fundmeldungen</td><td>GBIF</td></tr>
   <tr><td>Baumarten</td><td>Thünen-Institut</td></tr>
   <tr><td>Boden</td><td>ISRIC SoilGrids</td></tr>
   <tr><td>Waldflächen und Kartendaten</td><td>OpenStreetMap</td></tr>
   <tr><td>Gelände</td><td>LGLN Niedersachsen</td></tr>
+  </tbody>
 </table>
+</section>
 
 
+<section id="hinweise">
 <div class="kasten warn">
-  <h2 style="margin-top:0">Bitte beachten</h2>
+  <h2>Bitte beachten</h2>
 
   <p>Die Pilzkarte zeigt <b>Bedingungen, keine Pilze</b>.</p>
 
@@ -310,17 +569,53 @@ alle Faktoren zur Verfügung.</p>
 </div>
 
 
-<h3>Kurz gesagt</h3>
+<div class="kurz">
+  <h3>Kurz gesagt</h3>
 
-<p class="gross">Wetter beobachten. Wald und Boden berücksichtigen.
-Echte Funddaten auswerten. Ein interessantes Suchgebiet finden. Und
-dann selbst nachschauen.</p>
+  <p class="gross">Wetter beobachten. Wald und Boden berücksichtigen.
+  Echte Funddaten auswerten. Ein interessantes Suchgebiet finden. Und
+  dann selbst nachschauen.</p>
+
+  <p class="gruss">Viel Spaß beim Pilze sammeln!</p>
+</div>
+</section>
 
 <div class="fuss">
   <p><a href="index.html">&larr; Zurück zur Karte</a></p>
 </div>
 
 </main>
+
+<script>
+// Punkte unter einer Wischreihe: einer je Karte, der sichtbare gruen.
+// Am Rechner blendet das CSS sie aus.
+function wischPunkte(reihe) {
+  if (!reihe || reihe.nextElementSibling?.classList.contains("punkte")) return;
+  const karten = [...reihe.children];
+  const punkte = document.createElement("div");
+  punkte.className = "punkte";
+  punkte.setAttribute("aria-hidden", "true");
+  karten.forEach(() => punkte.appendChild(document.createElement("i")));
+  reihe.after(punkte);
+
+  const aktualisiere = () => {
+    const mitte = reihe.scrollLeft + reihe.clientWidth / 2;
+    let beste = 0, abstand = Infinity;
+    karten.forEach((k, i) => {
+      const d = Math.abs(k.offsetLeft + k.offsetWidth / 2 - mitte);
+      if (d < abstand) { abstand = d; beste = i; }
+    });
+    // Ganz am Ende steht die letzte Karte nicht mittig - trotzdem sie
+    if (reihe.scrollLeft + reihe.clientWidth >= reihe.scrollWidth - 4)
+      beste = karten.length - 1;
+    [...punkte.children].forEach((p, i) =>
+      p.classList.toggle("an", i === beste));
+  };
+  reihe.addEventListener("scroll", aktualisiere, { passive: true });
+  aktualisiere();
+}
+document.querySelectorAll(".wisch").forEach(wischPunkte);
+</script>
 
 <script>
 // Ein echtes Rechenbeispiel aus den Daten von heute.
@@ -376,46 +671,56 @@ fetch("daten.json").then(a => a.json()).then(d => {
     <tr><td>${titel}<br><span class="klein">${erklaerung}</span></td>
         <td class="z"><b>${komma(wert)}</b></td></tr>`;
 
+  // Punkte und Faktoren stehen am Rechner nebeneinander, die
+  // Rechnung darunter als Reihe von Kacheln.
   el.innerHTML = `
-    <p><b>${name}</b> &middot; ${zelle.titel}</p>
+    <p class="art"><b>${name}</b> &middot; ${zelle.titel}</p>
 
-    <p class="klein">Zuerst die Wetterpunkte. Jede Größe bringt
-    Punkte, wenn sie in dem Bereich liegt, in dem diese Art
-    besonders oft gefunden wurde:</p>
+    <div class="spalten wisch">
+      <div>
+        <p class="klein">Zuerst die Wetterpunkte. Jede Größe bringt
+        Punkte, wenn sie in dem Bereich liegt, in dem diese Art
+        besonders oft gefunden wurde:</p>
 
-    <table>
-      ${punktzeilen}
-      <tr><td><b>Wetterpunkte</b></td>
-          <td class="z"><b>${t.wetter} von 100</b></td></tr>
-    </table>
+        <table>
+          ${punktzeilen}
+          <tr><td><b>Wetterpunkte</b></td>
+              <td class="z"><b>${t.wetter} von 100</b></td></tr>
+        </table>
+      </div>
 
-    <p class="klein">Diese Punkte werden dann mit drei Faktoren
-    verrechnet. Jeder liegt zwischen 0 und 1 und kann den Wert nur
-    senken – ein fehlender Faktor lässt sich nicht durch einen
-    anderen ausgleichen:</p>
+      <div>
+        <p class="klein">Diese Punkte werden dann mit drei Faktoren
+        verrechnet. Jeder liegt zwischen 0 und 1 und kann den Wert nur
+        senken – ein fehlender Faktor lässt sich nicht durch einen
+        anderen ausgleichen:</p>
 
-    <table>
-      ${faktor("Jahreszeit", t.saison,
-               "wie gut der Monat zu dieser Art passt")}
-      ${faktor("Bäume", t.bestand,
-               zelle.bestand || "Bestand unbekannt")}
-      ${faktor("Boden", t.boden,
-               zelle.boden
-                 ? ("pH " + komma(zelle.boden.ph) + ", Ton "
-                    + komma(zelle.boden.ton) + " %")
-                 : "keine Bodendaten")}
-    </table>
+        <table>
+          ${faktor("Jahreszeit", t.saison,
+                   "wie gut der Monat zu dieser Art passt")}
+          ${faktor("Bäume", t.bestand,
+                   zelle.bestand || "Bestand unbekannt")}
+          ${faktor("Boden", t.boden,
+                   zelle.boden
+                     ? ("pH " + komma(zelle.boden.ph) + ", Ton "
+                        + komma(zelle.boden.ton) + " %")
+                     : "keine Bodendaten")}
+        </table>
+      </div>
+    </div>
 
     <div class="rechnung">
-      ${t.wetter} &times; ${komma(t.saison)} &times;
-      ${komma(t.bestand)} &times; ${komma(t.boden)}
-      = <b>${zelle.scores[besteArt][0]}</b>
+      <span>${t.wetter}</span> &times; <span>${komma(t.saison)}</span>
+      &times; <span>${komma(t.bestand)}</span> &times;
+      <span>${komma(t.boden)}</span>
+      = <span class="ende">${zelle.scores[besteArt][0]}</span>
     </div>
 
     <p class="klein">Das ist der höchste Wert, den diese Art heute in
     der ganzen Region erreicht. Er sagt: Hier passt gerade am meisten
     zusammen – nicht, dass dort ein Pilz steht.</p>
   `;
+  wischPunkte(el.querySelector(".wisch"));
 }).catch(() => {
   const el = document.getElementById("beispiel");
   if (el) el.innerHTML = '<p class="klein">Beispiel konnte nicht '
@@ -456,6 +761,48 @@ fetch("daten.json").then(a => a.json()).then(d => {
   const el = document.querySelector(".datenstand-oben");
   if (el) el.remove();
 });
+</script>
+
+<script>
+// Sprungleiste: den Chip des Abschnitts markieren, der gerade oben
+// im Bild steht, und ihn in der Leiste sichtbar halten.
+(() => {
+  const chips = [...document.querySelectorAll(".sprung a")];
+  const leiste = document.querySelector(".sprung .breite");
+  const abschnitte = chips
+    .map(a => document.querySelector(a.getAttribute("href")))
+    .filter(Boolean);
+  if (!abschnitte.length || !("IntersectionObserver" in window)) return;
+
+  const markiere = id => {
+    chips.forEach(a => {
+      const an = a.getAttribute("href") === "#" + id;
+      a.classList.toggle("an", an);
+      // Nur die Leiste waagerecht schieben, nicht die Seite
+      if (an) leiste.scrollTo({ left: a.offsetLeft - 18,
+                                behavior: "smooth" });
+    });
+  };
+
+  const sichtbar = new Set();
+  const beobachter = new IntersectionObserver(eintraege => {
+    eintraege.forEach(e => e.isIntersecting
+      ? sichtbar.add(e.target) : sichtbar.delete(e.target));
+    const oberster = abschnitte.find(s => sichtbar.has(s));
+    if (oberster) markiere(oberster.id);
+    else if (window.scrollY < 200)
+      chips.forEach(a => a.classList.remove("an"));
+  }, { rootMargin: "-60px 0px -55% 0px" });
+  abschnitte.forEach(s => beobachter.observe(s));
+
+  // Der letzte Abschnitt ist kurz und erreicht am Rechner nie den
+  // oberen Bildrand - ganz unten gilt deshalb er.
+  addEventListener("scroll", () => {
+    const unten = innerHeight + scrollY
+               >= document.documentElement.scrollHeight - 4;
+    if (unten) markiere(abschnitte[abschnitte.length - 1].id);
+  }, { passive: true });
+})();
 </script>
 
 <script>
