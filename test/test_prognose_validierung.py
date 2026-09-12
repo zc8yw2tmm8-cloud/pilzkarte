@@ -28,6 +28,26 @@ class PrognosePruefung(unittest.TestCase):
     def test_vollstaendig_und_nullwerte(self):
         self.assertEqual([], self.pruefe(self.zeilen))
 
+    def test_nachholen_nur_fehlende_orte_und_kleine_pakete(self):
+        with patch.object(p, "hole_buendel", side_effect=lambda orte, *a, **kw:
+                          [self.daily] * len(orte)) as holen, patch.object(p.time, "sleep"):
+            zeilen, rest = p.fehlende_nachholen(self.orte[:23], self.start, self.ende)
+        self.assertEqual([10, 10, 3], [len(c.args[0]) for c in holen.call_args_list])
+        self.assertEqual([], rest)
+        self.assertEqual(23 * 7, len(zeilen))
+        self.assertEqual(23 * 7, len({(z['ort'], z['datum']) for z in zeilen}))
+
+    def test_teilantwort_wird_vor_wiederholung_nicht_uebernommen(self):
+        kaputt = {**self.daily, p.FELDER[0]: [None] * 7}
+        zeilen, rest = p.paket_auswerten(self.orte[:2], [self.daily, kaputt],
+                                       self.start, self.ende)
+        self.assertEqual(7, len(zeilen))
+        self.assertEqual(self.orte[1:2], rest)
+        with patch.object(p, "hole_buendel", return_value=None), patch.object(p.time, "sleep"):
+            neu, rest = p.fehlende_nachholen(rest, self.start, self.ende)
+        self.assertEqual([], neu)
+        self.assertEqual(self.orte[1:2], rest)
+
     def test_toleranz_und_aufrunden(self):
         with patch.object(p, "MINDEST_ANTEIL", 0.98):
             self.assertEqual([], self.pruefe(self.zeilen[14:]))

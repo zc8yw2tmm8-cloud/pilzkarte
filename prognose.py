@@ -52,7 +52,7 @@ def lade_punkte():
 bremse = threading.Event()
 
 
-def hole_buendel(orte, start, ende):
+def hole_buendel(orte, start, ende, versuche=4, timeout=120):
     """Mehrere Orte in einer Anfrage. None bei Misserfolg."""
     import requests
 
@@ -65,16 +65,22 @@ def hole_buendel(orte, start, ende):
         "timezone": "Europe/Berlin",
     }
 
-    for versuch in range(4):
+    def melde(grund, versuch):
+        print(f"Prognosepaket ({len(orte)} Orte, ab {orte[0][0]}): "
+              f"Versuch {versuch + 1}/{versuche}: {grund}", flush=True)
+
+    for versuch in range(versuche):
         while bremse.is_set():
             time.sleep(1)
         try:
-            antwort = requests.get(url, params=parameter, timeout=120)
-        except Exception:
+            antwort = requests.get(url, params=parameter, timeout=timeout)
+        except requests.RequestException as e:
+            melde(type(e).__name__, versuch)
             time.sleep(2 * (versuch + 1))
             continue
 
         if antwort.status_code == 429:
+            melde("HTTP 429 (Abruflimit)", versuch)
             if not bremse.is_set():
                 bremse.set()
                 time.sleep(20)
@@ -82,24 +88,55 @@ def hole_buendel(orte, start, ende):
             time.sleep(4 * (versuch + 1))
             continue
         if antwort.status_code != 200:
+            melde(f"HTTP {antwort.status_code}", versuch)
             time.sleep(2 * (versuch + 1))
             continue
 
         try:
             daten = antwort.json()
         except Exception:
+            melde("Antwort ist kein gueltiges JSON", versuch)
             time.sleep(2)
             continue
 
         if isinstance(daten, dict):
             daten = [daten]
         if not isinstance(daten, list) or len(daten) != len(orte):
-            return None
+            melde("Falsche Anzahl von Orten in der Antwort", versuch)
+            time.sleep(2 * (versuch + 1))
+            continue
 
         return [d.get("daily") if isinstance(d, dict) else None
                 for d in daten]
 
     return None
+
+
+def paket_auswerten(paket, ergebnis, start, ende):
+    zeilen, fehlend = [], []
+    if ergebnis is None or len(ergebnis) != len(paket):
+        return zeilen, list(paket)
+    for ort, daten in zip(paket, ergebnis):
+        try:
+            neu = tageszeilen(ort, daten)
+            if fehlt_etwas(neu, [ort], start, ende):
+                raise ValueError("Ort nicht vollstaendig")
+            zeilen.extend(neu)
+        except (ValueError, TypeError):
+            fehlend.append(ort)
+    return zeilen, fehlend
+
+
+def fehlende_nachholen(orte, start, ende):
+    zeilen, fehlend = [], []
+    for i in range(0, len(orte), 10):
+        paket = orte[i:i + 10]
+        time.sleep(1)
+        daten = hole_buendel(paket, start, ende, versuche=2, timeout=40)
+        neu, fehlt = paket_auswerten(paket, daten, start, ende)
+        zeilen.extend(neu)
+        fehlend.extend(fehlt)
+    return zeilen, fehlend
 
 
 def buendel_moeglich(orte, start, ende):
@@ -222,6 +259,7 @@ def main():
               if gebuendelt else [[o] for o in orte])
 
     zeilen = []
+    fehlorte = []
     fehler = 0
     sperre = threading.Lock()
     beginn = time.time()
@@ -235,17 +273,10 @@ def main():
             time.sleep(PAUSE)
             with sperre:
                 erledigt[0] += 1
-                if ergebnis is None:
-                    fehler += len(paket)
-                else:
-                    for (name, lat, lon), d in zip(paket, ergebnis):
-                        if not d:
-                            fehler += 1
-                            continue
-                        try:
-                            zeilen.extend(tageszeilen((name, lat, lon), d))
-                        except ValueError:
-                            fehler += 1
+                neu, fehlt = paket_auswerten(paket, ergebnis, start, ende)
+                zeilen.extend(neu)
+                fehlorte.extend(fehlt)
+                fehler += len(fehlt)
 
 
                 if erledigt[0] % 20 == 0 or erledigt[0] == len(pakete):
@@ -255,6 +286,18 @@ def main():
                     print(f"  {erledigt[0]} von {len(pakete)} Anfragen, "
                           f"{len(zeilen)} Werte, {fehler} Fehler, "
                           f"noch ~{rest/60:.0f} min", flush=True)
+
+    if fehlorte:
+        print(f"Gezielt {len(fehlorte)} fehlende Orte in kleineren Paketen nachholen.",
+              flush=True)
+        # Bei grossflaechigem Ausfall keinen unbeschraenkten zweiten Abruf starten.
+        if len(fehlorte) <= 160:
+            neu, rest = fehlende_nachholen(fehlorte, start, ende)
+            zeilen.extend(neu)
+            fehler = len(rest)
+            print(f"Nach Wiederholung noch {fehler} Orte ohne vollstaendige Daten.", flush=True)
+        else:
+            print("Mehr als 160 Orte betroffen; kein weiterer Abruf in diesem Lauf.", flush=True)
 
     if not zeilen:
         print("Keine Prognosewerte erhalten - alte Datei bleibt stehen.",
@@ -267,9 +310,8 @@ def main():
               flush=True)
         for m in maengel:
             print(f"  {m}", flush=True)
-        print("\nBesser eine Vorhersage von gestern als eine mit\n"
-              "Loechern: Fehlende Zellen werden auf der Karte wie\n"
-              "schlechte Bedingungen gezeichnet.", flush=True)
+        print("Die erforderliche Abdeckung von 98 % ist nicht erreicht. "
+              "Die bisherige gepruefte Datei bleibt erhalten.", flush=True)
         sys.exit(1)
 
     schreibe(zeilen)

@@ -511,6 +511,11 @@
   #karte { position: absolute; inset: 0; z-index: 1; }
   #karte[hidden], #liste[hidden] { display: none; }
 
+  .maplibregl-popup { touch-action: pan-y; }
+  .blickrichtung { width: 36px; height: 64px; pointer-events: none; }
+  .blickrichtung span { display: block; margin: 0 auto; width: 0; height: 0;
+    border-left: 13px solid transparent; border-right: 13px solid transparent;
+    border-bottom: 28px solid #148de5; filter: drop-shadow(0 0 2px white); }
   .maplibregl-popup-content {
     background: var(--flaeche); color: var(--text);
     border-radius: 8px; padding: 12px 14px;
@@ -722,6 +727,7 @@ try {
 
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="interaktion.js"></script>
 <script src="konto_konfig.js" onerror="window.OHNE_KONTO=true"></script>
 <script>
 // ---- Farbskala, gleiche Werte wie in farben.py (dunkel) -------------
@@ -868,7 +874,7 @@ function zeigePopup(ort, inhalt) {
   // sichtbar wird
   setTimeout(() => {
     const kasten = offenesPopup && offenesPopup.getElement();
-    if (!kasten) return;
+    if (!kasten || kasten.dataset.beruehrt) return;
     const r = kasten.getBoundingClientRect();
     const c = karte.getContainer().getBoundingClientRect();
     // Die Raender, die von schwebenden Elementen belegt sind, zaehlen
@@ -2045,40 +2051,12 @@ fetch("daten.json")
     const orten = new maplibregl.GeolocateControl({
       positionOptions: { enableHighAccuracy: true, timeout: 12000 },
       trackUserLocation: true,
-      showUserLocation: true,
-      // Blickrichtung als Kegel, wie in den Karten-Apps. Braucht
-      // den Kompass des Geraets - am Rechner passiert nichts,
-      // auf dem Telefon fragt iOS beim ersten Mal um Erlaubnis.
-      showUserHeading: true
+      showUserLocation: true
     });
     karte.addControl(orten);
-
-    // Blickrichtung braucht den Kompass, und iOS gibt ihn erst nach
-    // ausdruecklicher Erlaubnis frei. Die laesst sich nur aus einer
-    // echten Nutzerhandlung heraus erfragen - deshalb beim ersten
-    // Druck auf den Standortknopf.
-    let sensorGefragt = false;
-    const sensorErlauben = () => {
-      if (sensorGefragt) return;
-      sensorGefragt = true;
-
-      const D0 = window.DeviceOrientationEvent;
-      if (D0 && typeof D0.requestPermission === "function") {
-        D0.requestPermission().then(antwort => {
-          if (antwort !== "granted") {
-            melde("Ohne Zugriff auf den Kompass zeigt die Karte "
-                  + "keine Blickrichtung.", 6000);
-          }
-        }).catch(() => {});
-      }
-    };
-
-    // Der Knopf entsteht erst, wenn die Steuerung eingehaengt ist
-    setTimeout(() => {
-      const b = document.querySelector(
-        ".maplibregl-ctrl-geolocate");
-      if (b) b.addEventListener("click", sensorErlauben);
-    }, 300);
+    blickrichtungEinrichten(karte, orten, melde);
+    const gestenAufheben = popupGestenTrennen(karte.getContainer(), karte);
+    karte.on("remove", gestenAufheben);
 
     orten.on("geolocate", e => {
       meinOrt = [e.coords.longitude, e.coords.latitude];

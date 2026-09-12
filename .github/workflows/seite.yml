@@ -58,11 +58,14 @@ jobs:
       - name: Hochladen
         uses: actions/upload-pages-artifact@v3
         with:
+          name: github-pages-${{ github.run_attempt }}
           path: web
 
       - name: Veroeffentlichen
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
 
     environment:
       name: github-pages
