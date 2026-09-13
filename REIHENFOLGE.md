@@ -1,90 +1,113 @@
 # Reihenfolge zum Ausführen
 
-Alle Dateien gehören in `C:\Users\Julia\pilzkarte` — neben `waldpunkte.csv`.
+Alle Befehle im Ordner `C:\Users\Julia\pilzkarte`.
 
-## Einmalig, in dieser Reihenfolge
+## Läuft von selbst (GitHub Actions)
 
-| # | Befehl | Dauer | Erzeugt |
-|---|---|---|---|
-| 1 | `python test_felder.py` | 2 s | nichts — prüft nur, ob die neuen Wetterfelder liefern |
-| 2 | `python hoehen.py` | 30 s | `hoehen.csv` |
-| 3 | `python hintergrund.py` | ~2 min | `hintergrund.csv` (ca. 30 MB) |
-| 4 | `python funde_arten.py` | ~5 min | `funde_arten.csv`, `aufwand.csv` |
-| 5 | `python funde_wetter2.py` | 10–20 min | `funde_wetter2.csv` |
-| 6 | `python kalibrieren.py` | 1–2 min | `kalibrierung.txt` |
-
-**Schritt 1 ist Pflicht.** Wenn dort ein Feld fehlt, brechen 3, 5 und 6 ab.
-
-## Historie neu aufbauen (Spalten haben sich geändert)
-
-`wetter_historie.csv` und `wetter_prognose.csv` **löschen**, dann:
-
-| # | Befehl | Dauer |
+| Workflow | Wann | Was |
 |---|---|---|
-| 7 | `python nachfuellen.py` | ~5 min (90 Tage, ein Aufruf pro Punkt) |
-| 8 | `python sammeln.py` | ~5 min |
-| 9 | `python prognose.py` | ~5 min |
-| 10 | `python karte.py` | 10 s |
+| `taeglich.yml` | 4 × täglich, kurz nach den ICON-D2-Läufen | `sammeln.py` (Vortag), `prognose.py` (6 Tage voraus), sonntags früh zusätzlich `nachfuellen.py` |
+| `seite.yml` | nach jedem erfolgreichen Sammellauf | `daten_export.py`, `web_bilder.py`, dann Veröffentlichung |
 
-## Täglich (Aufgabenplanung)
+Die Messwerte landen in Monatsdateien unter `wetter_historie/`, die
+Vorhersage in `wetter_prognose.csv`. `prognose.py` ersetzt die Datei
+nur, wenn mindestens 98 % der Orte vollständig geliefert wurden.
 
-`python taeglich.py` — ruft `sammeln.py` und `prognose.py` auf.
+Lokal läuft täglich nichts. `taeglich.py` ist nur noch ein Rückfall —
+nicht parallel zur Cloud laufen lassen, sonst gibt es Konflikte beim
+`git pull`.
+
+## Grundlagen neu erzeugen
+
+Nur nötig, wenn sich Gebiet oder Raster ändern:
+
+| # | Befehl | Erzeugt |
+|---|---|---|
+| 1 | `python waldraster.py` | `waldpunkte.csv` |
+| 2 | `python hoehen.py` | `hoehen.csv` |
+| 3 | `python ortsnamen.py` | `ortsnamen.csv` |
+| 4 | `python schutzgebiete.py` | `schutzgebiete.geojson` |
+| 5 | `python baumarten.py` | `baumarten.csv` (Thünen-Kacheln) |
+| 6 | `python bodendaten.py` | `bodendaten.csv` (SoilGrids) |
+| 7 | `python hintergrund.py` | `hintergrund.csv` (Vergleichstage) |
+| 8 | `python nachfuellen.py` | Wetterhistorie, setzt fort |
+
+Danach `python pruefe_orte.py` — prüft, ob alle Daten am richtigen
+Ort hängen.
+
+## Kalibrierung
+
+| # | Befehl | Erzeugt |
+|---|---|---|
+| 1 | `python funde_arten.py` | `funde_arten.csv`, `aufwand.csv` |
+| 2 | `python aufwand_orte.py`, `python aufwand_tage.py` | Meldeorte und -tage als Maßstab |
+| 3 | `python funde_wetter2.py` | `funde_wetter2.csv` |
+| 4 | `python kalibrieren.py` | `kalibrierung.txt` |
+| 5 | `python saison_uebernehmen.py` | Saisonfaktoren in `arten.py` |
+| 6 | `python baumarten_kalibrieren.py` | `baumarten_gewichte.txt` |
+| 7 | `python gewichte_uebernehmen.py` | Baumartengewichte in `arten.py` |
+
+Beide Kalibrierungen schreiben ins `kalibrierung_protokoll.md`, damit
+nachvollziehbar bleibt, aus welchen Daten die Zahlen stammen.
+iNaturalist-Funde kommen mit `funde_inaturalist.py` und
+`funde_zusammenfuegen.py` vor Schritt 3 dazu.
+
+## Bildebenen der Website
+
+| Ebene | Befehle | Ergebnis |
+|---|---|---|
+| Wald und Baumarten | `waldebenen.py`, dann `web_wald.py` | `web/wald/`, `web/wald.json` |
+| Relief | `dgm_holen.py`, `relief.py`, dann `relief_web.py` | `web/relief/`, `web/relief.json` |
+
+Beide Ebenen werden **nicht** in der Cloud erzeugt und müssen nach
+einer Änderung eingecheckt werden.
+
+## Örtliche Karten
+
+```
+python karte.py
+```
+
+Ergebnis: `karte_<art>.html` für alle elf Arten. **Achtung:** Bei
+veralteten Wetterdaten holt `karte.py` selbst den neuen Stand per
+`git pull --rebase --autostash`.
+
+## Prüfen
+
+| Befehl | prüft |
+|---|---|
+| `python pruefe_code.py` | fehlende Namen, Startschutz, Dateinamen — nach jedem Herunterladen |
+| `python pruefe_stand.py` | ob alle Dateien den neuesten Stand haben |
+| `python pruefe_orte.py` | Kennung und Koordinate aller Begleitdaten |
+| `python pruefe_raster.py` | ob die Punkte auf einem einheitlichen Gitter liegen |
+| `python herkunft.py` | was gemessen und was geschätzt ist |
+
+Tests: siehe `README.md`.
 
 ---
 
 # Was die Dateien tun
 
-**kennwerte.py** — gemeinsames Modul. Rechnet aus einer Tagesreihe alle
-Kenngrößen. Wird von Karte, Fundauswertung und Kalibrierung benutzt, damit
-alle drei garantiert dasselbe rechnen. Nicht direkt ausführen.
-
-**arten.py** — die fünf Pilzarten mit ihren Schwellenwerten, Saisonfaktoren
-und Waldtyp-Gewichten. **Das ist die Datei zum Nachjustieren.** Neue Art =
+**arten.py** — die elf Pilzarten mit Schwellenwerten, Saisonfaktoren
+und Baumartengewichten. **Die Datei zum Nachjustieren.** Neue Art =
 neuer Eintrag, kein Eingriff in den Rest.
 
-**test_felder.py** — prüft die neuen Open-Meteo-Felder.
+**kennwerte.py** — rechnet aus einer Tagesreihe alle Kenngrößen. Wird
+von Karte, Export, Fundauswertung und Kalibrierung benutzt, damit alle
+garantiert dasselbe rechnen. Nicht direkt ausführen.
 
-**hoehen.py** — Höhenlage für alle Waldpunkte, 11 API-Aufrufe.
+**historie.py** — liest und schreibt die Monatsdateien der
+Wetterhistorie. Nicht direkt ausführen.
 
-**hintergrund.py** — der wichtigste neue Baustein. Holt für 100 Waldpunkte
-die komplette Tagesreihe seit 2019. Das ist die Referenz: ohne sie sagt
-"Funde bei 31 % Bodenfeuchte" nichts.
+**hintergrund.py** — die komplette Tagesreihe seit 2019 für
+Vergleichspunkte. Ohne sie sagt „Funde bei 31 % Bodenfeuchte" nichts.
 
-**funde_arten.py** — Funde für alle fünf Arten von GBIF, plus die monatliche
-Zahl *aller* Pilzmeldungen als Aufwandskorrektur.
+**kalibrieren.py** — rechnet das Auswahlverhältnis: Fundanteil
+geteilt durch Anteil an Meldetagen, getrennt je Monatsgruppe.
+Verhältnis 1,0 = kein Signal.
 
-**funde_wetter2.py** — ordnet jedem Fund die Wetterlage davor zu, inklusive
-tiefer Bodenschichten, Verdunstung und 60-Tage-Bilanz.
+**karte.py** — örtliche Karten und Ladefunktionen für
+`daten_export.py`. Beide müssen zusammenpassen.
 
-**kalibrieren.py** — rechnet das Auswahlverhältnis: Fundanteil geteilt durch
-Hintergrundanteil, getrennt je Monatsgruppe. Verhältnis 1,0 = kein Signal.
-Liefert außerdem den Saisonfaktor zum Einsetzen in `arten.py`.
-
-**karte.py** — oben `ART = "steinpilz"` ändern für andere Arten. Ergebnis:
-`karte_steinpilz.html` usw.
-
----
-
-# Was am Score neu ist
-
-- **Timing-Regel gestrichen.** Traf nur auf 15,7 % der echten Funde zu.
-- **Bodentemperatur-Fenster 9–16 °C** statt 12–19 °C. Ein Viertel aller
-  Funde lag unter 10,3 °C.
-- **Saisonfaktor.** Ein kühler, nasser Juli ergibt jetzt nicht mehr
-  90 Punkte für Steinpilz. Stärke einstellbar über `SAISON_STAERKE`
-  in `arten.py`.
-- **Waldtyp-Faktor.** Wirkt, sobald `waldtypen.csv` gefüllt ist.
-- **Wasserbilanz** (Regen minus Verdunstung) über 14 und 60 Tage.
-  Ein Trockensommer dämpft jetzt bis in den Herbst.
-- **Tiefe Bodenschicht 7–28 cm** wird gesammelt und angezeigt. Ob sie
-  trennschärfer ist als 0–7 cm, sagt dir die Kalibrierung.
-- **Höhenlage** wird mitgeführt — wichtig, weil ein Drittel der
-  Fundmeldungen aus dem Harz kommt.
-
-# Was noch offen ist
-
-Die Werte für Regen und Lufttemperatur in `arten.py` sind noch geschätzt.
-Ersetze sie durch die Bereiche, in denen `kalibrierung.txt` ein
-Verhältnis über etwa 1,15 zeigt. Die vier Arten außer Steinpilz sind
-komplett geschätzt — auch dafür liefert die Kalibrierung Zahlen, sofern
-genug Funde zusammenkommen.
+**konfig.py** — gemeinsame Einstellungen, **noch nirgends
+eingebunden** (siehe `TODO.md`).

@@ -1,5 +1,11 @@
 # Stufe 1: Der tägliche Lauf in die Cloud
 
+> **Erledigt.** Diese Anleitung beschreibt die Ersteinrichtung im
+> August 2026 und bleibt nur zum Nachschlagen stehen. Heute läuft der
+> Abruf viermal täglich (`.github/workflows/taeglich.yml`), danach
+> baut `seite.yml` die Website neu. Den aktuellen Ablauf beschreibt
+> `REIHENFOLGE.md`.
+
 Danach sammelt die Pilzkarte selbstständig weiter, auch wenn dein
 Laptop aus ist. Rechne mit **einem bis zwei Abenden**.
 
@@ -114,8 +120,8 @@ Nach zwei bis fünf Minuten sollte ein grüner Haken stehen. Bei einem
 roten Kreuz: auf den Lauf klicken, die Ausgabe kopieren und mir
 schicken.
 
-Ab dann läuft es jeden Morgen um sechs Uhr UTC von selbst — acht Uhr
-im Sommer, sieben im Winter.
+Ab dann läuft es von selbst — inzwischen viermal täglich, kurz nach
+den ICON-D2-Läufen des DWD.
 
 ---
 
@@ -138,7 +144,8 @@ python karte.py
 ```
 
 Das erste holt die neuen Wetterdaten aus der Cloud, das zweite baut
-die Karte. In Stufe 2 entfällt auch das — dann steht die Karte im Netz.
+die örtliche Karte. Für die Website ist das nicht mehr nötig — sie
+wird nach jedem Abruf in der Cloud neu gebaut.
 
 ---
 
