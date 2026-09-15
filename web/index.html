@@ -500,6 +500,18 @@
   .baumfarbe { display: inline-block; width: 11px; height: 11px;
     flex: 0 0 11px; border-radius: 50%; border: 1px solid #fff;
     box-shadow: 0 0 0 1px #263040; vertical-align: middle; margin-right: 6px; }
+  /* Naturschutzgebiete: Musterfeld im Schalter und Hinweis im Fenster */
+  .schutzfarbe { display: inline-block; width: 10px; height: 10px;
+    border: 2px dashed #ef5350; background: rgba(239,83,80,.18);
+    border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+  body.hell .schutzfarbe { border-color: #c62828; background: rgba(198,40,40,.14); }
+  .schutzhinweis { margin: 0 0 8px; padding: 7px 9px; font-size: 12px;
+    line-height: 1.4; border-left: 3px solid #ef5350; border-radius: 4px;
+    background: rgba(239,83,80,.12); }
+  .schutzhinweis b { display: block; }
+  .schutzhinweis a { color: inherit; text-decoration: underline; }
+  body.hell .schutzhinweis { border-left-color: #c62828;
+    background: rgba(198,40,40,.08); }
   #baumlegende { position: absolute; bottom: calc(120px + env(safe-area-inset-bottom)); left: 10px; z-index: 6;
     max-width: min(430px, calc(100% - 70px));
     display: flex; flex-wrap: wrap; gap: 7px 13px; padding: 9px 12px;
@@ -701,6 +713,15 @@ try {
         <button class="tag" data-stil="aus">nur Karte</button>
         <button class="tag" data-schalter="funde">&#9679; Funde</button>
         <button class="tag" data-schalter="nah" hidden>nur 1 km</button>
+      </div>
+    </div>
+
+    <div class="zeile">
+      <span class="marke">Schutz</span>
+      <div class="tagleiste">
+        <button class="tag aktiv" data-schalter="schutz" aria-pressed="true"
+                title="Naturschutzgebiete ein- oder ausblenden"><span
+                class="schutzfarbe" aria-hidden="true"></span>Naturschutzgebiete</button>
       </div>
     </div>
 
@@ -1361,7 +1382,7 @@ function blattZu() {
   if (el) el.hidden = true;
 }
 
-function popupInhalt(z, klickOrt) {
+function popupInhalt(z, klickOrt, schutz = "") {
   const wert = z.scores[art][tag];
   const k = z.kenn;
 
@@ -1383,6 +1404,7 @@ function popupInhalt(z, klickOrt) {
   return `<div class="pop">
     <div class="titel">${z.titel}</div>
     <div class="lage">${lage.join(" · ")}</div>
+    ${schutz}
     <div class="score">${D.arten[art].name}
       <b>${scoreText(wert)}</b>${scoreGueltig(wert) ? '<span class="max">/100</span>' : ""}</div>
     ${tag === 0 ? trendZeile(z) : ""}
@@ -1486,6 +1508,161 @@ function aktualisiereFunde() {
   }
   const b = document.querySelector("[data-schalter=nah]");
   if (b) b.hidden = !meinOrt;
+}
+
+// ---- Naturschutzgebiete ---------------------------------------------
+// Rot umrandet: Naturschutzgebiete und Kernzonen, in denen Sammeln in
+// der Regel verboten ist. Erzeugt von schutzgebiete.py - Niedersachsen
+// amtlich vom NLWKN, Sachsen-Anhalt aus OpenStreetMap. Ob im einzelnen
+// Gebiet wirklich ein Sammelverbot gilt, steht in dessen Verordnung;
+// der Hinweis im Fenster verlinkt sie, prueft sie aber nicht.
+const SCHUTZ_FARBE = { dunkel: "#ef5350", hell: "#c62828" };
+const SCHUTZ_EBENEN = ["schutz_flaeche", "schutz_schraffur", "schutz_rand",
+                       "schutz_linie"];
+
+// Schraede Striche als Muster. Die Scorefarben reichen selbst bis ins
+// Rot - ueber einer roten Zelle waere eine rote Tönung allein nicht zu
+// erkennen, die dunkle Schraffur dagegen auf jedem Untergrund.
+function schraffurBild() {
+  const n = 10;
+  const leinwand = document.createElement("canvas");
+  leinwand.width = leinwand.height = n;
+  const g = leinwand.getContext("2d");
+  g.strokeStyle = "rgba(20,8,10,.5)";
+  g.lineWidth = 1.6;
+  g.beginPath();
+  // Drei Striche, damit das Muster an den Kachelraendern nahtlos ist
+  [[0, n, n, 0], [-n, n, n, -n], [0, 2 * n, 2 * n, 0]].forEach(
+    ([x1, y1, x2, y2]) => { g.moveTo(x1, y1); g.lineTo(x2, y2); });
+  g.stroke();
+  return g.getImageData(0, 0, n, n);
+}
+
+function textSicher(wert) {
+  return String(wert ?? "").replace(/[&<>"']/g, z => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[z]);
+}
+
+function schutzAn() {
+  const b = document.querySelector("[data-schalter=schutz]");
+  return !!b && b.classList.contains("aktiv");
+}
+
+function schutzFarbe() {
+  return document.body.classList.contains("hell")
+    ? SCHUTZ_FARBE.hell : SCHUTZ_FARBE.dunkel;
+}
+
+// Laeuft auch, wenn die Ebenen noch nicht da sind - dann greift die
+// Wahl beim Anlegen in schutzEinbinden
+function schutzZeigen() {
+  const sicht = schutzAn() ? "visible" : "none";
+  SCHUTZ_EBENEN.forEach(e => {
+    if (karte && karte.getLayer(e)) {
+      karte.setLayoutProperty(e, "visibility", sicht);
+    }
+  });
+}
+
+function schutzFaerben() {
+  if (!karte || !karte.getLayer("schutz_flaeche")) return;
+  karte.setPaintProperty("schutz_flaeche", "fill-color", schutzFarbe());
+  karte.setPaintProperty("schutz_linie", "line-color", schutzFarbe());
+}
+
+// Hinweiskasten fuer die angetippte Stelle, leer ausserhalb eines
+// Gebiets oder bei ausgeschalteter Ebene
+function schutzHinweis(punkt) {
+  if (!schutzAn() || !karte.getLayer("schutz_flaeche")) return "";
+  const gesehen = new Set();
+  return karte.queryRenderedFeatures(punkt, { layers: ["schutz_flaeche"] })
+    .map(f => f.properties)
+    .filter(p => {
+      const k = p.name + "|" + p.kennung;
+      if (gesehen.has(k)) return false;
+      gesehen.add(k);
+      return true;
+    })
+    .map(p => {
+      const titel = p.name && p.name !== p.art
+        ? `${textSicher(p.art)} &bdquo;${textSicher(p.name)}&ldquo;`
+        : textSicher(p.art);
+      const url = /^https:\/\//.test(p.url || "") ? p.url : "";
+      const quelle = url
+        ? `<a href="${textSicher(url)}" target="_blank" rel="noopener">Verordnung prüfen &#8599;</a>`
+        : (p.land === "ST"
+            ? "Verordnung beim Landesverwaltungsamt Sachsen-Anhalt prüfen."
+            : "Verordnung prüfen.");
+      return `<div class="schutzhinweis"><b>${titel}</b>
+        In der Regel Wegegebot und Sammelverbot. ${quelle}</div>`;
+    }).join("");
+}
+
+function schutzEinbinden(daten) {
+  if (!daten || !Array.isArray(daten.features) || !karte
+      || karte.getSource("schutz")) return;
+
+  karte.addSource("schutz", {
+    type: "geojson", data: daten,
+    attribution: "Naturschutzgebiete: NLWKN, " +
+      '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>'
+  });
+  if (!karte.hasImage("schraffur")) karte.addImage("schraffur", schraffurBild());
+  const sicht = schutzAn() ? "visible" : "none";
+  const unterSchrift = karte.getLayer("beschriftung") ? "beschriftung" : undefined;
+  const unterFunden = karte.getLayer("funde_buendel") ? "funde_buendel" : undefined;
+  const breite = ["interpolate", ["linear"], ["zoom"], 9, 1.2, 14, 2.5];
+
+  // Toenung und Schraffur ueber den Scorefarben, aber unter Strassen
+  // und Ortsnamen
+  karte.addLayer({
+    id: "schutz_flaeche", type: "fill", source: "schutz",
+    layout: { visibility: sicht },
+    paint: { "fill-color": schutzFarbe(), "fill-opacity": 0.18 }
+  }, unterSchrift);
+  karte.addLayer({
+    id: "schutz_schraffur", type: "fill", source: "schutz",
+    layout: { visibility: sicht },
+    paint: { "fill-pattern": "schraffur", "fill-opacity": 0.8 }
+  }, unterSchrift);
+  // Die Grenze ueber allem ausser den Funden - Wald- und Reliefbilder
+  // haengen sich vor "beschriftung" ein und wuerden sie sonst verdecken.
+  // Ein dunkler Rand darunter haelt die rote Strichlinie auch auf
+  // roten Zellen sichtbar.
+  karte.addLayer({
+    id: "schutz_rand", type: "line", source: "schutz",
+    layout: { visibility: sicht },
+    paint: {
+      "line-color": "rgba(15,8,10,.6)",
+      "line-width": ["interpolate", ["linear"], ["zoom"], 9, 2.8, 14, 4.5]
+    }
+  }, unterFunden);
+  karte.addLayer({
+    id: "schutz_linie", type: "line", source: "schutz",
+    layout: { visibility: sicht },
+    paint: {
+      "line-color": schutzFarbe(),
+      "line-width": breite,
+      "line-dasharray": [3, 2]
+    }
+  }, unterFunden);
+
+  // Nur fuer Stellen ohne Zelle - sonst zeigt das Zellfenster den
+  // Hinweis mit an
+  karte.on("click", "schutz_flaeche", e => {
+    const drueber = karte.queryRenderedFeatures(e.point, {
+      layers: ["flaechen", "funde", "funde_buendel", "eigene",
+               "fremde_funde", "routen"].filter(l => karte.getLayer(l))
+    });
+    if (drueber.length) return;
+    if (offenesPopup) {
+      offenesPopup.remove();
+      return;
+    }
+    const hinweis = schutzHinweis(e.point);
+    if (hinweis) zeigePopup(e.lngLat, `<div class="pop">${hinweis}</div>`);
+  });
 }
 
 // ---- Reliefebenen ---------------------------------------------------
@@ -1998,6 +2175,10 @@ fetch("daten.json")
         } else if (was === "nah") {
           nurNah = an;
           aktualisiereFunde();
+        } else if (was === "schutz") {
+          b.setAttribute("aria-pressed", String(an));
+          schutzZeigen();
+          if (typeof merkeEinstellungen === "function") merkeEinstellungen();
         }
       });
 
@@ -2286,7 +2467,7 @@ fetch("daten.json")
         // Die Navigation soll zur angetippten Stelle fuehren, nicht
         // zur Zellmitte - bei 2 km Kantenlaenge sind das bis zu
         // 1,4 km Unterschied.
-        zeigePopup(e.lngLat, popupInhalt(z, e.lngLat));
+        zeigePopup(e.lngLat, popupInhalt(z, e.lngLat, schutzHinweis(e.point)));
       });
       karte.on("mouseenter", "flaechen",
         () => karte.getCanvas().style.cursor = "pointer");
@@ -2337,6 +2518,21 @@ fetch("daten.json")
       fetch("relief.json", {cache: "no-cache"})
         .then(r => r.ok ? r.json() : [])
         .then(r => { relief = r; reliefEinbinden(); })
+        .catch(() => {});
+
+      // Naturschutzgebiete. Wer sie ausgeschaltet hatte, bekommt sie
+      // auch ohne Anmeldung ausgeschaltet zurueck - stelleWiederHer
+      // in konto.js laeuft nur mit Konto.
+      if (START.schutz === false) {
+        const sb = document.querySelector("[data-schalter=schutz]");
+        if (sb) {
+          sb.classList.remove("aktiv");
+          sb.setAttribute("aria-pressed", "false");
+        }
+      }
+      fetch("schutzgebiete.json")
+        .then(r => r.ok ? r.json() : null)
+        .then(schutzEinbinden)
         .catch(() => {});
 
       // Gespeicherte Werte anwenden, bevor das erste Bild steht

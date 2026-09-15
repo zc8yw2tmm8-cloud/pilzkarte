@@ -774,7 +774,8 @@ function sammleEinstellungen() {
     relief: gewaehlt("relief"),
     deckkraft: regler("deckregler"),
     funde: an("funde"),
-    routen: an("routen")
+    routen: an("routen"),
+    schutz: an("schutz")
   };
 }
 
@@ -868,6 +869,13 @@ function stelleWiederHer(e, versuch) {
     const b = document.querySelector(`[data-schalter=${w}]`);
     if (b && !!e[w] !== b.classList.contains("aktiv")) b.click();
   });
+  // Schutzgebiete sind von Haus aus an. Aeltere gespeicherte
+  // Einstellungen kennen den Schalter noch nicht - fehlt er, bleibt
+  // die Ebene an.
+  const schutz = document.querySelector("[data-schalter=schutz]");
+  if (schutz && (e.schutz !== false) !== schutz.classList.contains("aktiv")) {
+    schutz.click();
+  }
 
   einstellungenBereit = true;
 }
@@ -939,6 +947,9 @@ async function setzeAnsicht(neuHell, speichern) {
       }
     });
   }
+
+  // Schutzgebiete: dunkleres Rot auf der hellen Karte
+  if (typeof schutzFaerben === "function") schutzFaerben();
 
   // Das Symbol bleibt ein Symbol - vorher wurde es hier durch das
   // Wort "hell" oder "dunkel" ersetzt, und der runde Knopf sah

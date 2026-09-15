@@ -26,7 +26,7 @@ Nur nötig, wenn sich Gebiet oder Raster ändern:
 | 1 | `python waldraster.py` | `waldpunkte.csv` |
 | 2 | `python hoehen.py` | `hoehen.csv` |
 | 3 | `python ortsnamen.py` | `ortsnamen.csv` |
-| 4 | `python schutzgebiete.py` | `schutzgebiete.geojson` |
+| 4 | `python schutzgebiete.py` | `web/schutzgebiete.json` (eingecheckt, nur bei Bedarf neu) |
 | 5 | `python baumarten.py` | `baumarten.csv` (Thünen-Kacheln) |
 | 6 | `python bodendaten.py` | `bodendaten.csv` (SoilGrids) |
 | 7 | `python hintergrund.py` | `hintergrund.csv` (Vergleichstage) |

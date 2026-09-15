@@ -10,12 +10,13 @@ rechts oben den Tag und die Schutzgebiete.
 
 Braucht: wetter_historie.csv, waldpunkte.csv
 Optional: wetter_prognose.csv, waldtypen.csv, hoehen.csv,
-          schutzgebiete.geojson
+          web/schutzgebiete.json (aus schutzgebiete.py)
 """
 import csv
 import os
 import time
 import json
+import html
 import folium
 from datetime import date, timedelta
 from collections import defaultdict
@@ -112,7 +113,7 @@ RELIEF_WEB_INDEX = os.path.join("web", "relief.json")
 RELIEF_GRENZEN_DATEI = "relief_grenzen.csv"
 RELIEF_ALT = "relief_grenzen.txt"
 RELIEF_WEIT = "relief_weit_grenzen.txt"
-SCHUTZ_DATEI = "schutzgebiete.geojson"
+SCHUTZ_DATEI = os.path.join("web", "schutzgebiete.json")
 INDEX = "index.html"
 
 TAG_NAMEN = {0: "Heute", 1: "Morgen", 2: "Uebermorgen"}
@@ -1159,29 +1160,31 @@ def schutzgebiete(karte):
         return
     with open(SCHUTZ_DATEI, "r", encoding="utf-8") as f:
         sg = json.load(f)
+    if not sg["features"]:
+        return
 
-    for stufe, farbwert, titel, an in [
-        ("streng", THEMA["schutz_streng"],
-         "Naturschutzgebiete (Sammeln verboten)", True),
-        ("mild", THEMA["schutz_mild"],
-         "Landschaftsschutz / Natura 2000", False),
-    ]:
-        teil = {"type": "FeatureCollection",
-                "features": [x for x in sg["features"]
-                             if x["properties"]["stufe"] == stufe]}
-        if not teil["features"]:
-            continue
-
-        gruppe = folium.FeatureGroup(name=titel, show=an)
+    # Nur Naturschutzgebiete und Kernzonen - erzeugt von
+    # schutzgebiete.py, dieselbe Datei wie in der Webkarte. Ueber die
+    # Ebenenauswahl an- und abwaehlbar.
+    c = THEMA["schutz_streng"]
+    gruppe = folium.FeatureGroup(
+        name="Naturschutzgebiete (Sammeln in der Regel verboten)", show=True)
+    for x in sg["features"]:
+        p = x["properties"]
+        name = html.escape(p["name"])
+        link = (f'<br><a href="{html.escape(p["url"])}" target="_blank" '
+                f'rel="noopener">Verordnung</a>' if p.get("url") else "")
         folium.GeoJson(
-            teil,
-            style_function=lambda x, c=farbwert: {
+            x,
+            style_function=lambda _, c=c: {
                 "fillColor": c, "color": c, "weight": 2,
                 "fillOpacity": 0.15, "dashArray": "5,5"},
-            tooltip=folium.GeoJsonTooltip(fields=["name"],
-                                          aliases=["Schutzgebiet:"]),
+            tooltip=name,
+            popup=folium.Popup(
+                f"<b>{name}</b><br>{html.escape(p['art'])} &ndash; in der "
+                f"Regel Wegegebot und Sammelverbot.{link}", max_width=260),
         ).add_to(gruppe)
-        gruppe.add_to(karte)
+    gruppe.add_to(karte)
 
 
 def legende(karte, art, schnitt_heute):

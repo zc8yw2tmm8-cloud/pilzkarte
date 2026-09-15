@@ -210,15 +210,22 @@ Offen:
   Boden und Bäume reicht das nicht — dort stehen noch Schätzwerte.
   `saison_weit.py` liegt bereit.
 
-### Schutzgebiete — zurückgestellt bis zur Deutschlandkarte
+### Schutzgebiete — was noch fehlt
 
-`schutzgebiete.geojson` (OpenStreetMap) ist in den örtlichen Karten
-drin, online nicht. Gezeigt werden sollen nur einzeln belegte
-Sammelverbote, keine pauschale Einstufung jedes Naturschutzgebiets.
-Ausgesparte Flächen und zusammengesetzte Grenzen müssen erhalten
-bleiben — der jetzige OSM-Import ignoriert Innenringe. Quellen:
-Geodatendienst Niedersachsen mit Verordnungslinks, BfN-WFS für
-Deutschland.
+Seit 16. September auf Website und örtlicher Karte:
+`web/schutzgebiete.json` aus `schutzgebiete.py`, alle
+Naturschutzgebiete und Droemling-Kernzonen, ein- und ausblendbar, mit
+Link zur Verordnung. Niedersachsen amtlich vom NLWKN, Sachsen-Anhalt
+aus OpenStreetMap, Ringe und Löcher korrekt zusammengesetzt.
+
+Offen:
+- **Verordnungen einzeln prüfen.** Heute steht überall „in der Regel
+  Wegegebot und Sammelverbot – Verordnung prüfen“. Gebiete mit
+  bestätigtem Verbot könnten kräftiger, andere blasser erscheinen.
+- **Sachsen-Anhalt amtlich** statt OSM, spätestens mit der
+  Deutschlandkarte (BfN-WFS oder Landesdienst).
+- Die Datei entsteht nicht im täglichen Bau — ab und zu von Hand neu
+  holen.
 
 ### Reviere und eigene Zahlen
 

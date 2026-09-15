@@ -19,10 +19,12 @@ Sie sagt auch nicht, ob an einer Stelle etwas steht — nur, ob die
 Bedingungen dort gerade zu einer Art passen. Die Auflösung von 2 km
 beantwortet „wohin fahre ich", nicht „wo genau".
 
-Naturschutzgebiete sind in den örtlichen Karten eingezeichnet, auf der
-Website noch nicht. Die Angaben stammen aus OpenStreetMap und sind
-nicht rechtsverbindlich. Auf der Website sollen später nur einzeln
-belegte Sammelverbote erscheinen.
+Naturschutzgebiete sind auf der Website und in den örtlichen Karten
+rot eingezeichnet und lassen sich ein- und ausblenden. Niedersachsen
+kommt amtlich vom NLWKN, der Sachsen-Anhalt-Teil aus OpenStreetMap.
+Dort gilt in der Regel ein Wegegebot und Sammelverbot; maßgeblich ist
+die Verordnung des Gebiets, die beim Antippen verlinkt ist. Die
+Angaben sind nicht rechtsverbindlich.
 
 ## Wie die Zahlen zustande kommen
 
