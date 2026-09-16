@@ -1,0 +1,35 @@
+name: Wetterpakete vergleichen
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wetter-paketvergleich
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Diagnosepakete installieren
+        run: pip install 'requests>=2.31'
+      - name: Offline-Tests
+        run: python -B -m unittest test.test_wetter_paketvergleich
+      - name: Gleiche Orte mit 10 und 40 je Paket vergleichen
+        run: timeout 330s python -u wetter_paketvergleich.py
+      - name: Diagnoseergebnisse sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wetter-paketvergleich-${{ github.run_id }}
+          path: diagnose_ergebnis/
+          retention-days: 14
+          if-no-files-found: warn
