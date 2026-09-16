@@ -22,7 +22,7 @@ jobs:
       - name: Diagnosepakete installieren
         run: pip install 'requests>=2.31'
       - name: Offline-Tests
-        run: python -B -m unittest test.test_wetter_paketvergleich
+        run: python -B -m unittest discover -s test -p test_wetter_paketvergleich.py
       - name: Gleiche Orte mit 10 und 40 je Paket vergleichen
         run: timeout 330s python -u wetter_paketvergleich.py
       - name: Diagnoseergebnisse sichern
@@ -33,3 +33,4 @@ jobs:
           path: diagnose_ergebnis/
           retention-days: 14
           if-no-files-found: warn
+
