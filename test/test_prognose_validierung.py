@@ -86,7 +86,6 @@ class PrognosePruefung(unittest.TestCase):
             with patch.object(p, 'DATEI', str(ziel)), \
                  patch.object(p, 'lade_punkte', return_value=self.orte[:1]), \
                  patch.object(p, 'buendel_moeglich', return_value=False), \
-                 patch.object(p, 'PAUSE', 0), \
                  contextlib.redirect_stdout(io.StringIO()):
                 with patch.object(p, 'hole_buendel', return_value=None):
                     with self.assertRaises(SystemExit) as fehler:

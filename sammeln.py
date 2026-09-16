@@ -2,7 +2,8 @@
 Taeglicher Lauf: holt den Vortag fuer alle Waldpunkte.
 
 Regen und Lufttemperatur aus icon_d2 (2 km),
-Bodenwerte und Verdunstung aus best_match (icon_d2 liefert die nicht).
+Bodenwerte und Verdunstung aus best_match (der Open-Meteo-Zugang
+icon_d2 liefert diese Felder nicht).
 """
 import requests
 import csv
@@ -11,6 +12,7 @@ import time
 import threading
 from datetime import date, timedelta
 from concurrent.futures import ThreadPoolExecutor
+from wetter_abruf import TAKT
 
 import historie
 
@@ -20,7 +22,6 @@ PUNKTE_DATEI = "waldpunkte.csv"
 # hier klappt, wird beim Start geprueft - sonst wird einzeln geholt.
 BUENDEL = 50
 ARBEITER = 4
-PAUSE = 0.1
 
 FELDER = [
     "precipitation_sum",
@@ -41,9 +42,6 @@ def lade_punkte():
         for z in csv.DictReader(f):
             punkte.append((z["id"], float(z["lat"]), float(z["lon"])))
     return punkte
-
-
-bremse = threading.Event()
 
 
 def _werte(d, suffix=""):
@@ -96,30 +94,33 @@ def hole_buendel(orte, tag):
         "timezone": "Europe/Berlin",
     }
 
+    def melde(grund, versuch):
+        print(f"Sammelpaket ({len(orte)} Orte, ab {orte[0][0]}): "
+              f"Versuch {versuch + 1}/4: {grund}", flush=True)
+
     for versuch in range(4):
-        while bremse.is_set():
-            time.sleep(1)
+        if not TAKT.warte(len(orte), modelle=2):
+            return None
         try:
             antwort = requests.get(url, params=parameter, timeout=120)
-        except Exception:
+        except requests.RequestException as e:
+            melde(type(e).__name__, versuch)
             time.sleep(2 * (versuch + 1))
             continue
 
         if antwort.status_code == 429:
-            if not bremse.is_set():
-                bremse.set()
-                time.sleep(20)
-                bremse.clear()
-            time.sleep(4 * (versuch + 1))
+            pause = TAKT.gedrosselt(antwort.headers.get("Retry-After"))
+            melde(f"HTTP 429 (Abruflimit): {pause}", versuch)
             continue
-
         if antwort.status_code != 200:
+            melde(f"HTTP {antwort.status_code}", versuch)
             time.sleep(2 * (versuch + 1))
             continue
 
         try:
             daten = antwort.json()
-        except Exception:
+        except ValueError:
+            melde("Antwort ist kein gueltiges JSON", versuch)
             time.sleep(2)
             continue
 
@@ -127,6 +128,7 @@ def hole_buendel(orte, tag):
         if isinstance(daten, dict):
             daten = [daten]
         if not isinstance(daten, list) or len(daten) != len(orte):
+            melde("Falsche Anzahl von Orten in der Antwort", versuch)
             return None
 
         return [(_werte(d["daily"]) if isinstance(d, dict) and "daily" in d
@@ -157,6 +159,10 @@ def main():
         return
 
     gebuendelt = buendel_moeglich(offen, tag)
+    if TAKT.gestoppt:
+        print("Abruf wegen langer Serversperre beendet; vorhandene Daten bleiben erhalten.", flush=True)
+        sys.exit(1)
+    print("Abrufstart: Zieltakt 300 Orts-/Modelleinheiten je Minute pro Prozess.", flush=True)
     print(f"Mehrere Orte je Anfrage: "
           f"{'ja, ' + str(BUENDEL) + ' auf einmal' if gebuendelt else 'nein'}",
           flush=True)
@@ -172,7 +178,6 @@ def main():
 
     def arbeite(paket):
         ergebnis = hole_buendel(paket, tag)
-        time.sleep(PAUSE)
         return paket, ergebnis
 
     with ThreadPoolExecutor(max_workers=ARBEITER) as pool:
@@ -200,6 +205,9 @@ def main():
                           f"noch ~{rest/60:.0f} min", flush=True)
 
     historie.anhaengen(neue)
+    if TAKT.gestoppt:
+        print("Lange Serversperre: erhaltene Vortagswerte gesichert; Lauf unvollstaendig.", flush=True)
+        sys.exit(1)
 
     print(f"\n{len(neue)} neue Eintraege in {time.time()-beginn:.0f} s.",
           flush=True)
@@ -211,4 +219,5 @@ def main():
             sys.exit(1)
 
 
-main()
+if __name__ == "__main__":
+    main()

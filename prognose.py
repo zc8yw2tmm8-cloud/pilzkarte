@@ -2,7 +2,8 @@
 Holt die Vorhersage fuer 7 Tage. Wird jeden Tag komplett ueberschrieben -
 Nur gepruefte Ergebnisse duerfen die bisherige Datei ersetzen.
 
-Nur best_match: icon_d2 reicht nur zwei Tage und liefert keine Bodenwerte.
+Open-Meteo best_match: Der dortige icon_d2-Zugang reicht nur zwei Tage
+und liefert die hier benoetigten Bodenfelder nicht. DWD-GRIB separat pruefen.
 """
 import csv
 import os
@@ -12,6 +13,7 @@ import threading
 import math
 from datetime import date, timedelta
 from concurrent.futures import ThreadPoolExecutor
+from wetter_abruf import TAKT
 
 DATEI = "wetter_prognose.csv"
 PUNKTE_DATEI = "waldpunkte.csv"
@@ -19,7 +21,6 @@ TAGE_VORAUS = 6
 
 BUENDEL = 40
 ARBEITER = 4
-PAUSE = 0.1
 
 # Wie viele der Punkte mindestens zurueckkommen muessen, damit die
 # alte Datei ersetzt wird. Vorher reichte eine einzige Zeile: Kamen
@@ -49,9 +50,6 @@ def lade_punkte():
     return punkte
 
 
-bremse = threading.Event()
-
-
 def hole_buendel(orte, start, ende, versuche=4, timeout=120):
     """Mehrere Orte in einer Anfrage. None bei Misserfolg."""
     import requests
@@ -70,8 +68,8 @@ def hole_buendel(orte, start, ende, versuche=4, timeout=120):
               f"Versuch {versuch + 1}/{versuche}: {grund}", flush=True)
 
     for versuch in range(versuche):
-        while bremse.is_set():
-            time.sleep(1)
+        if not TAKT.warte(len(orte), modelle=1):
+            return None
         try:
             antwort = requests.get(url, params=parameter, timeout=timeout)
         except requests.RequestException as e:
@@ -80,12 +78,8 @@ def hole_buendel(orte, start, ende, versuche=4, timeout=120):
             continue
 
         if antwort.status_code == 429:
-            melde("HTTP 429 (Abruflimit)", versuch)
-            if not bremse.is_set():
-                bremse.set()
-                time.sleep(20)
-                bremse.clear()
-            time.sleep(4 * (versuch + 1))
+            pause = TAKT.gedrosselt(antwort.headers.get("Retry-After"))
+            melde(f"HTTP 429 (Abruflimit): {pause}", versuch)
             continue
         if antwort.status_code != 200:
             melde(f"HTTP {antwort.status_code}", versuch)
@@ -251,6 +245,10 @@ def main():
     print(f"Prognose {start} bis {ende} fuer {len(orte)} Punkte", flush=True)
 
     gebuendelt = buendel_moeglich(orte, start, ende)
+    if TAKT.gestoppt:
+        print("Abruf wegen langer Serversperre beendet; vorhandene Daten bleiben erhalten.", flush=True)
+        sys.exit(1)
+    print("Abrufstart: Zieltakt 300 Orts-/Modelleinheiten je Minute pro Prozess.", flush=True)
     print(f"Mehrere Orte je Anfrage: "
           f"{'ja, ' + str(BUENDEL) + ' auf einmal' if gebuendelt else 'nein'}",
           flush=True)
@@ -270,7 +268,6 @@ def main():
 
     with ThreadPoolExecutor(max_workers=ARBEITER) as pool:
         for paket, ergebnis in pool.map(arbeite, pakete):
-            time.sleep(PAUSE)
             with sperre:
                 erledigt[0] += 1
                 neu, fehlt = paket_auswerten(paket, ergebnis, start, ende)
@@ -287,6 +284,10 @@ def main():
                           f"{len(zeilen)} Werte, {fehler} Fehler, "
                           f"noch ~{rest/60:.0f} min", flush=True)
 
+    if TAKT.gestoppt:
+        print("Lange Serversperre - alte Prognosedatei bleibt stehen.", flush=True)
+        sys.exit(1)
+
     if fehlorte:
         print(f"Gezielt {len(fehlorte)} fehlende Orte in kleineren Paketen nachholen.",
               flush=True)
@@ -298,6 +299,10 @@ def main():
             print(f"Nach Wiederholung noch {fehler} Orte ohne vollstaendige Daten.", flush=True)
         else:
             print("Mehr als 160 Orte betroffen; kein weiterer Abruf in diesem Lauf.", flush=True)
+
+    if TAKT.gestoppt:
+        print("Lange Serversperre beim Nachholen - alte Prognosedatei bleibt stehen.", flush=True)
+        sys.exit(1)
 
     if not zeilen:
         print("Keine Prognosewerte erhalten - alte Datei bleibt stehen.",
