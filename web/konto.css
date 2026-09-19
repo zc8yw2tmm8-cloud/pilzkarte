@@ -215,4 +215,15 @@ body.hell .reiter #reiterkonto .avatar {
 .kasten-inhalt .fund-plus { color: var(--akzent); }
 .fund-plus span { font-size: 22px; vertical-align: middle; }
 .fund-zeile input, .fund-zeile select { box-sizing: border-box; }
+
+/* Native Datumsfelder bringen in WebKit und Blink eine eigene
+   Mindestbreite aus Datumstext und Kalendersymbol mit. Sie setzt sich
+   gegen width:100% durch, sodass das Feld auf schmalen Telefonen rechts
+   aus dem Kasten ragt. min-width und appearance heben das auf. */
+.kasten-inhalt input[type="date"] {
+  box-sizing: border-box; min-width: 0; max-width: 100%;
+  -webkit-appearance: none; appearance: none; }
+.kasten-inhalt input[type="date"]::-webkit-date-and-time-value {
+  text-align: left; margin: 0; }
+
 .kasten-inhalt button:disabled { opacity: .55; cursor: wait; }
