@@ -227,3 +227,18 @@ body.hell .reiter #reiterkonto .avatar {
   text-align: left; margin: 0; }
 
 .kasten-inhalt button:disabled { opacity: .55; cursor: wait; }
+
+/* Suchgang: gesuchte Arten, Ergebnis und Zustimmung */
+.suche-arten { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.suche-arten .tag { min-height: 36px; }
+.kasten-inhalt .suche-ergebnis { min-width: 0; margin: 12px 0;
+  padding: 6px 12px 8px; border: 1px solid var(--linie); border-radius: 8px; }
+.suche-ergebnis legend { color: var(--leise); font-size: 13px; padding: 0 5px; }
+.suche-ergebnis label, .suche-haken { display: flex; align-items: flex-start;
+  gap: 8px; min-height: 40px; padding-top: 8px; font-size: 14px; }
+.suche-haken { color: var(--leise); font-size: 13px; }
+.kasten-inhalt .suche-ergebnis input, .kasten-inhalt .suche-haken input {
+  width: 20px; height: 20px; margin: 0; flex: 0 0 20px; }
+/* Drei Antworten je Art nebeneinander, auf schmalen Telefonen umbrechend */
+.suche-wahl { display: flex; flex-wrap: wrap; column-gap: 16px; }
+.suche-wahl label { align-items: center; padding-top: 4px; }
